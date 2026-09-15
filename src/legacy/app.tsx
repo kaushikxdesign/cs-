@@ -12347,8 +12347,21 @@ export {
   GoalDetail,
   ManagerDashboard,
   ExecutiveDashboard,
-  AdminPage,
   ConnectorsAdmin,
+  // Admin sub-screens. Seven of these were unreachable in the MVP: they were
+  // wired into AdminPage's if-chain but had no tile in ADMIN_SECTIONS.
+  FieldManagerAdmin,
+  RequiredFieldsAdmin,
+  EmailConfigAdmin,
+  UserManagementAdmin,
+  RolesAdmin,
+  AutomationAdmin,
+  ActionsOverviewAdmin,
+  SignalsAdmin,
+  DriveAdmin,
+  SlaAdmin,
+  AssignmentAdmin,
+  NotificationsAdmin,
   PortalPreview,
   AssistantPanel,
 };

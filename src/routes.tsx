@@ -6,11 +6,12 @@ import { pageTitle } from '@/layout/nav';
 import { EmptyState } from '@/design-system';
 import { FileQuestion } from 'lucide-react';
 import {
-  ActionsPage, AdminPage, AssistantPanel, ConnectorsAdmin, Customer360,
+  ActionsPage, AssistantPanel, ConnectorsAdmin, Customer360,
   DrivePage, ExecutiveDashboard, GoalDetail, HealthPortfolio,
   ManagerDashboard, MyWork, PortalPreview, ProfileSettings,
 } from '@/legacy/app';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
+import { AdminPage } from '@/features/admin/AdminPage';
 import { InboxPage } from '@/features/inbox/InboxPage';
 import { CustomersPage } from '@/features/customers/CustomersPage';
 import { RisksPage } from '@/features/pipeline/RisksPage';
@@ -75,7 +76,7 @@ function ShellRoutes() {
             <Route path="/goals/:goalId" element={<Legacy><GoalDetail /></Legacy>} />
             <Route path="/manager" element={<Legacy><ManagerDashboard /></Legacy>} />
             <Route path="/executive" element={<Legacy><ExecutiveDashboard /></Legacy>} />
-            <Route path="/admin" element={<Legacy><AdminPage /></Legacy>} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/connectors" element={<Legacy><ConnectorsAdmin /></Legacy>} />
             <Route path="*" element={<Legacy><NotFound /></Legacy>} />
           </Routes>

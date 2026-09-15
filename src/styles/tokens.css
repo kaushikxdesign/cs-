@@ -218,6 +218,10 @@
   --shadow-sm: 0 1px 2px 0 rgb(24 24 27 / 0.06), 0 1px 3px 0 rgb(24 24 27 / 0.08);
   --shadow-lg: 0 8px 24px -4px rgb(24 24 27 / 0.12), 0 2px 6px -2px rgb(24 24 27 / 0.06);
 
+  /* ---- Containers ---- */
+  /* Settings forms cap here so label/field pairs stay scannable. */
+  --container-form: 760px;
+
   /* ---- Density ---- */
   --height-control: 32px;
   --height-control-sm: 28px;

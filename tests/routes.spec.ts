@@ -62,3 +62,23 @@ test('the role switcher changes user and lands on that role\'s dashboard', async
   await expect(page).toHaveURL(/#\/manager/);
   await expect(page.locator('nav button[aria-label="Account menu"]')).toContainText('DO');
 });
+
+// Seven admin screens were wired into AdminPage but had no tile, so nothing
+// could open them. Each must now be reachable from the settings subnav.
+const PREVIOUSLY_UNREACHABLE = [
+  ['reqfields', 'Required fields'],
+  ['sla', 'SLA'],
+  ['assignment', 'Assignment'],
+  ['notify', 'Notifications'],
+  ['automation', 'Automation'],
+  ['actionsview', 'Actions overview'],
+  ['drive', 'Drive'],
+];
+
+for (const [section, title] of PREVIOUSLY_UNREACHABLE) {
+  test(`admin section "${title}" is reachable`, async ({ page }) => {
+    await page.goto(`/#/admin?section=${section}`, { waitUntil: 'networkidle' });
+    await expect(page.locator('h1')).toContainText(title);
+    await expect(page.locator('#cx42-error')).toBeHidden();
+  });
+}
