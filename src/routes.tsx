@@ -8,8 +8,9 @@ import { FileQuestion } from 'lucide-react';
 import {
   ActionsPage, AdminPage, AssistantPanel, ConnectorsAdmin, Customer360, CustomersList,
   Dashboard, DrivePage, ExecutiveDashboard, Expansion, GoalDetail, HealthPortfolio,
-  ManagerDashboard, MyWork, PortalPreview, ProfileSettings, Renewals, Risks, TicketsPage,
+  ManagerDashboard, MyWork, PortalPreview, ProfileSettings, Renewals, Risks,
 } from '@/legacy/app';
+import { InboxPage } from '@/features/inbox/InboxPage';
 
 function RedirectToDashboard() {
   const navigate = useNavigate();
@@ -30,43 +31,49 @@ function NotFound() {
 }
 
 /**
- * Screens still come from the legacy module; the shell and the route table no
- * longer do. Each screen drops off this import list as it is rebuilt.
+ * Screens not yet rebuilt still paint their own headers and rely on Tailwind
+ * v3 border defaults, so each is wrapped in .cx-legacy with the page padding
+ * the old shell used to provide. Rebuilt screens render bare and own their
+ * full height — which is what the three-pane inbox needs.
  */
+function Legacy({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="cx-legacy p-6">{children}</div>
+    </div>
+  );
+}
+
 function ShellRoutes() {
   const { pathname } = useLocation();
   return (
     <AppShell assistant={<AssistantPanel />}>
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        {/* Screens not yet rebuilt still paint their own headers and
-            Tailwind v3 classes, so they stay wrapped in .cx-legacy. */}
-        <div className="cx-legacy p-6" data-page={pageTitle(pathname)}>
+      <div className="flex min-h-0 flex-1 flex-col" data-page={pageTitle(pathname)}>
           <Routes>
             <Route path="/" element={<RedirectToDashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/work" element={<MyWork />} />
+            <Route path="/dashboard" element={<Legacy><Dashboard /></Legacy>} />
+            <Route path="/work" element={<Legacy><MyWork /></Legacy>} />
             {/* Registered here for the first time: the MVP defined TicketsPage
                 and linked to /tickets from the queue, but never declared the
                 route, so every ticket row landed on the 404. */}
-            <Route path="/tickets" element={<TicketsPage />} />
-            <Route path="/customers" element={<CustomersList />} />
-            <Route path="/customers/:customerId" element={<Customer360 />} />
-            <Route path="/health" element={<HealthPortfolio />} />
-            <Route path="/renewals" element={<Renewals />} />
-            <Route path="/risks" element={<Risks />} />
-            <Route path="/expansion" element={<Expansion />} />
-            <Route path="/profile" element={<ProfileSettings />} />
-            <Route path="/actions" element={<ActionsPage />} />
-            <Route path="/drive" element={<DrivePage />} />
-            <Route path="/qbrs" element={<DrivePage />} />
-            <Route path="/goals/:goalId" element={<GoalDetail />} />
-            <Route path="/manager" element={<ManagerDashboard />} />
-            <Route path="/executive" element={<ExecutiveDashboard />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/connectors" element={<ConnectorsAdmin />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/tickets" element={<InboxPage />} />
+            <Route path="/customers" element={<Legacy><CustomersList /></Legacy>} />
+            <Route path="/customers/:customerId" element={<Legacy><Customer360 /></Legacy>} />
+            <Route path="/health" element={<Legacy><HealthPortfolio /></Legacy>} />
+            <Route path="/renewals" element={<Legacy><Renewals /></Legacy>} />
+            <Route path="/risks" element={<Legacy><Risks /></Legacy>} />
+            <Route path="/expansion" element={<Legacy><Expansion /></Legacy>} />
+            <Route path="/profile" element={<Legacy><ProfileSettings /></Legacy>} />
+            <Route path="/actions" element={<Legacy><ActionsPage /></Legacy>} />
+            <Route path="/drive" element={<Legacy><DrivePage /></Legacy>} />
+            <Route path="/qbrs" element={<Legacy><DrivePage /></Legacy>} />
+            <Route path="/goals/:goalId" element={<Legacy><GoalDetail /></Legacy>} />
+            <Route path="/manager" element={<Legacy><ManagerDashboard /></Legacy>} />
+            <Route path="/executive" element={<Legacy><ExecutiveDashboard /></Legacy>} />
+            <Route path="/admin" element={<Legacy><AdminPage /></Legacy>} />
+            <Route path="/admin/connectors" element={<Legacy><ConnectorsAdmin /></Legacy>} />
+            <Route path="*" element={<Legacy><NotFound /></Legacy>} />
           </Routes>
-        </div>
       </div>
     </AppShell>
   );

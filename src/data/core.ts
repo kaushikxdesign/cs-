@@ -474,6 +474,9 @@ const CONTACTS = {
 
 // ============================================================
 
+
+function cxHash(s){ let h=0; for(let i=0;i<String(s).length;i++){ h=((h<<5)-h)+String(s).charCodeAt(i); h|=0; } return Math.abs(h); }
+
 export {
   ACTION_TASKS,
   CONNECTORS,
@@ -492,5 +495,6 @@ export {
   TICKETS,
   USERS,
   calcHealth,
+  cxHash,
   genHistory,
 };

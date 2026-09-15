@@ -23,9 +23,16 @@ export default tseslint.config(
     },
   },
   {
-    // The data layer is the bottom of the graph: it may import only from itself.
+    // The data layer is the bottom of the graph. It may import from itself,
+    // but never upward — that is what would reintroduce a load-order cycle.
     files: ['src/data/**/*.ts'],
-    rules: { 'no-restricted-imports': ['error', { patterns: ['@/*', '../*'] }] },
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: ['@/features/*', '@/design-system/*', '@/layout/*', '@/state/*', '@/router*', '@/lib/*', '../*'],
+      }],
+      // Moved verbatim from the MVP; unused callback args are not worth churn.
+      '@typescript-eslint/no-unused-vars': ['warn', { args: 'none' }],
+    },
   },
   {
     files: ['src/**/*.{ts,tsx}'],
