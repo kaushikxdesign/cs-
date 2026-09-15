@@ -7,9 +7,10 @@ import { EmptyState } from '@/design-system';
 import { FileQuestion } from 'lucide-react';
 import {
   ActionsPage, AdminPage, AssistantPanel, ConnectorsAdmin, Customer360,
-  Dashboard, DrivePage, ExecutiveDashboard, GoalDetail, HealthPortfolio,
+  DrivePage, ExecutiveDashboard, GoalDetail, HealthPortfolio,
   ManagerDashboard, MyWork, PortalPreview, ProfileSettings,
 } from '@/legacy/app';
+import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { InboxPage } from '@/features/inbox/InboxPage';
 import { CustomersPage } from '@/features/customers/CustomersPage';
 import { RisksPage } from '@/features/pipeline/RisksPage';
@@ -55,7 +56,7 @@ function ShellRoutes() {
       <div className="flex min-h-0 flex-1 flex-col" data-page={pageTitle(pathname)}>
           <Routes>
             <Route path="/" element={<RedirectToDashboard />} />
-            <Route path="/dashboard" element={<Legacy><Dashboard /></Legacy>} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/work" element={<Legacy><MyWork /></Legacy>} />
             {/* Registered here for the first time: the MVP defined TicketsPage
                 and linked to /tickets from the queue, but never declared the

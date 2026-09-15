@@ -12338,7 +12338,6 @@ export {
   ErrorBoundary,
   // Screens, consumed by src/routes.tsx while they still live here.
   // Each name disappears from this list as its screen is rebuilt.
-  Dashboard,
   MyWork,
   Customer360,
   HealthPortfolio,
