@@ -6,11 +6,15 @@ import { pageTitle } from '@/layout/nav';
 import { EmptyState } from '@/design-system';
 import { FileQuestion } from 'lucide-react';
 import {
-  ActionsPage, AdminPage, AssistantPanel, ConnectorsAdmin, Customer360, CustomersList,
-  Dashboard, DrivePage, ExecutiveDashboard, Expansion, GoalDetail, HealthPortfolio,
-  ManagerDashboard, MyWork, PortalPreview, ProfileSettings, Renewals, Risks,
+  ActionsPage, AdminPage, AssistantPanel, ConnectorsAdmin, Customer360,
+  Dashboard, DrivePage, ExecutiveDashboard, GoalDetail, HealthPortfolio,
+  ManagerDashboard, MyWork, PortalPreview, ProfileSettings,
 } from '@/legacy/app';
 import { InboxPage } from '@/features/inbox/InboxPage';
+import { CustomersPage } from '@/features/customers/CustomersPage';
+import { RisksPage } from '@/features/pipeline/RisksPage';
+import { ExpansionPage } from '@/features/pipeline/ExpansionPage';
+import { RenewalsPage } from '@/features/pipeline/RenewalsPage';
 
 function RedirectToDashboard() {
   const navigate = useNavigate();
@@ -57,12 +61,12 @@ function ShellRoutes() {
                 and linked to /tickets from the queue, but never declared the
                 route, so every ticket row landed on the 404. */}
             <Route path="/tickets" element={<InboxPage />} />
-            <Route path="/customers" element={<Legacy><CustomersList /></Legacy>} />
+            <Route path="/customers" element={<CustomersPage />} />
             <Route path="/customers/:customerId" element={<Legacy><Customer360 /></Legacy>} />
             <Route path="/health" element={<Legacy><HealthPortfolio /></Legacy>} />
-            <Route path="/renewals" element={<Legacy><Renewals /></Legacy>} />
-            <Route path="/risks" element={<Legacy><Risks /></Legacy>} />
-            <Route path="/expansion" element={<Legacy><Expansion /></Legacy>} />
+            <Route path="/renewals" element={<RenewalsPage />} />
+            <Route path="/risks" element={<RisksPage />} />
+            <Route path="/expansion" element={<ExpansionPage />} />
             <Route path="/profile" element={<Legacy><ProfileSettings /></Legacy>} />
             <Route path="/actions" element={<Legacy><ActionsPage /></Legacy>} />
             <Route path="/drive" element={<Legacy><DrivePage /></Legacy>} />

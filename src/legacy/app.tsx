@@ -12340,12 +12340,8 @@ export {
   // Each name disappears from this list as its screen is rebuilt.
   Dashboard,
   MyWork,
-  CustomersList,
   Customer360,
   HealthPortfolio,
-  Renewals,
-  Risks,
-  Expansion,
   ProfileSettings,
   ActionsPage,
   DrivePage,
@@ -12355,6 +12351,5 @@ export {
   AdminPage,
   ConnectorsAdmin,
   PortalPreview,
-  TicketsPage,
   AssistantPanel,
 };
