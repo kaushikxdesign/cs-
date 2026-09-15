@@ -8,10 +8,11 @@ import { FileQuestion } from 'lucide-react';
 import {
   ActionsPage, AssistantPanel, ConnectorsAdmin, Customer360,
   DrivePage, ExecutiveDashboard, GoalDetail, HealthPortfolio,
-  ManagerDashboard, MyWork, PortalPreview, ProfileSettings,
+  ManagerDashboard, PortalPreview, ProfileSettings,
 } from '@/legacy/app';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { AdminPage } from '@/features/admin/AdminPage';
+import { MyWorkPage } from '@/features/work/MyWorkPage';
 import { InboxPage } from '@/features/inbox/InboxPage';
 import { CustomersPage } from '@/features/customers/CustomersPage';
 import { RisksPage } from '@/features/pipeline/RisksPage';
@@ -58,7 +59,7 @@ function ShellRoutes() {
           <Routes>
             <Route path="/" element={<RedirectToDashboard />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/work" element={<Legacy><MyWork /></Legacy>} />
+            <Route path="/work" element={<MyWorkPage />} />
             {/* Registered here for the first time: the MVP defined TicketsPage
                 and linked to /tickets from the queue, but never declared the
                 route, so every ticket row landed on the 404. */}
