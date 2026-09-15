@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import './legacy.css';
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm--line-height);
+    /* cv11 = single-storey a; ss01 = alternate digits. Both make
+       dense UI text read more clearly at small sizes. */
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Metrics and tables must never shift width as digits change. */
+  table, .tabular, [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  ::placeholder {
+    color: var(--text-disabled);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

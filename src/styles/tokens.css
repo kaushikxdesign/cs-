@@ -1,0 +1,230 @@
+/* ============================================================
+   CX42 DESIGN TOKENS
+   Primitives are raw values. Components must reference ONLY
+   semantic tokens, never primitives.
+   ============================================================ */
+
+:root {
+  /* ---- Primitives: gray ---- */
+  --gray-0:   #FFFFFF;
+  --gray-25:  #FCFCFD;
+  --gray-50:  #F7F7F8;
+  --gray-100: #F0F0F2;
+  --gray-200: #E4E4E7;
+  --gray-300: #D4D4D8;
+  --gray-400: #A1A1AA;
+  --gray-500: #71717A;
+  --gray-600: #52525B;
+  --gray-700: #3F3F46;
+  --gray-800: #27272A;
+  --gray-900: #18181B;
+
+  /* ---- Primitives: accent (one hue only, swap here) ---- */
+  --accent-50:  #EEF2FF;
+  --accent-100: #E0E7FF;
+  --accent-500: #4F5BD5;
+  --accent-600: #3F4AC0;
+  --accent-700: #343DA3;
+
+  /* ---- Primitives: status ---- */
+  --green-50:  #ECFDF3;  --green-200: #ABEFC6;  --green-700: #067647;  --green-600: #079455;
+  --amber-50:  #FFFAEB;  --amber-200: #FEDF89;  --amber-700: #B54708;  --amber-600: #DC6803;
+  --red-50:    #FEF3F2;  --red-200:   #FECDCA;  --red-700:   #B42318;  --red-600:   #D92D20;
+  --blue-50:   #EFF8FF;  --blue-200:  #B2DDFF;  --blue-700:  #175CD3;  --blue-600:  #1570EF;
+
+  /* ---- Semantic: surfaces ---- */
+  --bg-canvas:    var(--gray-50);
+  --bg-surface:   var(--gray-0);
+  --bg-subtle:    var(--gray-50);
+  --bg-hover:     var(--gray-100);
+  --bg-selected:  var(--gray-100);
+  --bg-inverse:   var(--gray-900);
+
+  /* ---- Semantic: borders ---- */
+  --border-default: var(--gray-200);
+  --border-strong:  var(--gray-300);
+
+  /* ---- Semantic: text ---- */
+  --text-primary:   var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-tertiary:  var(--gray-500);
+  --text-disabled:  var(--gray-400);
+  --text-on-accent: var(--gray-0);
+  --text-inverse:   var(--gray-0);
+
+  /* ---- Semantic: accent ---- */
+  --accent:        var(--accent-500);
+  --accent-hover:  var(--accent-600);
+  --accent-active: var(--accent-700);
+  --accent-subtle: var(--accent-50);
+  --accent-muted:  var(--accent-100);
+  --accent-text:   var(--accent-700);
+
+  /* ---- Semantic: focus ---- */
+  --focus-ring: var(--accent-500);
+
+  /* ---- Semantic: status quads ---- */
+  --status-success-subtle: var(--green-50);
+  --status-success-border: var(--green-200);
+  --status-success-text:   var(--green-700);
+  --status-success-solid:  var(--green-600);
+
+  --status-warning-subtle: var(--amber-50);
+  --status-warning-border: var(--amber-200);
+  --status-warning-text:   var(--amber-700);
+  --status-warning-solid:  var(--amber-600);
+
+  --status-danger-subtle:  var(--red-50);
+  --status-danger-border:  var(--red-200);
+  --status-danger-text:    var(--red-700);
+  --status-danger-solid:   var(--red-600);
+
+  --status-info-subtle:    var(--blue-50);
+  --status-info-border:    var(--blue-200);
+  --status-info-text:      var(--blue-700);
+  --status-info-solid:     var(--blue-600);
+
+  /* ---- Semantic: charts (muted categorical) ---- */
+  --chart-1: #6366F1;
+  --chart-2: #0EA5E9;
+  --chart-3: #14B8A6;
+  --chart-4: #F59E0B;
+  --chart-5: #A855F7;
+  --chart-6: #64748B;
+}
+
+/* Dark-ready: only semantic tokens are redefined, never primitives. */
+:root:not([data-theme='light']) {
+  @media (prefers-color-scheme: dark) {
+    --bg-canvas:   var(--gray-900);
+    --bg-surface:  var(--gray-800);
+    --bg-subtle:   var(--gray-800);
+    --bg-hover:    var(--gray-700);
+    --bg-selected: var(--gray-700);
+    --bg-inverse:  var(--gray-0);
+
+    --border-default: var(--gray-700);
+    --border-strong:  var(--gray-600);
+
+    --text-primary:   var(--gray-50);
+    --text-secondary: var(--gray-300);
+    --text-tertiary:  var(--gray-400);
+    --text-disabled:  var(--gray-600);
+    --text-inverse:   var(--gray-900);
+
+    --accent-subtle: #1E1B4B;
+    --accent-muted:  #2E2A6B;
+    --accent-text:   var(--accent-100);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg-canvas:   var(--gray-900);
+  --bg-surface:  var(--gray-800);
+  --bg-subtle:   var(--gray-800);
+  --bg-hover:    var(--gray-700);
+  --bg-selected: var(--gray-700);
+  --bg-inverse:  var(--gray-0);
+
+  --border-default: var(--gray-700);
+  --border-strong:  var(--gray-600);
+
+  --text-primary:   var(--gray-50);
+  --text-secondary: var(--gray-300);
+  --text-tertiary:  var(--gray-400);
+  --text-disabled:  var(--gray-600);
+  --text-inverse:   var(--gray-900);
+
+  --accent-subtle: #1E1B4B;
+  --accent-muted:  #2E2A6B;
+  --accent-text:   var(--accent-100);
+}
+
+/* ============================================================
+   Tailwind theme mapping.
+   `inline` makes generated utilities emit var(--token) rather
+   than the resolved value, so the dark overrides above apply.
+   ============================================================ */
+@theme inline {
+  --color-canvas:      var(--bg-canvas);
+  --color-surface:     var(--bg-surface);
+  --color-subtle:      var(--bg-subtle);
+  --color-hover:       var(--bg-hover);
+  --color-selected:    var(--bg-selected);
+  --color-inverse:     var(--bg-inverse);
+
+  --color-border-default: var(--border-default);
+  --color-border-strong:  var(--border-strong);
+
+  --color-primary:     var(--text-primary);
+  --color-secondary:   var(--text-secondary);
+  --color-tertiary:    var(--text-tertiary);
+  --color-disabled:    var(--text-disabled);
+  --color-on-accent:   var(--text-on-accent);
+  --color-text-inverse: var(--text-inverse);
+
+  --color-accent:        var(--accent);
+  --color-accent-hover:  var(--accent-hover);
+  --color-accent-active: var(--accent-active);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-muted:  var(--accent-muted);
+  --color-accent-text:   var(--accent-text);
+
+  --color-success-subtle: var(--status-success-subtle);
+  --color-success-border: var(--status-success-border);
+  --color-success-text:   var(--status-success-text);
+  --color-success-solid:  var(--status-success-solid);
+
+  --color-warning-subtle: var(--status-warning-subtle);
+  --color-warning-border: var(--status-warning-border);
+  --color-warning-text:   var(--status-warning-text);
+  --color-warning-solid:  var(--status-warning-solid);
+
+  --color-danger-subtle:  var(--status-danger-subtle);
+  --color-danger-border:  var(--status-danger-border);
+  --color-danger-text:    var(--status-danger-text);
+  --color-danger-solid:   var(--status-danger-solid);
+
+  --color-info-subtle:    var(--status-info-subtle);
+  --color-info-border:    var(--status-info-border);
+  --color-info-text:      var(--status-info-text);
+  --color-info-solid:     var(--status-info-solid);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+
+  /* ---- Typography ---- */
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --text-caption: 0.75rem;      --text-caption--line-height: 1rem;
+  --text-body-sm: 0.8125rem;    --text-body-sm--line-height: 1.25rem;
+  --text-body: 0.875rem;        --text-body--line-height: 1.375rem;
+  --text-title-sm: 0.9375rem;   --text-title-sm--line-height: 1.375rem;
+  --text-title: 1.125rem;       --text-title--line-height: 1.625rem;
+  --text-display: 1.5rem;       --text-display--line-height: 2rem;
+
+  /* ---- Radii ---- */
+  --radius-sm: 4px;   /* badges, checkboxes */
+  --radius-md: 6px;   /* buttons, inputs, nav items */
+  --radius-lg: 8px;   /* cards, popovers, menus */
+  --radius-xl: 12px;  /* modals, drawers */
+
+  /* ---- Elevation: cards have none ---- */
+  --shadow-sm: 0 1px 2px 0 rgb(24 24 27 / 0.06), 0 1px 3px 0 rgb(24 24 27 / 0.08);
+  --shadow-lg: 0 8px 24px -4px rgb(24 24 27 / 0.12), 0 2px 6px -2px rgb(24 24 27 / 0.06);
+
+  /* ---- Density ---- */
+  --height-control: 32px;
+  --height-control-sm: 28px;
+  --height-row: 40px;
+  --size-icon: 16px;
+
+  /* ---- Motion ---- */
+  --duration-fast: 120ms;
+  --duration-panel: 180ms;
+}
