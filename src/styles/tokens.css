@@ -85,12 +85,12 @@
   --status-info-solid:     var(--blue-600);
 
   /* ---- Semantic: charts (muted categorical) ---- */
-  --chart-1: #6366F1;
-  --chart-2: #0EA5E9;
-  --chart-3: #14B8A6;
-  --chart-4: #F59E0B;
-  --chart-5: #A855F7;
-  --chart-6: #64748B;
+  --chart-1: #5B63C4;
+  --chart-2: #3E8DBE;
+  --chart-3: #429B90;
+  --chart-4: #C0913F;
+  --chart-5: #8A6BAE;
+  --chart-6: #6B7280;
 }
 
 /* Dark-ready: only semantic tokens are redefined, never primitives. */
