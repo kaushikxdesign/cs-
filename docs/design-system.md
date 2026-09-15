@@ -41,8 +41,8 @@ than a resolved colour. That is what lets the dark-mode block override them.
 
 ### Typography
 
-Inter (self-hosted), `font-feature-settings: "cv11", "ss01"`, tabular numerals on
-all metrics and tables. Weights 400, 500, 600 only. **Nothing below 12px.**
+Geist (self-hosted, variable), tabular numerals on all metrics and tables.
+Weights 400, 500, 600 only. **Nothing below 12px.**
 
 | Token | Size / line height | Use |
 |---|---|---|
@@ -109,6 +109,10 @@ outcome of pressing it).
 
 ## Decisions taken where the brief was silent
 
+- **The app is light only.** Dark tokens exist but are opt-in via an explicit
+  `data-theme="dark"`, deliberately not wired to `prefers-color-scheme`: a
+  viewer on a dark OS should still get the light product rather than a
+  half-tuned dark one. `color-scheme: light` keeps native controls in step.
 - **Tailwind v4** over v3, because its CSS-first `@theme` maps directly onto
   CSS-variable tokens. v4 changed the default border colour from `gray-200` to
   `currentColor`; legacy markup relies on the v3 default in 122 places, so

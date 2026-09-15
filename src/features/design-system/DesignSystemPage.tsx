@@ -112,7 +112,7 @@ export function DesignSystemPage() {
               </div>
             </Section>
 
-            <Section title="Typography" description="Inter, weights 400/500/600, tabular numerals. Nothing below 12px.">
+            <Section title="Typography" description="Geist, weights 400/500/600, tabular numerals. Nothing below 12px.">
               <div className="divide-y divide-border-default">
                 {TYPE_SCALE.map((t) => (
                   <div key={t.token} className="flex items-baseline gap-4 py-3">

@@ -5,6 +5,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: light;
+
   /* ---- Primitives: gray ---- */
   --gray-0:   #FFFFFF;
   --gray-25:  #FCFCFD;
@@ -93,31 +95,12 @@
   --chart-6: #6B7280;
 }
 
-/* Dark-ready: only semantic tokens are redefined, never primitives. */
-:root:not([data-theme='light']) {
-  @media (prefers-color-scheme: dark) {
-    --bg-canvas:   var(--gray-900);
-    --bg-surface:  var(--gray-800);
-    --bg-subtle:   var(--gray-800);
-    --bg-hover:    var(--gray-700);
-    --bg-selected: var(--gray-700);
-    --bg-inverse:  var(--gray-0);
-
-    --border-default: var(--gray-700);
-    --border-strong:  var(--gray-600);
-
-    --text-primary:   var(--gray-50);
-    --text-secondary: var(--gray-300);
-    --text-tertiary:  var(--gray-400);
-    --text-disabled:  var(--gray-600);
-    --text-inverse:   var(--gray-900);
-
-    --accent-subtle: #1E1B4B;
-    --accent-muted:  #2E2A6B;
-    --accent-text:   var(--accent-100);
-  }
-}
-
+/*
+ * The app is light. Dark is opt-in only, via an explicit data-theme="dark"
+ * on the root element — deliberately NOT wired to prefers-color-scheme, so a
+ * viewer on a dark OS still gets the light product rather than a half-tuned
+ * dark one.
+ */
 :root[data-theme='dark'] {
   --bg-canvas:   var(--gray-900);
   --bg-surface:  var(--gray-800);
@@ -198,7 +181,7 @@
   --color-chart-6: var(--chart-6);
 
   /* ---- Typography ---- */
-  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --text-caption: 0.75rem;      --text-caption--line-height: 1rem;

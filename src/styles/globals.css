@@ -13,9 +13,8 @@
     font-family: var(--font-sans);
     font-size: var(--text-body-sm);
     line-height: var(--text-body-sm--line-height);
-    /* cv11 = single-storey a; ss01 = alternate digits. Both make
-       dense UI text read more clearly at small sizes. */
-    font-feature-settings: 'cv11', 'ss01';
+    /* Geist needs no stylistic-set overrides; digits are aligned per-element
+       with tabular-nums where they sit in columns. */
     -webkit-font-smoothing: antialiased;
   }
 
