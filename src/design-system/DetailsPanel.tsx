@@ -18,7 +18,7 @@ export function DetailsPanel({
   return (
     <aside
       className={cn(
-        'flex w-80 shrink-0 flex-col border-l border-border-default bg-surface',
+        'flex w-72 shrink-0 flex-col border-l border-border-default bg-surface 2xl:w-80',
         className,
       )}
     >

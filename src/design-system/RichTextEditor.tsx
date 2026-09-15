@@ -16,9 +16,10 @@ const TOOLS: Cmd[] = [
 ];
 
 /**
- * Restyled wrapper around the MVP's contenteditable composer. The editing
- * surface keeps the legacy `.cx-editor` class so its typography rules apply;
- * only the chrome is rebuilt on tokens.
+ * Contenteditable composer. Deliberately does not reuse the legacy
+ * `.cx-editor` class — that stylesheet is deleted with the legacy module, and
+ * its fixed 180px min-height is too tall for a docked composer in a narrow
+ * pane. Typography lives in `.cx-rte` in globals.css instead.
  */
 export function RichTextEditor({
   value,
@@ -26,12 +27,15 @@ export function RichTextEditor({
   placeholder = 'Write a message…',
   footer,
   className,
+  minHeight = 'min-h-20',
 }: {
   value?: string;
   onChange?: (html: string) => void;
   placeholder?: string;
   footer?: React.ReactNode;
   className?: string;
+  /** Tailwind min-height class for the editing surface. */
+  minHeight?: string;
 }) {
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -71,7 +75,7 @@ export function RichTextEditor({
         aria-multiline="true"
         data-placeholder={placeholder}
         onInput={() => onChange?.(ref.current?.innerHTML ?? '')}
-        className="cx-editor px-3 py-2.5 text-body text-primary"
+        className={cn('cx-rte px-3 py-2.5 text-body text-primary outline-none overflow-y-auto', minHeight)}
       />
       {footer && <div className="border-t border-border-default px-3 py-2">{footer}</div>}
     </div>

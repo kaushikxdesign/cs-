@@ -33,7 +33,7 @@ export function TicketList({
   onSearchChange: (v: string) => void;
 }) {
   return (
-    <div className="flex w-96 shrink-0 flex-col border-r border-border-default bg-surface">
+    <div className="flex w-80 shrink-0 flex-col border-r border-border-default bg-surface 2xl:w-96">
       <div className="border-b border-border-default p-3">
         <SearchInput
           value={search}
