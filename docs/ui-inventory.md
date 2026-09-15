@@ -20,6 +20,7 @@ re-platform. Anything that looks broken or pointless is recorded under
 - [Data layer](#data-layer)
 - [Roles and privileges](#roles-and-privileges)
 - [Design primitives and their replacements](#design-primitives-and-their-replacements)
+- [Migration status](#migration-status)
 - [Questions](#questions)
 
 ---
@@ -418,17 +419,37 @@ no auth — `activeUser`/`activeRole` are seeded to Maya/CSM.
 `slate` → `neutral`; `blue`/`purple`/`teal` → `neutral` or `accent` by meaning;
 `green` → `success`; `amber` → `warning`; `red` → `danger`.
 
+## Migration status
+
+| Screen | State | Module |
+|---|---|---|
+| Tickets / inbox | **Rebuilt** — three-pane | `src/features/inbox/` |
+| Customers list | **Rebuilt** — DataTable | `src/features/customers/` |
+| Risks | **Rebuilt** — DataTable + Drawer | `src/features/pipeline/` |
+| Expansion | **Rebuilt** | `src/features/pipeline/` |
+| Renewals | **Rebuilt** | `src/features/pipeline/` |
+| Dashboard | **Rebuilt** — metric/chart cards | `src/features/dashboard/` |
+| Admin | **Rebuilt shell** — settings subnav; section bodies still legacy | `src/features/admin/` |
+| App shell, nav, ⌘K, toasts | **Rebuilt** | `src/layout/` |
+| My Work, Customer 360, Goals, Health, Manager/Exec dashboards, Actions, Drive, Profile, Portal preview | Legacy, running inside the new shell | `src/legacy/app.tsx` |
+
+Legacy screens render inside the new shell wrapped in `.cx-legacy`, which
+restores the Tailwind v3 border default they rely on. Each drops out of
+`src/legacy/app.tsx`'s export list as it is rebuilt; the file and its
+`@ts-nocheck` go with the last one.
+
 ## Questions
 
 Open items found during the audit. Per the brief, nothing here was silently
-deleted. Items 1–3 are behaviour changes already approved before Phase 1.
+deleted. Items 1–3 are behaviour changes that have now been made.
 
 1. **`/tickets` was never registered.** `TicketsPage` (8414) is defined, reads
    `query.ticket` and renders `TicketDetail` — but is referenced nowhere, and the
    route does not exist. `MyWork`'s ticket rows (6951) navigate to
    `/tickets?ticket=<id>`, which falls through to the `*` 404. This looks like a
    forgotten route registration, not a deliberate omission.
-   **Decision: register the route and wire the screen.** Confirm intent.
+   **Done:** the route is registered and now renders the rebuilt inbox.
+   Covered by a test asserting it no longer 404s.
 2. **Seven admin sub-screens are unreachable** — Required fields (13376), SLA
    (10761), Assignment (10914), Notifications (11003), Automation (11629),
    ActionsOverview (12463) and Drive (10650) are fully implemented and wired into
@@ -438,12 +459,15 @@ deleted. Items 1–3 are behaviour changes already approved before Phase 1.
    the grid, not abandoned.
    Consequence: `UPDATE_GATE_CONFIG` and `SET_GATE_FIELD_REQUIRED` have no UI
    path at all, since `RequiredFieldsAdmin` is their only trigger.
-   **Decision: surface all seven in the settings subnav.** Confirm.
+   **Done:** all thirteen admin sections are in the settings subnav and
+   addressable by URL. Each previously unreachable one has a test. This also
+   gives `UPDATE_GATE_CONFIG` and `SET_GATE_FIELD_REQUIRED` a UI path.
 3. **Five routes are in no navigation** — `/health`, `/renewals`, `/manager`,
    `/executive`, `/goals/:goalId` (plus `/qbrs`, a duplicate path to `DrivePage`).
-   **Decision: give them homes in the secondary nav.** Confirm — and confirm
-   whether `/qbrs` should remain a second path to Drive or become its own screen.
-4. **`support` persona is half-built.** `MyWork` (6829–6831) branches on
+   **Done:** `/health` and `/renewals` are Customers views, `/manager` and
+   `/executive` are Dashboard views, and `/goals/:goalId` is reached from My
+   Work. `/qbrs` still renders Drive — see Question 9, which needs your call.
+4. **`support` persona is half-built — still open, preserved as is.** `MyWork` (6829–6831) branches on
    `persona === 'support'` with its own `SUPPORT_TABS`, but `PERSONAS` (7103)
    defines only `csm`, so `SWITCH_PERSONA` can never reach it. Unfinished feature,
    or intentionally dormant? Preserved as-is for now.
@@ -456,11 +480,11 @@ deleted. Items 1–3 are behaviour changes already approved before Phase 1.
 7. **Privileges enforce nothing.** `APP_ROLES`/`PRIVILEGE_GROUPS` is a settings-
    page mock. Should privileges gate real UI, or stay presentational? Staying
    presentational for this rebuild — it is a business-logic change otherwise.
-8. **Health history is randomised per load.** `genHistory` (223) uses
-   `Math.random()` and `new Date()`, so every reload produces different charts.
-   Demo data arguably should be stable; a seeded generator would also make visual
-   parity testing meaningful. Requires a decision because it changes what users
-   see.
+8. **Health history is randomised per load — still open.** `genHistory` uses
+   `Math.random()` and `new Date()`, so every reload produces different charts
+   and the dashboard's health trend differs between sessions. Seeding it would
+   make demo data stable and visual snapshot testing meaningful, but it changes
+   what users see, so it is left alone pending your call.
 9. **`QBRsPage` and `ReportsPage` are dead code.** Both are defined (9430, 9505)
    and referenced nowhere. Meanwhile `/qbrs` and `/drive` both render `DrivePage`
    (9310) — so the QBR route shows the Drive screen while a real QBR page sits

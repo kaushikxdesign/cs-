@@ -8,8 +8,13 @@ import { appReducer } from '@/state/appReducer';
 
 const AppContext = createContext<any>(null);
 
-function AppProvider({ children }: { children: React.ReactNode }) {
-  const initialState = {
+/**
+ * Exported so the reducer can be tested from a known baseline. About twenty
+ * of the 45 actions have no reachable UI path, so unit tests are the only
+ * thing that covers them.
+ */
+export function createInitialState() {
+  return {
     activeRole: 'csm',
     persona: 'csm',
     followedTickets: ['sup1842'],
@@ -39,7 +44,10 @@ function AppProvider({ children }: { children: React.ReactNode }) {
     assistantContext: null,
     lastCreatedGoalId: null,
   };
-  const [state, dispatch] = useReducer(appReducer, initialState);
+}
+
+function AppProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(appReducer, undefined, createInitialState);
   
   // Auto-dismiss toasts
   useEffect(() => {
