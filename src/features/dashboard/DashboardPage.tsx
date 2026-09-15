@@ -88,7 +88,7 @@ export function DashboardPage() {
         title={`Good morning, ${USERS[state.activeUser]?.name?.split(' ')[0] ?? 'there'}`}
         meta={<span>Here's what changed across your portfolio.</span>}
         actions={
-          <Button variant="primary" onClick={() => navigate('/work')}>
+          <Button variant="solid" onClick={() => navigate("/work")}>
             Go to my work
           </Button>
         }

@@ -81,7 +81,7 @@ export function DesignSystemPage() {
       <PageHeader
         title="Design system"
         meta={<span>Every token and component in one place.</span>}
-        actions={<Button variant="primary" icon={<Plus className="size-4" strokeWidth={1.5} />}>Primary action</Button>}
+        actions={<Button variant="solid" icon={<Plus className="size-4" strokeWidth={1.75} />}>Primary action</Button>}
         tabs={
           <Tabs
             value={tab}
@@ -147,10 +147,12 @@ export function DesignSystemPage() {
 
         {tab === 'components' && (
           <>
-            <Section title="Button" description="At most one primary per view.">
+            <Section title="Button" description="One solid action per view. The accent stays reserved for selection and identity.">
               <Row label="Variants">
-                <Button variant="primary">Primary</Button>
+                <Button variant="solid">Solid</Button>
+                <Button variant="primary">Accent</Button>
                 <Button variant="secondary">Secondary</Button>
+                <Button variant="subtle">Subtle</Button>
                 <Button variant="ghost">Ghost</Button>
                 <Button variant="danger">Danger</Button>
               </Row>

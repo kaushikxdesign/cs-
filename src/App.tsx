@@ -4,6 +4,7 @@ import { AppProvider } from '@/state/AppContext';
 import { AppRoutes } from '@/routes';
 import { DesignSystemPage } from '@/features/design-system/DesignSystemPage';
 import { ThemeProvider } from '@/lib/theme';
+import { TooltipProvider } from '@/design-system';
 
 function currentPath() {
   return window.location.hash.slice(1).split('?')[0] || '/dashboard';
@@ -25,7 +26,9 @@ export function App() {
   if (path === '/design-system')
     return (
       <ThemeProvider>
-        <DesignSystemPage />
+        <TooltipProvider>
+          <DesignSystemPage />
+        </TooltipProvider>
       </ThemeProvider>
     );
 

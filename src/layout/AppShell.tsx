@@ -41,31 +41,37 @@ export function AppShell({
   };
 
   // ⌘K, the rail and the secondary nav all read the same nav definition.
-  const commands: CommandItem[] = React.useMemo(
-    () =>
-      ALL_MODULES.flatMap((m) => {
-        const Icon = m.icon;
-        const icon = <Icon className="size-4 text-on-surface-subtle" strokeWidth={1.5} />;
-        const own: CommandItem = {
-          id: m.id,
-          label: m.label,
-          group: 'Navigate',
-          icon,
-          onSelect: () => navigate(m.path),
-        };
-        const views = (m.views ?? [])
-          .filter((v) => v.path !== m.path)
-          .map((v) => ({
-            id: `${m.id}:${v.path}`,
-            label: `${m.label} — ${v.label}`,
-            group: 'Views',
-            icon,
-            onSelect: () => navigate(v.path),
-          }));
-        return [own, ...views];
-      }),
-    [navigate],
-  );
+  // Emitted in group order, not interleaved: the palette prints a header
+  // whenever the group changes, so mixing modules and their views made the
+  // same two headings repeat all the way down the list.
+  const commands: CommandItem[] = React.useMemo(() => {
+    const iconFor = (m: (typeof ALL_MODULES)[number]) => {
+      const Icon = m.icon;
+      return <Icon className="size-4 text-on-surface-subtle" strokeWidth={1.75} />;
+    };
+
+    const modules: CommandItem[] = ALL_MODULES.map((m) => ({
+      id: m.id,
+      label: m.label,
+      group: 'Go to',
+      icon: iconFor(m),
+      onSelect: () => navigate(m.path),
+    }));
+
+    const views: CommandItem[] = ALL_MODULES.flatMap((m) =>
+      (m.views ?? [])
+        .filter((v) => v.path !== m.path)
+        .map((v) => ({
+          id: `${m.id}:${v.path}`,
+          label: `${m.label} — ${v.label}`,
+          group: 'Saved views',
+          icon: iconFor(m),
+          onSelect: () => navigate(v.path),
+        })),
+    );
+
+    return [...modules, ...views];
+  }, [navigate]);
 
   return (
     <TooltipProvider>

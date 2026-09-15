@@ -1,7 +1,8 @@
 import React from 'react';
 import * as RDialog from '@radix-ui/react-dialog';
-import { Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, CornerDownLeft, Search } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { Kbd } from './Badge';
 
 export interface CommandItem {
   id: string;
@@ -63,7 +64,7 @@ export function CommandPalette({
         <RDialog.Overlay className="fixed inset-0 z-40 bg-scrim" />
         <RDialog.Content
           aria-label="Command palette"
-          className="fixed left-1/2 top-24 z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border-default bg-surface shadow-lg"
+          className="fixed left-1/2 top-24 z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border border-border-default bg-surface shadow-lg"
         >
           <RDialog.Title className="sr-only">Command palette</RDialog.Title>
           <div className="flex items-center gap-2 border-b border-border-default px-3">
@@ -74,7 +75,7 @@ export function CommandPalette({
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={onKeyDown}
               placeholder={placeholder}
-              className="h-11 w-full bg-transparent text-body text-on-surface outline-none placeholder:text-on-surface-faint"
+              className="h-12 w-full bg-transparent text-body-lg text-on-surface outline-none placeholder:text-on-surface-faint"
             />
           </div>
           <div className="max-h-80 overflow-y-auto p-1">
@@ -98,17 +99,34 @@ export function CommandPalette({
                       onOpenChange(false);
                     }}
                     className={cn(
-                      'flex h-8 w-full items-center gap-2 rounded-md px-2 text-body-sm',
+                      'flex h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-body-sm',
+                      'transition-colors duration-[120ms]',
                       i === active ? 'bg-hover text-on-surface' : 'text-on-surface-muted',
                     )}
                   >
                     {item.icon}
                     <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
-                    {item.hint && <span className="shrink-0 text-caption text-on-surface-subtle">{item.hint}</span>}
+                    {item.hint && <Kbd className="shrink-0">{item.hint}</Kbd>}
                   </button>
                 </React.Fragment>
               );
             })}
+          </div>
+
+          <div className="flex items-center gap-4 border-t border-border-default px-3 py-2">
+            <span className="flex items-center gap-1.5 text-caption text-on-surface-subtle">
+              <Kbd><ArrowUp className="size-3" strokeWidth={2} /></Kbd>
+              <Kbd><ArrowDown className="size-3" strokeWidth={2} /></Kbd>
+              to navigate
+            </span>
+            <span className="flex items-center gap-1.5 text-caption text-on-surface-subtle">
+              <Kbd><CornerDownLeft className="size-3" strokeWidth={2} /></Kbd>
+              to select
+            </span>
+            <span className="flex items-center gap-1.5 text-caption text-on-surface-subtle">
+              <Kbd>Esc</Kbd>
+              to close
+            </span>
           </div>
         </RDialog.Content>
       </RDialog.Portal>
