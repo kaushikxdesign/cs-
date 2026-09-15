@@ -48,3 +48,17 @@ test('portal preview bypasses the app shell', async ({ page }) => {
   // The shell's primary nav must not render on this route.
   await expect(page.locator('#root')).not.toContainText('CX42 Drive');
 });
+
+test('/tickets resolves — it was declared nowhere in the MVP', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  await expect(page.locator('#root')).not.toContainText('Page not found');
+  await expect(page.locator('#root')).toContainText('SUP1842');
+});
+
+test('the role switcher changes user and lands on that role\'s dashboard', async ({ page }) => {
+  await page.goto('/#/dashboard', { waitUntil: 'networkidle' });
+  await page.locator('button[aria-label="Account menu"]').click();
+  await page.getByRole('menuitem', { name: /Manager/ }).click();
+  await expect(page).toHaveURL(/#\/manager/);
+  await expect(page.locator('nav button[aria-label="Account menu"]')).toContainText('DO');
+});

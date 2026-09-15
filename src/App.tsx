@@ -1,16 +1,16 @@
 import React from 'react';
-import { App as LegacyApp } from './legacy/app';
-import { DesignSystemPage } from './features/design-system/DesignSystemPage';
+import { HashRouter } from '@/router';
+import { AppProvider } from '@/state/AppContext';
+import { AppRoutes } from '@/routes';
+import { DesignSystemPage } from '@/features/design-system/DesignSystemPage';
 
 function currentPath() {
   return window.location.hash.slice(1).split('?')[0] || '/dashboard';
 }
 
 /**
- * The design-system gallery renders outside the app shell so the components
- * can be reviewed without any screen chrome around them. It is intercepted
- * here rather than registered in the legacy route table, which keeps the
- * quarantined module untouched.
+ * The design-system gallery renders outside the shell so components can be
+ * reviewed without screen chrome around them.
  */
 export function App() {
   const [path, setPath] = React.useState(currentPath);
@@ -22,5 +22,12 @@ export function App() {
   }, []);
 
   if (path === '/design-system') return <DesignSystemPage />;
-  return <LegacyApp />;
+
+  return (
+    <AppProvider>
+      <HashRouter>
+        <AppRoutes />
+      </HashRouter>
+    </AppProvider>
+  );
 }

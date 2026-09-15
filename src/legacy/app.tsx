@@ -12444,4 +12444,28 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export { App, ErrorBoundary };
+export {
+  App,
+  ErrorBoundary,
+  // Screens, consumed by src/routes.tsx while they still live here.
+  // Each name disappears from this list as its screen is rebuilt.
+  Dashboard,
+  MyWork,
+  CustomersList,
+  Customer360,
+  HealthPortfolio,
+  Renewals,
+  Risks,
+  Expansion,
+  ProfileSettings,
+  ActionsPage,
+  DrivePage,
+  GoalDetail,
+  ManagerDashboard,
+  ExecutiveDashboard,
+  AdminPage,
+  ConnectorsAdmin,
+  PortalPreview,
+  TicketsPage,
+  AssistantPanel,
+};
