@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { IconButton } from './Button';
 
-const OVERLAY = 'fixed inset-0 z-40 bg-inverse/20';
+const OVERLAY = 'fixed inset-0 z-40 bg-scrim';
 const PANEL = 'z-50 border border-border-default bg-surface shadow-lg';
 
 /** Blocking confirmation or a short focused form. Anything record-shaped belongs in a Drawer. */
@@ -41,9 +41,9 @@ export function Dialog({
         >
           <div className="flex items-start justify-between gap-4 px-5 pt-4">
             <div className="min-w-0">
-              <RDialog.Title className="text-title-sm font-semibold text-primary">{title}</RDialog.Title>
+              <RDialog.Title className="text-title-sm font-semibold text-on-surface">{title}</RDialog.Title>
               {description && (
-                <RDialog.Description className="mt-1 text-body-sm text-tertiary">
+                <RDialog.Description className="mt-1 text-body-sm text-on-surface-subtle">
                   {description}
                 </RDialog.Description>
               )}
@@ -97,11 +97,11 @@ export function Drawer({
         >
           <div className="flex items-start justify-between gap-4 border-b border-border-default px-4 py-3">
             <div className="min-w-0">
-              <RDialog.Title className="text-title-sm font-semibold text-primary truncate">
+              <RDialog.Title className="text-title-sm font-semibold text-on-surface truncate">
                 {title}
               </RDialog.Title>
               {description && (
-                <RDialog.Description className="mt-0.5 text-caption text-tertiary">
+                <RDialog.Description className="mt-0.5 text-caption text-on-surface-subtle">
                   {description}
                 </RDialog.Description>
               )}
@@ -124,20 +124,45 @@ export function Drawer({
   );
 }
 
-export function Tooltip({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
+export function Tooltip({
+  label,
+  children,
+  side = 'right',
+}: {
+  label: React.ReactNode;
+  children: React.ReactNode;
+  side?: 'top' | 'right' | 'bottom' | 'left';
+}) {
   return (
-    <RTooltip.Provider delayDuration={300}>
-      <RTooltip.Root>
-        <RTooltip.Trigger asChild>{children}</RTooltip.Trigger>
-        <RTooltip.Portal>
-          <RTooltip.Content
-            sideOffset={6}
-            className="z-50 rounded-md bg-inverse px-2 py-1 text-caption text-inverse shadow-sm"
-          >
-            {label}
-          </RTooltip.Content>
-        </RTooltip.Portal>
-      </RTooltip.Root>
+    <RTooltip.Root>
+      <RTooltip.Trigger asChild>{children}</RTooltip.Trigger>
+      <RTooltip.Portal>
+        <RTooltip.Content
+          side={side}
+          sideOffset={8}
+          className={cn(
+            'z-50 rounded-md bg-inverted px-2 py-1 shadow-md',
+            'text-caption font-medium text-on-inverse',
+            'select-none',
+          )}
+        >
+          {label}
+          <RTooltip.Arrow className="fill-[var(--inverted)]" width={10} height={5} />
+        </RTooltip.Content>
+      </RTooltip.Portal>
+    </RTooltip.Root>
+  );
+}
+
+/**
+ * One provider at the app root. Radix needs an ancestor provider; mounting
+ * one per tooltip also meant every tooltip ran its own delay timer, so the
+ * usual "hover one, the rest open instantly" grouping never worked.
+ */
+export function TooltipProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <RTooltip.Provider delayDuration={400} skipDelayDuration={300}>
+      {children}
     </RTooltip.Provider>
   );
 }
@@ -203,7 +228,7 @@ export function DropdownMenu({
                 className={cn(
                   'flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-body-sm outline-none',
                   'data-[highlighted]:bg-hover',
-                  item.danger ? 'text-danger-text' : 'text-primary',
+                  item.danger ? 'text-danger-fg' : 'text-on-surface',
                 )}
               >
                 {item.icon}

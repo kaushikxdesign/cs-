@@ -141,12 +141,12 @@ export function DashboardPage() {
                       <li key={r.id} className="flex items-center gap-3 px-4 py-3">
                         <Badge tone={severityTone(r.severity)}>{r.severity}</Badge>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-body-sm font-medium text-primary">
+                          <p className="truncate text-body-sm font-medium text-on-surface">
                             {customersById[r.customerId]?.name}
                           </p>
-                          <p className="truncate text-caption text-tertiary">{r.title}</p>
+                          <p className="truncate text-caption text-on-surface-subtle">{r.title}</p>
                         </div>
-                        <span className="shrink-0 text-body-sm text-secondary tabular-nums">
+                        <span className="shrink-0 text-body-sm text-on-surface-muted tabular-nums">
                           {formatCurrency(r.amountAtRisk)}
                         </span>
                         <Button size="sm" variant="secondary" onClick={() => navigate(`/customers/${r.customerId}`)}>
@@ -198,8 +198,8 @@ export function DashboardPage() {
                     <li key={t.id} className="flex items-start gap-2 px-4 py-2.5">
                       <Avatar name={USERS[t.ownerId]?.name} size="sm" className="mt-0.5" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-body-sm text-primary">{t.title}</p>
-                        {t.dueDate && <p className="mt-0.5 text-caption text-tertiary">Due {formatDate(t.dueDate)}</p>}
+                        <p className="text-body-sm text-on-surface">{t.title}</p>
+                        {t.dueDate && <p className="mt-0.5 text-caption text-on-surface-subtle">Due {formatDate(t.dueDate)}</p>}
                       </div>
                     </li>
                   ))}

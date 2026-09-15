@@ -39,9 +39,9 @@ export function EmptyState({
 }) {
   return (
     <div className={cn('flex flex-col items-center justify-center px-6 py-12 text-center', className)}>
-      {icon && <div className="mb-3 text-tertiary">{icon}</div>}
-      <p className="text-title-sm font-semibold text-primary">{title}</p>
-      {description && <p className="mt-1 max-w-sm text-body-sm text-tertiary">{description}</p>}
+      {icon && <div className="mb-3 text-on-surface-subtle">{icon}</div>}
+      <p className="text-title-sm font-semibold text-on-surface">{title}</p>
+      {description && <p className="mt-1 max-w-sm text-body-sm text-on-surface-subtle">{description}</p>}
       {action && (
         <Button variant="secondary" className="mt-4" onClick={action.onClick}>
           {action.label}

@@ -3,6 +3,7 @@ import { HashRouter } from '@/router';
 import { AppProvider } from '@/state/AppContext';
 import { AppRoutes } from '@/routes';
 import { DesignSystemPage } from '@/features/design-system/DesignSystemPage';
+import { ThemeProvider } from '@/lib/theme';
 
 function currentPath() {
   return window.location.hash.slice(1).split('?')[0] || '/dashboard';
@@ -21,13 +22,20 @@ export function App() {
     return () => window.removeEventListener('hashchange', onChange);
   }, []);
 
-  if (path === '/design-system') return <DesignSystemPage />;
+  if (path === '/design-system')
+    return (
+      <ThemeProvider>
+        <DesignSystemPage />
+      </ThemeProvider>
+    );
 
   return (
+    <ThemeProvider>
     <AppProvider>
       <HashRouter>
         <AppRoutes />
       </HashRouter>
     </AppProvider>
+    </ThemeProvider>
   );
 }

@@ -8,8 +8,8 @@
   }
 
   body {
-    background-color: var(--bg-canvas);
-    color: var(--text-primary);
+    background-color: var(--surface-canvas);
+    color: var(--on-surface);
     font-family: var(--font-sans);
     font-size: var(--text-body-sm);
     line-height: var(--text-body-sm--line-height);
@@ -29,7 +29,7 @@
   }
 
   ::placeholder {
-    color: var(--text-disabled);
+    color: var(--on-surface-faint);
   }
 }
 
@@ -37,7 +37,7 @@
 @layer components {
   .cx-rte:empty::before {
     content: attr(data-placeholder);
-    color: var(--text-disabled);
+    color: var(--on-surface-faint);
     pointer-events: none;
   }
   .cx-rte p { margin: 0 0 0.5rem; }
@@ -47,11 +47,11 @@
     border-left: 3px solid var(--border-strong);
     padding-left: 0.75rem;
     margin: 0 0 0.5rem;
-    color: var(--text-secondary);
+    color: var(--on-surface-muted);
   }
-  .cx-rte a { color: var(--accent-text); text-decoration: underline; }
+  .cx-rte a { color: var(--accent-on-subtle); text-decoration: underline; }
   .cx-rte pre {
-    background: var(--bg-subtle);
+    background: var(--surface-subtle);
     border-radius: var(--radius-md);
     padding: 0.5rem 0.75rem;
     font-family: var(--font-mono);

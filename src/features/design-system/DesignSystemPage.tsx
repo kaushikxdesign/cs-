@@ -17,8 +17,8 @@ function Section({ title, description, children }: { title: string; description?
   return (
     <section className="space-y-3">
       <div>
-        <h2 className="text-title font-semibold text-primary">{title}</h2>
-        {description && <p className="mt-0.5 text-body-sm text-tertiary">{description}</p>}
+        <h2 className="text-title font-semibold text-on-surface">{title}</h2>
+        {description && <p className="mt-0.5 text-body-sm text-on-surface-subtle">{description}</p>}
       </div>
       <Card className="p-4">{children}</Card>
     </section>
@@ -28,7 +28,7 @@ function Section({ title, description, children }: { title: string; description?
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-border-default py-3 last:border-0">
-      <span className="w-32 shrink-0 text-caption text-tertiary">{label}</span>
+      <span className="w-32 shrink-0 text-caption text-on-surface-subtle">{label}</span>
       <div className="flex flex-wrap items-center gap-2">{children}</div>
     </div>
   );
@@ -98,12 +98,12 @@ export function DesignSystemPage() {
               <div className="space-y-4">
                 {SWATCHES.map((g) => (
                   <div key={g.group}>
-                    <p className="mb-2 text-caption font-medium text-tertiary">{g.group}</p>
+                    <p className="mb-2 text-caption font-medium text-on-surface-subtle">{g.group}</p>
                     <div className="flex flex-wrap gap-3">
                       {g.tokens.map((t) => (
                         <div key={t} className="w-36">
                           <div className={`h-10 rounded-md border border-border-default ${t}`} />
-                          <p className="mt-1 text-caption text-tertiary">{t}</p>
+                          <p className="mt-1 text-caption text-on-surface-subtle">{t}</p>
                         </div>
                       ))}
                     </div>
@@ -116,9 +116,9 @@ export function DesignSystemPage() {
               <div className="divide-y divide-border-default">
                 {TYPE_SCALE.map((t) => (
                   <div key={t.token} className="flex items-baseline gap-4 py-3">
-                    <span className="w-20 shrink-0 text-caption text-tertiary">{t.token}</span>
-                    <span className={`flex-1 text-primary ${t.cls}`}>The quick brown fox — 1,234,567</span>
-                    <span className="hidden w-56 shrink-0 text-caption text-tertiary sm:block">{t.use}</span>
+                    <span className="w-20 shrink-0 text-caption text-on-surface-subtle">{t.token}</span>
+                    <span className={`flex-1 text-on-surface ${t.cls}`}>The quick brown fox — 1,234,567</span>
+                    <span className="hidden w-56 shrink-0 text-caption text-on-surface-subtle sm:block">{t.use}</span>
                   </div>
                 ))}
               </div>
@@ -129,16 +129,16 @@ export function DesignSystemPage() {
                 {[['rounded-sm', '4px — badges'], ['rounded-md', '6px — buttons, inputs'], ['rounded-lg', '8px — cards, menus'], ['rounded-xl', '12px — modals, drawers']].map(([cls, label]) => (
                   <div key={cls} className="w-40">
                     <div className={`h-12 border border-border-default bg-subtle ${cls}`} />
-                    <p className="mt-1 text-caption text-tertiary">{label}</p>
+                    <p className="mt-1 text-caption text-on-surface-subtle">{label}</p>
                   </div>
                 ))}
                 <div className="w-40">
                   <div className="h-12 rounded-lg bg-surface shadow-sm" />
-                  <p className="mt-1 text-caption text-tertiary">shadow-sm — popovers</p>
+                  <p className="mt-1 text-caption text-on-surface-subtle">shadow-sm — popovers</p>
                 </div>
                 <div className="w-40">
                   <div className="h-12 rounded-xl bg-surface shadow-lg" />
-                  <p className="mt-1 text-caption text-tertiary">shadow-lg — modals</p>
+                  <p className="mt-1 text-caption text-on-surface-subtle">shadow-lg — modals</p>
                 </div>
               </div>
             </Section>
@@ -232,7 +232,7 @@ export function DesignSystemPage() {
                 <Button onClick={() => setDrawer(true)}>Open drawer</Button>
                 <Button onClick={() => setPalette(true)}>Command palette</Button>
                 <Tooltip label="Tooltips explain icon-only controls"><Button>Hover me</Button></Tooltip>
-                <Popover trigger={<Button>Popover</Button>}><p className="text-body-sm text-secondary">Popover content.</p></Popover>
+                <Popover trigger={<Button>Popover</Button>}><p className="text-body-sm text-on-surface-muted">Popover content.</p></Popover>
                 <DropdownMenu
                   trigger={<Button>Menu</Button>}
                   items={[
@@ -318,9 +318,9 @@ export function DesignSystemPage() {
                 onStepClick={setStep}
               />
               <div className="mt-4 space-y-2">
-                <RuleRow keyword="When"><RuleValue>Health score</RuleValue><span className="text-body-sm text-secondary">drops below</span><RuleValue>60</RuleValue></RuleRow>
-                <RuleRow keyword="If" onRemove={() => {}}><RuleValue>ARR</RuleValue><span className="text-body-sm text-secondary">is over</span><RuleValue>$100K</RuleValue></RuleRow>
-                <RuleRow keyword="Then"><RuleValue>Create task</RuleValue><span className="text-body-sm text-secondary">for the account owner</span></RuleRow>
+                <RuleRow keyword="When"><RuleValue>Health score</RuleValue><span className="text-body-sm text-on-surface-muted">drops below</span><RuleValue>60</RuleValue></RuleRow>
+                <RuleRow keyword="If" onRemove={() => {}}><RuleValue>ARR</RuleValue><span className="text-body-sm text-on-surface-muted">is over</span><RuleValue>$100K</RuleValue></RuleRow>
+                <RuleRow keyword="Then"><RuleValue>Create task</RuleValue><span className="text-body-sm text-on-surface-muted">for the account owner</span></RuleRow>
               </div>
               <StepperFooter
                 left={<Button variant="ghost">Back</Button>}
@@ -376,10 +376,10 @@ export function DesignSystemPage() {
           <KeyValueList items={[{ label: 'Owner', value: 'Maya Chen' }, { label: 'Renewal', value: 'Mar 14, 2026' }]} />
         </PanelSection>
         <PanelSection title="Health">
-          <div className="flex items-center gap-2"><Badge tone="danger" dot>Red — 38</Badge><span className="text-caption text-tertiary">down 12 this month</span></div>
+          <div className="flex items-center gap-2"><Badge tone="danger" dot>Red — 38</Badge><span className="text-caption text-on-surface-subtle">down 12 this month</span></div>
         </PanelSection>
         <PanelSection title="Related" defaultOpen={false}>
-          <p className="text-body-sm text-secondary">3 open risks, 1 expansion opportunity.</p>
+          <p className="text-body-sm text-on-surface-muted">3 open risks, 1 expansion opportunity.</p>
         </PanelSection>
       </Drawer>
 

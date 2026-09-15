@@ -55,8 +55,8 @@ export function ExpansionPage() {
       sortValue: (o) => customersById[o.customerId]?.name ?? '',
       render: (o) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-primary">{customersById[o.customerId]?.name}</p>
-          {o.headline && <p className="truncate text-caption text-tertiary">{o.headline}</p>}
+          <p className="truncate font-medium text-on-surface">{customersById[o.customerId]?.name}</p>
+          {o.headline && <p className="truncate text-caption text-on-surface-subtle">{o.headline}</p>}
         </div>
       ),
     },
@@ -79,7 +79,7 @@ export function ExpansionPage() {
       sortValue: (o) => o.crmOpportunityState,
       render: (o) =>
         o.crmOpportunityState === 'none' ? (
-          <span className="text-tertiary">Not created</span>
+          <span className="text-on-surface-subtle">Not created</span>
         ) : (
           <Badge tone="info">{titleCase(o.crmOpportunityState)}</Badge>
         ),

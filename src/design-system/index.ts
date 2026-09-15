@@ -1,5 +1,5 @@
 export { Button, IconButton, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
-export { Badge, CountBadge, StatusDot, type Tone } from './Badge';
+export { Badge, CountBadge, StatusDot, Kbd, humanize, type Tone } from './Badge';
 export { Avatar, AvatarGroup } from './Avatar';
 export { Card, CardHeader, CardBody, MetricCard, ChartCard, KeyValueList } from './Card';
 export {
@@ -7,7 +7,7 @@ export {
   RadioGroup, SegmentedControl, type SelectOption,
 } from './Form';
 export { Combobox, type ComboboxOption } from './Combobox';
-export { Dialog, Drawer, Tooltip, Popover, DropdownMenu, type MenuItem } from './Overlay';
+export { Dialog, Drawer, Tooltip, TooltipProvider, Popover, DropdownMenu, type MenuItem } from './Overlay';
 export { Tabs, type TabItem } from './Tabs';
 export { DataTable, type Column } from './DataTable';
 export { FilterBar, type FilterChip } from './FilterBar';

@@ -47,7 +47,7 @@ export function CustomersPage() {
       render: (c) => (
         <span className="flex items-center gap-2">
           <Avatar name={c.name} size="md" />
-          <span className="font-medium text-primary">{c.name}</span>
+          <span className="font-medium text-on-surface">{c.name}</span>
         </span>
       ),
     },
@@ -57,7 +57,7 @@ export function CustomersPage() {
       sortValue: (c) => health(c)?.compositeScore ?? 0,
       render: (c) => {
         const h = health(c);
-        if (!h) return <span className="text-tertiary">—</span>;
+        if (!h) return <span className="text-on-surface-subtle">—</span>;
         return (
           <Badge tone={healthTone(h.band)} dot>
             {h.compositeScore}

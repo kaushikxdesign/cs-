@@ -15,14 +15,14 @@ export const CHART_COLORS = [
 ] as const;
 
 export const STATUS_CHART_COLORS = {
-  success: 'var(--status-success-solid)',
-  warning: 'var(--status-warning-solid)',
-  danger: 'var(--status-danger-solid)',
-  info: 'var(--status-info-solid)',
+  success: 'var(--success-solid)',
+  warning: 'var(--warning-solid)',
+  danger: 'var(--danger-solid)',
+  info: 'var(--info-solid)',
 } as const;
 
 /** 12px is the floor for all UI text, charts included. */
-export const AXIS_TICK = { fontSize: 12, fill: 'var(--text-tertiary)' } as const;
+export const AXIS_TICK = { fontSize: 12, fill: 'var(--on-surface-subtle)' } as const;
 
 export const AXIS_PROPS = {
   tickLine: false,
@@ -38,14 +38,14 @@ export const GRID_PROPS = {
 } as const;
 
 export const TOOLTIP_PROPS = {
-  cursor: { fill: 'var(--bg-hover)' },
+  cursor: { fill: 'var(--surface-hover)' },
   contentStyle: {
-    background: 'var(--bg-surface)',
+    background: 'var(--surface-default)',
     border: '1px solid var(--border-default)',
     borderRadius: '8px',
     fontSize: '13px',
-    color: 'var(--text-primary)',
+    color: 'var(--on-surface)',
     boxShadow: '0 1px 2px 0 rgb(24 24 27 / 0.06), 0 1px 3px 0 rgb(24 24 27 / 0.08)',
   },
-  labelStyle: { color: 'var(--text-tertiary)', fontSize: '12px' },
+  labelStyle: { color: 'var(--on-surface-subtle)', fontSize: '12px' },
 } as const;

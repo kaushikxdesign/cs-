@@ -1,177 +1,246 @@
 /* ============================================================
    CX42 DESIGN TOKENS
-   Primitives are raw values. Components must reference ONLY
-   semantic tokens, never primitives.
+
+   Primitives are raw values. Components reference ONLY semantic
+   tokens — never a primitive, never a literal.
+
+   Naming rule, learned the hard way: a token that ends up as both
+   `bg-x` and `text-x` is a trap. Surfaces are named `surface-*`,
+   and the colour that sits ON a surface is `on-*`. That is why the
+   tooltip could render dark text on a dark ground: `--color-inverse`
+   and `--color-text-inverse` both generated a `text-*` utility, and
+   the wrong one won.
    ============================================================ */
 
 :root {
   color-scheme: light;
 
-  /* ---- Primitives: gray ---- */
-  --gray-0:   #FFFFFF;
-  --gray-25:  #FCFCFD;
-  --gray-50:  #F7F7F8;
-  --gray-100: #F0F0F2;
-  --gray-200: #E4E4E7;
-  --gray-300: #D4D4D8;
-  --gray-400: #A1A1AA;
-  --gray-500: #71717A;
-  --gray-600: #52525B;
-  --gray-700: #3F3F46;
-  --gray-800: #27272A;
-  --gray-900: #18181B;
+  /* ---- Primitives: neutral ----
+     Very slightly cool, so it sits under an indigo accent without
+     reading as a muddy warm grey. */
+  --n-0:   #FFFFFF;
+  --n-25:  #FCFCFD;
+  --n-50:  #F7F7F8;
+  --n-75:  #F2F2F4;
+  --n-100: #EDEDEF;
+  --n-150: #E6E6E9;
+  --n-200: #DFDFE3;
+  --n-300: #CBCBD2;
+  --n-400: #9E9EA8;
+  --n-500: #71717A;
+  --n-600: #55555E;
+  --n-700: #3D3D45;
+  --n-800: #26262C;
+  --n-850: #1C1C21;
+  --n-900: #151518;
+  --n-950: #0D0D0F;
 
-  /* ---- Primitives: accent (one hue only, swap here) ---- */
-  --accent-50:  #EEF2FF;
-  --accent-100: #E0E7FF;
-  --accent-500: #4F5BD5;
-  --accent-600: #3F4AC0;
-  --accent-700: #343DA3;
+  /* ---- Primitives: accent ---- */
+  --a-50:  #EEF0FE;
+  --a-100: #DFE2FC;
+  --a-200: #C4C9F8;
+  --a-400: #7B7FE8;
+  --a-500: #5B5BD6;
+  --a-600: #4B4ACB;
+  --a-700: #3C3BA8;
 
   /* ---- Primitives: status ---- */
-  --green-50:  #ECFDF3;  --green-200: #ABEFC6;  --green-700: #067647;  --green-600: #079455;
-  --amber-50:  #FFFAEB;  --amber-200: #FEDF89;  --amber-700: #B54708;  --amber-600: #DC6803;
-  --red-50:    #FEF3F2;  --red-200:   #FECDCA;  --red-700:   #B42318;  --red-600:   #D92D20;
-  --blue-50:   #EFF8FF;  --blue-200:  #B2DDFF;  --blue-700:  #175CD3;  --blue-600:  #1570EF;
+  --g-50: #ECFDF3; --g-200: #A9EFC5; --g-600: #079455; --g-700: #06773F;
+  --y-50: #FFFAEB; --y-200: #FEDF89; --y-600: #DC6803; --y-700: #B25406;
+  --r-50: #FEF3F2; --r-200: #FECDCA; --r-600: #D92D20; --r-700: #B42318;
+  --b-50: #EFF8FF; --b-200: #B2DDFF; --b-600: #1570EF; --b-700: #175CD3;
 
-  /* ---- Semantic: surfaces ---- */
-  --bg-canvas:    var(--gray-50);
-  --bg-surface:   var(--gray-0);
-  --bg-subtle:    var(--gray-50);
-  --bg-hover:     var(--gray-100);
-  --bg-selected:  var(--gray-100);
-  --bg-inverse:   var(--gray-900);
+  /* ---- Primitives: avatar hues ----
+     Assigned deterministically per name. Colour on people is what
+     makes a dense list scannable — grey avatars carry no signal. */
+  --av-1: #6366F1; --av-2: #0EA5E9; --av-3: #10B981; --av-4: #F59E0B;
+  --av-5: #EC4899; --av-6: #8B5CF6; --av-7: #14B8A6; --av-8: #EF4444;
 
-  /* ---- Semantic: borders ---- */
-  --border-default: var(--gray-200);
-  --border-strong:  var(--gray-300);
+  /* ============================================================
+     SEMANTIC — surfaces, stacked by elevation in the app chrome.
+     The reference differentiates panes by GROUND, not by border:
+     rail darkest, sidebar tinted, content white.
+     ============================================================ */
+  --surface-rail:     var(--n-100);
+  --surface-sidebar:  var(--n-50);
+  --surface-canvas:   var(--n-50);
+  --surface-default:  var(--n-0);
+  --surface-panel:    var(--n-50);
+  --surface-subtle:   var(--n-75);
+  --surface-hover:    var(--n-100);
+  --surface-selected: var(--a-50);
+  --inverted:         var(--n-900);
+  --scrim:            rgb(13 13 15 / 0.32);
 
-  /* ---- Semantic: text ---- */
-  --text-primary:   var(--gray-900);
-  --text-secondary: var(--gray-600);
-  --text-tertiary:  var(--gray-500);
-  --text-disabled:  var(--gray-400);
-  --text-on-accent: var(--gray-0);
-  --text-inverse:   var(--gray-0);
+  /* Message bubbles read as two voices, not two bordered boxes. */
+  --bubble-in:  var(--n-100);
+  --bubble-out: var(--a-100);
 
-  /* ---- Semantic: accent ---- */
-  --accent:        var(--accent-500);
-  --accent-hover:  var(--accent-600);
-  --accent-active: var(--accent-700);
-  --accent-subtle: var(--accent-50);
-  --accent-muted:  var(--accent-100);
-  --accent-text:   var(--accent-700);
+  /* ---- Borders ---- */
+  --border-default: var(--n-150);
+  --border-strong:  var(--n-300);
 
-  /* ---- Semantic: focus ---- */
-  --focus-ring: var(--accent-500);
+  /* ---- Foreground ---- */
+  --on-surface:        var(--n-900);
+  --on-surface-muted:  var(--n-600);
+  --on-surface-subtle: var(--n-500);
+  --on-surface-faint:  var(--n-400);
+  --on-accent:         var(--n-0);
+  --on-inverse:        var(--n-0);
 
-  /* ---- Semantic: status quads ---- */
-  --status-success-subtle: var(--green-50);
-  --status-success-border: var(--green-200);
-  --status-success-text:   var(--green-700);
-  --status-success-solid:  var(--green-600);
+  /* ---- Accent ---- */
+  --accent:        var(--a-500);
+  --accent-hover:  var(--a-600);
+  --accent-active: var(--a-700);
+  --accent-subtle: var(--a-50);
+  --accent-muted:  var(--a-200);
+  --accent-on-subtle: var(--a-700);
 
-  --status-warning-subtle: var(--amber-50);
-  --status-warning-border: var(--amber-200);
-  --status-warning-text:   var(--amber-700);
-  --status-warning-solid:  var(--amber-600);
+  /* Primary actions are near-black in the reference, not accent —
+     the accent is reserved for selection and identity. */
+  --solid:       var(--n-900);
+  --solid-hover: var(--n-800);
+  --on-solid:    var(--n-0);
 
-  --status-danger-subtle:  var(--red-50);
-  --status-danger-border:  var(--red-200);
-  --status-danger-text:    var(--red-700);
-  --status-danger-solid:   var(--red-600);
+  --focus-ring: var(--a-500);
 
-  --status-info-subtle:    var(--blue-50);
-  --status-info-border:    var(--blue-200);
-  --status-info-text:      var(--blue-700);
-  --status-info-solid:     var(--blue-600);
+  /* ---- Status quads ---- */
+  --success-subtle: var(--g-50); --success-border: var(--g-200);
+  --success-fg:     var(--g-700); --success-solid:  var(--g-600);
+  --warning-subtle: var(--y-50); --warning-border: var(--y-200);
+  --warning-fg:     var(--y-700); --warning-solid:  var(--y-600);
+  --danger-subtle:  var(--r-50); --danger-border:  var(--r-200);
+  --danger-fg:      var(--r-700); --danger-solid:   var(--r-600);
+  --info-subtle:    var(--b-50); --info-border:    var(--b-200);
+  --info-fg:        var(--b-700); --info-solid:     var(--b-600);
 
-  /* ---- Semantic: charts (muted categorical) ---- */
-  --chart-1: #5B63C4;
-  --chart-2: #3E8DBE;
-  --chart-3: #429B90;
-  --chart-4: #C0913F;
-  --chart-5: #8A6BAE;
-  --chart-6: #6B7280;
-}
-
-/*
- * The app is light. Dark is opt-in only, via an explicit data-theme="dark"
- * on the root element — deliberately NOT wired to prefers-color-scheme, so a
- * viewer on a dark OS still gets the light product rather than a half-tuned
- * dark one.
- */
-:root[data-theme='dark'] {
-  --bg-canvas:   var(--gray-900);
-  --bg-surface:  var(--gray-800);
-  --bg-subtle:   var(--gray-800);
-  --bg-hover:    var(--gray-700);
-  --bg-selected: var(--gray-700);
-  --bg-inverse:  var(--gray-0);
-
-  --border-default: var(--gray-700);
-  --border-strong:  var(--gray-600);
-
-  --text-primary:   var(--gray-50);
-  --text-secondary: var(--gray-300);
-  --text-tertiary:  var(--gray-400);
-  --text-disabled:  var(--gray-600);
-  --text-inverse:   var(--gray-900);
-
-  --accent-subtle: #1E1B4B;
-  --accent-muted:  #2E2A6B;
-  --accent-text:   var(--accent-100);
+  /* ---- Charts (muted, so status stays the loudest thing) ---- */
+  --chart-1: #5B63C4; --chart-2: #3E8DBE; --chart-3: #429B90;
+  --chart-4: #C0913F; --chart-5: #8A6BAE; --chart-6: #6B7280;
 }
 
 /* ============================================================
-   Tailwind theme mapping.
-   `inline` makes generated utilities emit var(--token) rather
-   than the resolved value, so the dark overrides above apply.
+   DARK — every semantic token redefined, no primitive touched.
+   Applied only on an explicit data-theme="dark": the switcher
+   writes it, and "system" resolves to a stamp too, so the page
+   never half-follows the OS into an untested palette.
+   ============================================================ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-rail:     var(--n-950);
+  --surface-sidebar:  var(--n-900);
+  --surface-canvas:   var(--n-900);
+  --surface-default:  var(--n-850);
+  --surface-panel:    var(--n-900);
+  --surface-subtle:   var(--n-800);
+  --surface-hover:    var(--n-800);
+  --surface-selected: #26263A;
+  --inverted:         var(--n-0);
+  --scrim:            rgb(0 0 0 / 0.5);
+
+  --bubble-in:  var(--n-800);
+  --bubble-out: #2E2E52;
+
+  --border-default: #2B2B33;
+  --border-strong:  #3C3C46;
+
+  --on-surface:        var(--n-50);
+  --on-surface-muted:  #A8A8B3;
+  --on-surface-subtle: #8A8A95;
+  --on-surface-faint:  #6B6B76;
+  --on-accent:         var(--n-0);
+  --on-inverse:        var(--n-900);
+
+  --accent:         var(--a-400);
+  --accent-hover:   #8E92EF;
+  --accent-active:  var(--a-200);
+  --accent-subtle:  #232346;
+  --accent-muted:   #343465;
+  --accent-on-subtle: var(--a-200);
+
+  /* Inverted in dark: the strongest action is light on dark. */
+  --solid:       var(--n-0);
+  --solid-hover: var(--n-100);
+  --on-solid:    var(--n-900);
+
+  --focus-ring: var(--a-400);
+
+  --success-subtle: #0E2A1C; --success-border: #1C4D33;
+  --success-fg:     #6EE7A8; --success-solid:  #10B981;
+  --warning-subtle: #2E2008; --warning-border: #573C12;
+  --warning-fg:     #FCD34D; --warning-solid:  #F59E0B;
+  --danger-subtle:  #2E1414; --danger-border:  #5A2220;
+  --danger-fg:      #FCA5A5; --danger-solid:   #EF4444;
+  --info-subtle:    #0C2136; --info-border:    #16436E;
+  --info-fg:        #93C5FD; --info-solid:     #3B82F6;
+
+  --chart-1: #7B7FE8; --chart-2: #56A8DC; --chart-3: #4FB8AB;
+  --chart-4: #D9A94E; --chart-5: #A484CC; --chart-6: #8B909C;
+}
+
+/* ============================================================
+   Tailwind mapping. `inline` makes utilities emit var(--token)
+   rather than a resolved colour, so the dark block above applies.
    ============================================================ */
 @theme inline {
-  --color-canvas:      var(--bg-canvas);
-  --color-surface:     var(--bg-surface);
-  --color-subtle:      var(--bg-subtle);
-  --color-hover:       var(--bg-hover);
-  --color-selected:    var(--bg-selected);
-  --color-inverse:     var(--bg-inverse);
+  --color-rail:            var(--surface-rail);
+  --color-sidebar:         var(--surface-sidebar);
+  --color-canvas:          var(--surface-canvas);
+  --color-surface:         var(--surface-default);
+  --color-panel:           var(--surface-panel);
+  --color-subtle:          var(--surface-subtle);
+  --color-hover:           var(--surface-hover);
+  --color-selected:        var(--surface-selected);
+  /* Used plain only. A token referenced both plain (`bg-inverted`) and with
+     an opacity modifier (`bg-inverted/20`) emits only the modifier variant,
+     which is how the tooltip ended up with a transparent background. Scrims
+     therefore get their own token below rather than borrowing this one. */
+  --color-inverted: var(--inverted);
+  --color-scrim:    var(--scrim);
+
+  --color-bubble-in:  var(--bubble-in);
+  --color-bubble-out: var(--bubble-out);
 
   --color-border-default: var(--border-default);
   --color-border-strong:  var(--border-strong);
 
-  --color-primary:     var(--text-primary);
-  --color-secondary:   var(--text-secondary);
-  --color-tertiary:    var(--text-tertiary);
-  --color-disabled:    var(--text-disabled);
-  --color-on-accent:   var(--text-on-accent);
-  --color-text-inverse: var(--text-inverse);
+  /* Foreground tokens are all `on-*`, so no `text-*` utility can
+     ever collide with a surface of the same name. */
+  --color-on-surface:        var(--on-surface);
+  --color-on-surface-muted:  var(--on-surface-muted);
+  --color-on-surface-subtle: var(--on-surface-subtle);
+  --color-on-surface-faint:  var(--on-surface-faint);
+  --color-on-accent:         var(--on-accent);
+  --color-on-inverse:        var(--on-inverse);
+  --color-on-solid:          var(--on-solid);
 
-  --color-accent:        var(--accent);
-  --color-accent-hover:  var(--accent-hover);
-  --color-accent-active: var(--accent-active);
-  --color-accent-subtle: var(--accent-subtle);
-  --color-accent-muted:  var(--accent-muted);
-  --color-accent-text:   var(--accent-text);
+  --color-accent:            var(--accent);
+  --color-accent-hover:      var(--accent-hover);
+  --color-accent-active:     var(--accent-active);
+  --color-accent-subtle:     var(--accent-subtle);
+  --color-accent-muted:      var(--accent-muted);
+  --color-accent-on-subtle:  var(--accent-on-subtle);
 
-  --color-success-subtle: var(--status-success-subtle);
-  --color-success-border: var(--status-success-border);
-  --color-success-text:   var(--status-success-text);
-  --color-success-solid:  var(--status-success-solid);
+  --color-solid:       var(--solid);
+  --color-solid-hover: var(--solid-hover);
 
-  --color-warning-subtle: var(--status-warning-subtle);
-  --color-warning-border: var(--status-warning-border);
-  --color-warning-text:   var(--status-warning-text);
-  --color-warning-solid:  var(--status-warning-solid);
-
-  --color-danger-subtle:  var(--status-danger-subtle);
-  --color-danger-border:  var(--status-danger-border);
-  --color-danger-text:    var(--status-danger-text);
-  --color-danger-solid:   var(--status-danger-solid);
-
-  --color-info-subtle:    var(--status-info-subtle);
-  --color-info-border:    var(--status-info-border);
-  --color-info-text:      var(--status-info-text);
-  --color-info-solid:     var(--status-info-solid);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-border: var(--success-border);
+  --color-success-fg:     var(--success-fg);
+  --color-success-solid:  var(--success-solid);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-border: var(--warning-border);
+  --color-warning-fg:     var(--warning-fg);
+  --color-warning-solid:  var(--warning-solid);
+  --color-danger-subtle:  var(--danger-subtle);
+  --color-danger-border:  var(--danger-border);
+  --color-danger-fg:      var(--danger-fg);
+  --color-danger-solid:   var(--danger-solid);
+  --color-info-subtle:    var(--info-subtle);
+  --color-info-border:    var(--info-border);
+  --color-info-fg:        var(--info-fg);
+  --color-info-solid:     var(--info-solid);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -182,36 +251,32 @@
 
   /* ---- Typography ---- */
   --font-sans: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --text-caption: 0.75rem;      --text-caption--line-height: 1rem;
-  --text-body-sm: 0.8125rem;    --text-body-sm--line-height: 1.25rem;
-  --text-body: 0.875rem;        --text-body--line-height: 1.375rem;
-  --text-title-sm: 0.9375rem;   --text-title-sm--line-height: 1.375rem;
-  --text-title: 1.125rem;       --text-title--line-height: 1.625rem;
-  --text-display: 1.5rem;       --text-display--line-height: 2rem;
+  /* A step bolder and larger than before. The reference leans on a
+     genuinely large conversation title to anchor the pane. */
+  --text-caption:  0.75rem;    --text-caption--line-height:  1.0625rem;
+  --text-body-sm:  0.8125rem;  --text-body-sm--line-height:  1.25rem;
+  --text-body:     0.875rem;   --text-body--line-height:     1.375rem;
+  --text-body-lg:  0.9375rem;  --text-body-lg--line-height:  1.5rem;
+  --text-title-sm: 1rem;       --text-title-sm--line-height: 1.375rem;
+  --text-title:    1.25rem;    --text-title--line-height:    1.75rem;
+  --text-title-lg: 1.5rem;     --text-title-lg--line-height: 2rem;
+  --text-display:  1.75rem;    --text-display--line-height:  2.25rem;
 
-  /* ---- Radii ---- */
-  --radius-sm: 4px;   /* badges, checkboxes */
-  --radius-md: 6px;   /* buttons, inputs, nav items */
-  --radius-lg: 8px;   /* cards, popovers, menus */
-  --radius-xl: 12px;  /* modals, drawers */
+  /* ---- Radii — softer than before; the reference is quite round ---- */
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
 
-  /* ---- Elevation: cards have none ---- */
-  --shadow-sm: 0 1px 2px 0 rgb(24 24 27 / 0.06), 0 1px 3px 0 rgb(24 24 27 / 0.08);
-  --shadow-lg: 0 8px 24px -4px rgb(24 24 27 / 0.12), 0 2px 6px -2px rgb(24 24 27 / 0.06);
+  --shadow-sm: 0 1px 2px 0 rgb(13 13 15 / 0.05), 0 1px 3px 0 rgb(13 13 15 / 0.07);
+  --shadow-md: 0 4px 12px -2px rgb(13 13 15 / 0.10), 0 2px 4px -2px rgb(13 13 15 / 0.06);
+  --shadow-lg: 0 12px 32px -6px rgb(13 13 15 / 0.16), 0 4px 8px -4px rgb(13 13 15 / 0.08);
 
-  /* ---- Containers ---- */
-  /* Settings forms cap here so label/field pairs stay scannable. */
   --container-form: 760px;
 
-  /* ---- Density ---- */
-  --height-control: 32px;
-  --height-control-sm: 28px;
-  --height-row: 40px;
-  --size-icon: 16px;
-
-  /* ---- Motion ---- */
   --duration-fast: 120ms;
   --duration-panel: 180ms;
 }

@@ -26,7 +26,7 @@ export function RuleRow({
         className,
       )}
     >
-      <span className="w-10 shrink-0 text-caption font-medium uppercase text-tertiary">{keyword}</span>
+      <span className="w-10 shrink-0 text-caption font-medium uppercase text-on-surface-subtle">{keyword}</span>
       {children}
       {onRemove && (
         <IconButton label="Remove rule" size="sm" className="ml-auto" onClick={onRemove}>
@@ -39,7 +39,7 @@ export function RuleRow({
 
 export function RuleValue({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-sm bg-subtle px-1.5 py-0.5 text-body-sm font-medium text-primary">
+    <span className="rounded-sm bg-subtle px-1.5 py-0.5 text-body-sm font-medium text-on-surface">
       {children}
     </span>
   );

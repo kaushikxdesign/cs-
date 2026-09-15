@@ -28,8 +28,8 @@ export function CardHeader({
   return (
     <div className={cn('flex items-start justify-between gap-4 px-4 py-3', className)}>
       <div className="min-w-0">
-        <h3 className="text-title-sm font-semibold text-primary truncate">{title}</h3>
-        {description && <p className="mt-0.5 text-caption text-tertiary">{description}</p>}
+        <h3 className="text-title-sm font-semibold text-on-surface truncate">{title}</h3>
+        {description && <p className="mt-0.5 text-caption text-on-surface-subtle">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>
@@ -59,14 +59,14 @@ export function MetricCard({ label, value, delta, invertDelta, hint, className }
   const good = delta === undefined ? null : invertDelta ? delta < 0 : delta > 0;
   return (
     <Card className={cn('px-4 py-3', className)}>
-      <p className="text-caption text-tertiary">{label}</p>
+      <p className="text-caption text-on-surface-subtle">{label}</p>
       <div className="mt-1 flex items-baseline gap-2">
-        <span className="text-display font-semibold text-primary tabular-nums">{value}</span>
+        <span className="text-display font-semibold text-on-surface tabular-nums">{value}</span>
         {delta !== undefined && (
           <span
             className={cn(
               'inline-flex items-center gap-0.5 text-caption font-medium tabular-nums',
-              good ? 'text-success-text' : 'text-danger-text',
+              good ? 'text-success-fg' : 'text-danger-fg',
             )}
           >
             {delta > 0 ? (
@@ -78,7 +78,7 @@ export function MetricCard({ label, value, delta, invertDelta, hint, className }
           </span>
         )}
       </div>
-      {hint && <p className="mt-1 text-caption text-tertiary">{hint}</p>}
+      {hint && <p className="mt-1 text-caption text-on-surface-subtle">{hint}</p>}
     </Card>
   );
 }
@@ -115,8 +115,8 @@ export function KeyValueList({
     <dl className={cn('divide-y divide-border-default', className)}>
       {items.map((item, i) => (
         <div key={i} className="flex items-start justify-between gap-4 py-2">
-          <dt className="text-body-sm text-tertiary shrink-0">{item.label}</dt>
-          <dd className="text-body-sm text-primary text-right min-w-0">{item.value}</dd>
+          <dt className="text-body-sm text-on-surface-subtle shrink-0">{item.label}</dt>
+          <dd className="text-body-sm text-on-surface text-right min-w-0">{item.value}</dd>
         </div>
       ))}
     </dl>

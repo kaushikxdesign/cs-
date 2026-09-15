@@ -38,8 +38,8 @@ export function Stepper({
                 className={cn(
                   'flex size-5 shrink-0 items-center justify-center rounded-full border text-caption font-medium tabular-nums',
                   done && 'border-accent bg-accent text-on-accent',
-                  active && 'border-accent text-accent-text',
-                  !done && !active && 'border-border-strong text-tertiary',
+                  active && 'border-accent text-accent-on-subtle',
+                  !done && !active && 'border-border-strong text-on-surface-subtle',
                 )}
               >
                 {done ? <Check className="size-3" strokeWidth={2} /> : i + 1}
@@ -47,7 +47,7 @@ export function Stepper({
               <span
                 className={cn(
                   'whitespace-nowrap text-body-sm',
-                  active ? 'font-medium text-primary' : 'text-secondary',
+                  active ? 'font-medium text-on-surface' : 'text-on-surface-muted',
                 )}
               >
                 {s.label}

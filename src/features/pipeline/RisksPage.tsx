@@ -56,8 +56,8 @@ export function RisksPage() {
       sortValue: (r) => r.title,
       render: (r) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-primary">{r.title}</p>
-          <p className="truncate text-caption text-tertiary">{customersById[r.customerId]?.name}</p>
+          <p className="truncate font-medium text-on-surface">{r.title}</p>
+          <p className="truncate text-caption text-on-surface-subtle">{customersById[r.customerId]?.name}</p>
         </div>
       ),
     },
@@ -151,16 +151,16 @@ export function RisksPage() {
             />
             {open.rootCause && (
               <div>
-                <p className="text-caption font-medium uppercase tracking-wide text-tertiary">Root cause</p>
-                <p className="mt-1 text-body text-secondary">{open.rootCause}</p>
+                <p className="text-caption font-medium uppercase tracking-wide text-on-surface-subtle">Root cause</p>
+                <p className="mt-1 text-body text-on-surface-muted">{open.rootCause}</p>
               </div>
             )}
             {open.evidence && open.evidence.length > 0 && (
               <div>
-                <p className="text-caption font-medium uppercase tracking-wide text-tertiary">Evidence</p>
+                <p className="text-caption font-medium uppercase tracking-wide text-on-surface-subtle">Evidence</p>
                 <ul className="mt-1 space-y-1">
                   {open.evidence.map((e, i) => (
-                    <li key={i} className="text-body-sm text-secondary">• {e}</li>
+                    <li key={i} className="text-body-sm text-on-surface-muted">• {e}</li>
                   ))}
                 </ul>
               </div>

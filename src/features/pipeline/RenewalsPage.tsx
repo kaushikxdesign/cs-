@@ -48,8 +48,8 @@ export function RenewalsPage() {
       sortValue: (r) => customersById[r.customerId]?.name ?? '',
       render: (r) => (
         <div className="min-w-0">
-          <p className="truncate font-medium text-primary">{customersById[r.customerId]?.name}</p>
-          <p className="truncate text-caption text-tertiary">{r.nextStep}</p>
+          <p className="truncate font-medium text-on-surface">{customersById[r.customerId]?.name}</p>
+          <p className="truncate text-caption text-on-surface-subtle">{r.nextStep}</p>
         </div>
       ),
     },
@@ -72,7 +72,7 @@ export function RenewalsPage() {
       render: (r) => (
         <span>
           {formatDate(r.renewalDate)}
-          <span className="ml-1.5 text-caption text-tertiary tabular-nums">{r.daysRemaining}d</span>
+          <span className="ml-1.5 text-caption text-on-surface-subtle tabular-nums">{r.daysRemaining}d</span>
         </span>
       ),
     },

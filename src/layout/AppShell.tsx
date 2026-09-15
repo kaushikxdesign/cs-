@@ -1,8 +1,8 @@
 import React from 'react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
-import { CommandPalette, ToastViewport, useCommandPalette, type CommandItem } from '@/design-system';
-import { USERS } from '@/data/core';
+import { CommandPalette, ToastViewport, TooltipProvider, useCommandPalette, type CommandItem } from '@/design-system';
+import { TICKETS } from '@/data/core';
 import { ALL_MODULES, moduleForPath } from './nav';
 import { NavRail } from './NavRail';
 import { SecondaryNav } from './SecondaryNav';
@@ -29,12 +29,23 @@ export function AppShell({
 
   const activeModule = moduleForPath(pathname);
 
+  // Counts shown in the rail and the secondary nav. Real numbers make the
+  // nav a status surface rather than a list of links.
+  const openTickets = TICKETS.filter((t: any) => t.status !== 'resolved').length;
+  const railCounts = { inbox: openTickets };
+  const viewCounts: Record<string, number> = {
+    '/tickets': openTickets,
+    '/customers': (state.customers ?? []).length,
+    '/risks': Object.values(state.risks ?? {}).filter((r: any) => r.status !== 'resolved').length,
+    '/expansion': Object.keys(state.expansionOpps ?? {}).length,
+  };
+
   // ⌘K, the rail and the secondary nav all read the same nav definition.
   const commands: CommandItem[] = React.useMemo(
     () =>
       ALL_MODULES.flatMap((m) => {
         const Icon = m.icon;
-        const icon = <Icon className="size-4 text-tertiary" strokeWidth={1.5} />;
+        const icon = <Icon className="size-4 text-on-surface-subtle" strokeWidth={1.5} />;
         const own: CommandItem = {
           id: m.id,
           label: m.label,
@@ -57,11 +68,12 @@ export function AppShell({
   );
 
   return (
+    <TooltipProvider>
     <div className="flex h-screen overflow-hidden bg-canvas">
       <NavRail
         activeModuleId={activeModule?.id}
         activeRole={state.activeRole}
-        userName={USERS[state.activeUser]?.name ?? 'CX42'}
+        counts={railCounts}
         onNavigate={navigate}
         onSwitchRole={(roleId, userId, path) => {
           dispatch({ type: 'SWITCH_ROLE', role: roleId, userId });
@@ -74,6 +86,7 @@ export function AppShell({
           module={activeModule}
           currentPath={pathname}
           currentQuery={query}
+          counts={viewCounts}
           onNavigate={navigate}
           onOpenSearch={() => setPaletteOpen(true)}
           onCollapse={() => setNavCollapsed(true)}
@@ -94,5 +107,6 @@ export function AppShell({
         onDismiss={(id) => dispatch({ type: 'DISMISS_TOAST', id })}
       />
     </div>
+    </TooltipProvider>
   );
 }

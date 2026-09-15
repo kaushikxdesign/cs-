@@ -8,7 +8,7 @@ const ICONS: Partial<Record<Tone, React.ReactNode>> = {
   warning: <AlertTriangle className="size-4 text-warning-solid" strokeWidth={1.5} />,
   danger: <XCircle className="size-4 text-danger-solid" strokeWidth={1.5} />,
   info: <Info className="size-4 text-info-solid" strokeWidth={1.5} />,
-  neutral: <Info className="size-4 text-tertiary" strokeWidth={1.5} />,
+  neutral: <Info className="size-4 text-on-surface-subtle" strokeWidth={1.5} />,
 };
 
 export interface ToastItem {
@@ -41,11 +41,11 @@ export function ToastViewport({
           )}
         >
           <span className="mt-px shrink-0">{ICONS[t.tone ?? 'neutral']}</span>
-          <p className="min-w-0 flex-1 text-body-sm text-primary">{t.message}</p>
+          <p className="min-w-0 flex-1 text-body-sm text-on-surface">{t.message}</p>
           <button
             onClick={() => onDismiss(t.id)}
             aria-label="Dismiss"
-            className="shrink-0 rounded-sm p-0.5 text-tertiary hover:bg-hover hover:text-primary"
+            className="shrink-0 rounded-sm p-0.5 text-on-surface-subtle hover:bg-hover hover:text-on-surface"
           >
             <X className="size-4" strokeWidth={1.5} />
           </button>

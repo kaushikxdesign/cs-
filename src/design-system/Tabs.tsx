@@ -33,13 +33,13 @@ export function Tabs({
               'relative -mb-px flex items-center gap-1.5 whitespace-nowrap border-b-2 px-0.5 pb-2 pt-1',
               'text-body-sm transition-colors duration-[120ms]',
               active
-                ? 'border-accent font-medium text-primary'
-                : 'border-transparent text-secondary hover:text-primary',
+                ? 'border-accent font-medium text-on-surface'
+                : 'border-transparent text-on-surface-muted hover:text-on-surface',
             )}
           >
             {t.label}
             {t.count !== undefined && (
-              <span className="text-caption text-tertiary tabular-nums">{t.count}</span>
+              <span className="text-caption text-on-surface-subtle tabular-nums">{t.count}</span>
             )}
           </button>
         );

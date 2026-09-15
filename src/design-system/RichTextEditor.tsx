@@ -75,7 +75,7 @@ export function RichTextEditor({
         aria-multiline="true"
         data-placeholder={placeholder}
         onInput={() => onChange?.(ref.current?.innerHTML ?? '')}
-        className={cn('cx-rte px-3 py-2.5 text-body text-primary outline-none overflow-y-auto', minHeight)}
+        className={cn('cx-rte px-3 py-2.5 text-body text-on-surface outline-none overflow-y-auto', minHeight)}
       />
       {footer && <div className="border-t border-border-default px-3 py-2">{footer}</div>}
     </div>

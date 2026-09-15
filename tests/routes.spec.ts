@@ -52,7 +52,8 @@ test('portal preview bypasses the app shell', async ({ page }) => {
 test('/tickets resolves — it was declared nowhere in the MVP', async ({ page }) => {
   await page.goto('/#/tickets', { waitUntil: 'networkidle' });
   await expect(page.locator('#root')).not.toContainText('Page not found');
-  await expect(page.locator('#root')).toContainText('SUP1842');
+  // The list is keyed by account, not ticket id — the id lives in Details.
+  await expect(page.locator('#root')).toContainText('Acme Analytics');
 });
 
 test('the role switcher changes user and lands on that role\'s dashboard', async ({ page }) => {
@@ -82,3 +83,46 @@ for (const [section, title] of PREVIOUSLY_UNREACHABLE) {
     await expect(page.locator('#cx42-error')).toBeHidden();
   });
 }
+
+test('tooltips render with a painted background, not dark on dark', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  await page.locator('nav button[aria-label="Customers"]').hover();
+
+  const tip = page.locator('[data-radix-popper-content-wrapper] > *').first();
+  await expect(tip).toBeVisible();
+
+  // Regression guard: tailwind-merge used to strip the colour classes,
+  // leaving white-on-transparent — visible in the DOM but unreadable.
+  const { color, bg } = await tip.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { color: s.color, bg: s.backgroundColor };
+  });
+  expect(bg).not.toBe('rgba(0, 0, 0, 0)');
+  expect(color).not.toBe(bg);
+});
+
+test('the primary action is legible, not black on black', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  const close = page.getByRole('button', { name: 'Close' }).last();
+  const { color, bg } = await close.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { color: s.color, bg: s.backgroundColor };
+  });
+  expect(color).not.toBe(bg);
+});
+
+test('status labels are Title Case, never raw enum values', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  const details = page.locator('aside');
+  await expect(details).toContainText(/Critical|High|Medium|Low/);
+  await expect(details).not.toContainText(/\bcritical\b|\bmid_market\b/);
+});
+
+test('the theme switcher stamps the root and survives a reload', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  await page.locator('button[aria-label="Toggle theme"]').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});

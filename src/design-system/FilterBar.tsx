@@ -47,15 +47,15 @@ export function FilterBar({
       {chips.map((c) => (
         <span
           key={c.id}
-          className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border-default bg-surface pl-2 pr-1 text-caption text-primary"
+          className="inline-flex h-7 items-center gap-1.5 rounded-md border border-border-default bg-surface pl-2 pr-1 text-caption text-on-surface"
         >
-          <span className="text-tertiary">{c.label}</span>
+          <span className="text-on-surface-subtle">{c.label}</span>
           {c.value}
           {onRemove && (
             <button
               onClick={() => onRemove(c.id)}
               aria-label={`Remove ${c.label} filter`}
-              className="rounded-sm p-0.5 text-tertiary hover:bg-hover hover:text-primary"
+              className="rounded-sm p-0.5 text-on-surface-subtle hover:bg-hover hover:text-on-surface"
             >
               <X className="size-3" strokeWidth={1.5} />
             </button>
@@ -76,7 +76,7 @@ export function FilterBar({
               <button
                 key={o.id}
                 onClick={() => onAdd(o.id)}
-                className="flex h-8 w-full items-center rounded-md px-2 text-body-sm text-primary hover:bg-hover"
+                className="flex h-8 w-full items-center rounded-md px-2 text-body-sm text-on-surface hover:bg-hover"
               >
                 {o.label}
               </button>

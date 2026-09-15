@@ -91,14 +91,14 @@ export function DataTable<T>({
                 key={c.key}
                 style={c.width ? { width: c.width } : undefined}
                 className={cn(
-                  'h-9 px-3 text-caption font-medium text-tertiary',
+                  'h-9 px-3 text-caption font-medium text-on-surface-subtle',
                   c.align === 'right' ? 'text-right' : 'text-left',
                 )}
               >
                 {c.sortValue ? (
                   <button
                     onClick={() => toggleSort(c.key)}
-                    className="inline-flex items-center gap-1 hover:text-primary"
+                    className="inline-flex items-center gap-1 hover:text-on-surface"
                   >
                     {c.header}
                     {sort?.key === c.key ? (
@@ -150,7 +150,7 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     className={cn(
-                      'h-10 px-3 text-primary',
+                      'h-10 px-3 text-on-surface',
                       c.align === 'right' && 'text-right tabular-nums',
                     )}
                   >

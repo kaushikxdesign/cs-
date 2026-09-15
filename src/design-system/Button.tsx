@@ -2,23 +2,33 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-export type ButtonSize = 'sm' | 'md';
+/**
+ * `solid` is the strongest action — near-black in light, near-white in dark.
+ * The accent stays reserved for selection and identity, so a screen can have
+ * one unmistakable primary action without the accent competing with it.
+ */
+export type ButtonVariant = 'solid' | 'primary' | 'secondary' | 'ghost' | 'subtle' | 'danger';
+export type ButtonSize = 'xs' | 'sm' | 'md';
 
 const VARIANTS: Record<ButtonVariant, string> = {
+  solid:
+    'bg-solid text-on-solid hover:bg-solid-hover border border-transparent',
   primary:
     'bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-active border border-transparent',
   secondary:
-    'bg-surface text-primary border border-border-default hover:bg-hover active:bg-selected',
+    'bg-surface text-on-surface border border-border-default hover:bg-hover',
+  subtle:
+    'bg-subtle text-on-surface border border-transparent hover:bg-hover',
   ghost:
-    'bg-transparent text-secondary border border-transparent hover:bg-hover hover:text-primary',
+    'bg-transparent text-on-surface-muted border border-transparent hover:bg-hover hover:text-on-surface',
   danger:
-    'bg-danger-solid text-on-accent hover:opacity-90 active:opacity-100 border border-transparent',
+    'bg-danger-solid text-white hover:opacity-90 border border-transparent',
 };
 
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'h-7 px-2.5 text-caption gap-1.5',
-  md: 'h-8 px-3 text-body-sm gap-2',
+  xs: 'h-6 px-2 text-caption gap-1 rounded-md',
+  sm: 'h-7 px-2.5 text-caption gap-1.5 rounded-md',
+  md: 'h-8 px-3 text-body-sm gap-1.5 rounded-lg',
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -38,26 +48,32 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
       ref={ref}
       disabled={disabled || loading}
       className={cn(
-        'inline-flex items-center justify-center rounded-md font-medium whitespace-nowrap',
+        'inline-flex items-center justify-center font-medium whitespace-nowrap',
         'transition-colors duration-[120ms]',
-        'disabled:opacity-50 disabled:pointer-events-none',
+        'disabled:opacity-40 disabled:pointer-events-none',
         VARIANTS[variant],
         SIZES[size],
         className,
       )}
       {...props}
     >
-      {loading ? <Loader2 className="size-4 animate-spin" strokeWidth={1.5} /> : icon}
+      {loading ? <Loader2 className="size-4 animate-spin" strokeWidth={1.75} /> : icon}
       {children}
       {iconRight}
     </button>
   );
 });
 
+const ICON_SIZES: Record<ButtonSize, string> = {
+  xs: 'size-6 rounded-md',
+  sm: 'size-7 rounded-md',
+  md: 'size-8 rounded-lg',
+};
+
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  /** Required: icon-only controls carry no text for assistive tech. */
+  /** Required: an icon-only control has no text for assistive tech. */
   label: string;
   children: React.ReactNode;
 }
@@ -70,13 +86,12 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
     <button
       ref={ref}
       aria-label={label}
-      title={label}
       className={cn(
-        'inline-flex items-center justify-center rounded-md shrink-0',
+        'inline-flex items-center justify-center shrink-0',
         'transition-colors duration-[120ms]',
-        'disabled:opacity-50 disabled:pointer-events-none',
+        'disabled:opacity-40 disabled:pointer-events-none',
         VARIANTS[variant],
-        size === 'sm' ? 'size-7' : 'size-8',
+        ICON_SIZES[size],
         className,
       )}
       {...props}

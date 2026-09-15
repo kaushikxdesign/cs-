@@ -24,7 +24,7 @@ export function DetailsPanel({
     >
       {(title || onClose) && (
         <div className="flex h-12 items-center justify-between gap-2 border-b border-border-default px-4">
-          <h2 className="text-title-sm font-semibold text-primary truncate">{title}</h2>
+          <h2 className="text-title-sm font-semibold text-on-surface truncate">{title}</h2>
           {onClose && (
             <IconButton label="Close panel" onClick={onClose}>
               <PanelRightClose className="size-4" strokeWidth={1.5} />
@@ -56,9 +56,9 @@ export function PanelSection({
         aria-expanded={open}
         className="flex h-10 w-full items-center justify-between gap-2 px-4 text-left"
       >
-        <span className="text-caption font-medium uppercase tracking-wide text-tertiary">{title}</span>
+        <span className="text-caption font-medium uppercase tracking-wide text-on-surface-subtle">{title}</span>
         <ChevronDown
-          className={cn('size-4 text-tertiary transition-transform duration-[180ms]', !open && '-rotate-90')}
+          className={cn('size-4 text-on-surface-subtle transition-transform duration-[180ms]', !open && '-rotate-90')}
           strokeWidth={1.5}
         />
       </button>

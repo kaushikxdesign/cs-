@@ -7,13 +7,13 @@ import { Check, ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/lib/cn';
 
 const FIELD =
-  'h-8 w-full rounded-md border border-border-default bg-surface px-2.5 text-body-sm text-primary ' +
-  'transition-colors duration-[120ms] placeholder:text-disabled ' +
+  'h-8 w-full rounded-md border border-border-default bg-surface px-2.5 text-body-sm text-on-surface ' +
+  'transition-colors duration-[120ms] placeholder:text-on-surface-faint ' +
   'hover:border-border-strong disabled:opacity-50 disabled:pointer-events-none';
 
 export function Label({ className, children, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
-    <label className={cn('block text-caption font-medium text-secondary', className)} {...props}>
+    <label className={cn('block text-caption font-medium text-on-surface-muted', className)} {...props}>
       {children}
     </label>
   );
@@ -37,9 +37,9 @@ export function Field({
       {label && <Label>{label}</Label>}
       {children}
       {error ? (
-        <p className="text-caption text-danger-text">{error}</p>
+        <p className="text-caption text-danger-fg">{error}</p>
       ) : (
-        hint && <p className="text-caption text-tertiary">{hint}</p>
+        hint && <p className="text-caption text-on-surface-subtle">{hint}</p>
       )}
     </div>
   );
@@ -55,7 +55,7 @@ export function SearchInput({ className, ...props }: React.InputHTMLAttributes<H
   return (
     <div className="relative">
       <Search
-        className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-tertiary"
+        className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-on-surface-subtle"
         strokeWidth={1.5}
       />
       <input type="search" className={cn(FIELD, 'pl-8', className)} {...props} />
@@ -103,7 +103,7 @@ export function Select({
       >
         <RSelect.Value placeholder={placeholder} />
         <RSelect.Icon>
-          <ChevronDown className="size-4 text-tertiary" strokeWidth={1.5} />
+          <ChevronDown className="size-4 text-on-surface-subtle" strokeWidth={1.5} />
         </RSelect.Icon>
       </RSelect.Trigger>
       <RSelect.Portal>
@@ -117,7 +117,7 @@ export function Select({
               <RSelect.Item
                 key={o.value}
                 value={o.value}
-                className="relative flex h-8 cursor-default select-none items-center rounded-md pl-7 pr-2 text-body-sm text-primary outline-none data-[highlighted]:bg-hover"
+                className="relative flex h-8 cursor-default select-none items-center rounded-md pl-7 pr-2 text-body-sm text-on-surface outline-none data-[highlighted]:bg-hover"
               >
                 <RSelect.ItemIndicator className="absolute left-2 inline-flex">
                   <Check className="size-4 text-accent" strokeWidth={1.5} />
@@ -165,7 +165,7 @@ export function Checkbox({
   );
   if (!label) return box;
   return (
-    <label className="inline-flex cursor-pointer items-center gap-2 text-body-sm text-primary">
+    <label className="inline-flex cursor-pointer items-center gap-2 text-body-sm text-on-surface">
       {box}
       {label}
     </label>
@@ -198,7 +198,7 @@ export function Switch({
   );
   if (!label) return sw;
   return (
-    <label className="inline-flex cursor-pointer items-center gap-2 text-body-sm text-primary">
+    <label className="inline-flex cursor-pointer items-center gap-2 text-body-sm text-on-surface">
       {sw}
       {label}
     </label>
@@ -219,7 +219,7 @@ export function RadioGroup({
   return (
     <RRadio.Root value={value} onValueChange={onValueChange} className={cn('space-y-2', className)}>
       {options.map((o) => (
-        <label key={o.value} className="flex cursor-pointer items-center gap-2 text-body-sm text-primary">
+        <label key={o.value} className="flex cursor-pointer items-center gap-2 text-body-sm text-on-surface">
           <RRadio.Item
             value={o.value}
             className="flex size-4 items-center justify-center rounded-full border border-border-strong bg-surface data-[state=checked]:border-accent"
@@ -259,7 +259,7 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(o.value)}
             className={cn(
               'h-7 rounded-md px-2.5 text-caption font-medium transition-colors duration-[120ms]',
-              active ? 'bg-surface text-primary shadow-sm' : 'text-secondary hover:text-primary',
+              active ? 'bg-surface text-on-surface shadow-sm' : 'text-on-surface-muted hover:text-on-surface',
             )}
           >
             {o.label}

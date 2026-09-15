@@ -60,26 +60,26 @@ export function CommandPalette({
   return (
     <RDialog.Root open={open} onOpenChange={onOpenChange}>
       <RDialog.Portal>
-        <RDialog.Overlay className="fixed inset-0 z-40 bg-inverse/20" />
+        <RDialog.Overlay className="fixed inset-0 z-40 bg-scrim" />
         <RDialog.Content
           aria-label="Command palette"
           className="fixed left-1/2 top-24 z-50 w-full max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border-default bg-surface shadow-lg"
         >
           <RDialog.Title className="sr-only">Command palette</RDialog.Title>
           <div className="flex items-center gap-2 border-b border-border-default px-3">
-            <Search className="size-4 shrink-0 text-tertiary" strokeWidth={1.5} />
+            <Search className="size-4 shrink-0 text-on-surface-subtle" strokeWidth={1.5} />
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={onKeyDown}
               placeholder={placeholder}
-              className="h-11 w-full bg-transparent text-body text-primary outline-none placeholder:text-disabled"
+              className="h-11 w-full bg-transparent text-body text-on-surface outline-none placeholder:text-on-surface-faint"
             />
           </div>
           <div className="max-h-80 overflow-y-auto p-1">
             {results.length === 0 && (
-              <p className="px-3 py-6 text-center text-body-sm text-tertiary">No matches</p>
+              <p className="px-3 py-6 text-center text-body-sm text-on-surface-subtle">No matches</p>
             )}
             {results.map((item, i) => {
               const showGroup = item.group && item.group !== lastGroup;
@@ -87,7 +87,7 @@ export function CommandPalette({
               return (
                 <React.Fragment key={item.id}>
                   {showGroup && (
-                    <p className="px-2 pb-1 pt-3 text-caption font-medium uppercase tracking-wide text-tertiary">
+                    <p className="px-2 pb-1 pt-3 text-caption font-medium uppercase tracking-wide text-on-surface-subtle">
                       {item.group}
                     </p>
                   )}
@@ -99,12 +99,12 @@ export function CommandPalette({
                     }}
                     className={cn(
                       'flex h-8 w-full items-center gap-2 rounded-md px-2 text-body-sm',
-                      i === active ? 'bg-hover text-primary' : 'text-secondary',
+                      i === active ? 'bg-hover text-on-surface' : 'text-on-surface-muted',
                     )}
                   >
                     {item.icon}
                     <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
-                    {item.hint && <span className="shrink-0 text-caption text-tertiary">{item.hint}</span>}
+                    {item.hint && <span className="shrink-0 text-caption text-on-surface-subtle">{item.hint}</span>}
                   </button>
                 </React.Fragment>
               );

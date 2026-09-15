@@ -21,10 +21,10 @@ export function Timeline({ items, className }: { items: TimelineItem[]; classNam
           </div>
           <div className="min-w-0 flex-1 pb-1">
             <div className="flex items-baseline justify-between gap-3">
-              <p className="text-body-sm font-medium text-primary">{item.title}</p>
-              {item.meta && <span className="shrink-0 text-caption text-tertiary">{item.meta}</span>}
+              <p className="text-body-sm font-medium text-on-surface">{item.title}</p>
+              {item.meta && <span className="shrink-0 text-caption text-on-surface-subtle">{item.meta}</span>}
             </div>
-            {item.body && <div className="mt-1 text-body-sm text-secondary">{item.body}</div>}
+            {item.body && <div className="mt-1 text-body-sm text-on-surface-muted">{item.body}</div>}
           </div>
         </li>
       ))}

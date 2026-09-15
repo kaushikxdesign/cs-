@@ -59,8 +59,8 @@ export function AdminPage() {
                 onClick={() => navigate(`/admin?section=${s.id}`)}
                 className="flex w-full flex-col items-start px-4 py-3 text-left transition-colors duration-[120ms] hover:bg-hover"
               >
-                <span className="text-body-sm font-medium text-primary">{s.title}</span>
-                <span className="mt-0.5 text-caption text-tertiary">{s.description}</span>
+                <span className="text-body-sm font-medium text-on-surface">{s.title}</span>
+                <span className="mt-0.5 text-caption text-on-surface-subtle">{s.description}</span>
               </button>
             ))}
           </div>
