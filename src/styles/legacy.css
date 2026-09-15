@@ -5,8 +5,11 @@
    Omitted: the .sidebar-link / .sidebar-link.active @apply rules.
    They compiled fine under the Tailwind play CDN but no element
    ever referenced the class (see ui-inventory.md, Question 6).
+
+   Also omitted: the `body { font-family }` rule. It is unlayered, so it
+   outranked globals.css's @layer base and reverted the whole app to
+   system fonts. Body typography belongs to the token layer now.
    ============================================================ */
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: #f1f5f9; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
