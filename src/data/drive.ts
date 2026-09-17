@@ -2,7 +2,7 @@ const DRIVE_SOPS = [
   {
     id:'sop_churn', title:'Customer churn — wind-down SOP', category:'Churn',
     owner:'Amara Osei', updated:'Jul 30, 2025', version:'v4.2', reads:212, fmt:'SOP',
-    status:'published', tone:'red', icon:'\u{1F4C9}',
+    status:'published', tone:'red', icon: undefined,
     when:'A customer has confirmed churn or served notice of non-renewal.',
     summary:'Protects revenue recovery, preserves the relationship for a future win-back, and ensures nothing is left legally or operationally open when the contract ends.',
     phases:[
@@ -40,7 +40,7 @@ const DRIVE_SOPS = [
   {
     id:'sop_risk', title:'Churn risk intervention SOP', category:'Churn',
     owner:'Maya Chen', updated:'Jul 22, 2025', version:'v3.1', reads:340, fmt:'SOP',
-    status:'published', tone:'amber', icon:'\u{1F6A8}',
+    status:'published', tone:'amber', icon: undefined,
     when:'Health band drops to Red, or churn status is set to "Likely to churn".',
     summary:'A 30-day structured intervention to diagnose the real problem, get executive alignment on a fix, and convert the account back to a defensible position before renewal.',
     phases:[
@@ -67,7 +67,7 @@ const DRIVE_SOPS = [
   {
     id:'sop_champion', title:'Champion departure SOP', category:'Relationship',
     owner:'Sam Rivera', updated:'Jul 11, 2025', version:'v2.0', reads:158, fmt:'SOP',
-    status:'published', tone:'purple', icon:'\u{1F6A9}',
+    status:'published', tone:'purple', icon: undefined,
     when:'A contact with buying role Champion or Decision maker leaves the company.',
     summary:'Champion loss is the single strongest leading indicator of churn. This SOP re-establishes coverage within 30 days before the relationship goes cold.',
     phases:[
@@ -91,13 +91,13 @@ const DRIVE_SOPS = [
   {
     id:'sop_onboard', title:'New customer onboarding SOP (first 90 days)', category:'Onboarding',
     owner:'Maya Chen', updated:'Jun 28, 2025', version:'v5.0', reads:421, fmt:'SOP',
-    status:'published', tone:'green', icon:'\u{1F680}',
+    status:'published', tone:'green', icon: undefined,
     when:'A new contract is signed and the account moves to Onboarding.',
     summary:'Standardises the first 90 days so every customer reaches first value on schedule and enters steady state with an identified champion and agreed success criteria.',
     phases:[
       { name:'Days 0\u201314 — Kickoff', tasks:[
         { t:'Send the welcome pack and book the kickoff call', owner:'CSM', due:'Day 2' },
-        { t:'Complete the handover doc from Sales (goals, promises, risks)', owner:'AE \u2192 CSM', due:'Day 3' },
+        { t:'Complete the handover doc from Sales (goals, promises, risks)', owner:'AE  CSM', due:'Day 3' },
         { t:'Confirm the executive sponsor and champion in writing', owner:'CSM', due:'Day 7' },
         { t:'Agree written success criteria for day 90', owner:'CSM + Customer', due:'Day 14' },
       ]},
@@ -117,7 +117,7 @@ const DRIVE_SOPS = [
   {
     id:'sop_p1', title:'P1 escalation SOP', category:'Support',
     owner:'Amara Osei', updated:'Jul 18, 2025', version:'v3.4', reads:389, fmt:'SOP',
-    status:'published', tone:'red', icon:'\u26A1',
+    status:'published', tone:'red', icon: undefined,
     when:'A P1 critical ticket is raised, or escalation score rises above 70.',
     summary:'Keeps the commercial relationship intact while engineering resolves the incident, with clear ownership of customer communication.',
     phases:[
@@ -142,7 +142,7 @@ const DRIVE_SOPS = [
   {
     id:'sop_renewal', title:'Renewal defence SOP', category:'Renewal',
     owner:'Sam Rivera', updated:'Jul 05, 2025', version:'v2.6', reads:276, fmt:'SOP',
-    status:'published', tone:'blue', icon:'\u{1F504}',
+    status:'published', tone:'blue', icon: undefined,
     when:'An account enters the 120-day renewal window, or renewal forecast moves to At risk.',
     summary:'Turns the renewal conversation into a confirmation of value already delivered rather than a negotiation under time pressure.',
     phases:[
@@ -167,7 +167,7 @@ const DRIVE_SOPS = [
   {
     id:'sop_expansion', title:'Expansion qualification SOP', category:'Growth',
     owner:'Maya Chen', updated:'Jun 12, 2025', version:'v1.8', reads:143, fmt:'SOP',
-    status:'draft', tone:'teal', icon:'\u{1F4C8}',
+    status:'draft', tone:'teal', icon: undefined,
     when:'An expansion signal is detected \u2014 seat utilisation above 85%, or a new business unit appears.',
     summary:'Qualifies expansion signals before they reach the pipeline so AEs spend time on opportunities with genuine evidence behind them.',
     phases:[
@@ -178,7 +178,7 @@ const DRIVE_SOPS = [
       ]},
       { name:'Hand off', tasks:[
         { t:'Write the opportunity brief with evidence attached', owner:'CSM', due:'Day 10' },
-        { t:'Introduce the AE to the budget holder', owner:'CSM \u2192 AE', due:'Day 12' },
+        { t:'Introduce the AE to the budget holder', owner:'CSM  AE', due:'Day 12' },
         { t:'Create the CRM opportunity with the signal linked', owner:'AE', due:'Day 14' },
       ]},
     ],
@@ -187,7 +187,7 @@ const DRIVE_SOPS = [
 ];
 
 const DRIVE_KINDS = [
-  { id:'qbr', label:'QBR', singular:'QBR', icon:'\u{1F4CA}', tone:'blue', desc:'Business review decks, agendas and past QBR records.' },
+  { id:'qbr', label:'QBR', singular:'QBR', icon: undefined, tone:'blue', desc:'Business review decks, agendas and past QBR records.' },
 ];
 
 const DRIVE_FILES = [

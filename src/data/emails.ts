@@ -182,11 +182,11 @@ const EMAIL_TEMPLATES = [
 // three the CSM cares about; priority_queue and signal_triggered are kept
 // distinct because they already exist in the data.
 const TASK_SOURCES = {
-  action:           { label:'Actions',             tone:'blue',   icon:'\u26A1' },
-  email:            { label:'Converted from Email',tone:'purple', icon:'\u2709' },
-  manual:           { label:'Manually created',    tone:'slate',  icon:'\u270E' },
-  priority_queue:   { label:'Priority queue',      tone:'amber',  icon:'\u25A6' },
-  signal_triggered: { label:'Signal triggered',    tone:'teal',   icon:'\u{1F4E1}' },
+  action:           { label:'Actions',             tone:'blue',   icon: undefined },
+  email:            { label:'Converted from Email',tone:'purple', icon: undefined },
+  manual:           { label:'Manually created',    tone:'slate',  icon: undefined },
+  priority_queue:   { label:'Priority queue',      tone:'amber',  icon: undefined },
+  signal_triggered: { label:'Signal triggered',    tone:'teal',   icon: undefined },
 };
 
 export {

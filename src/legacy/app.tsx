@@ -27,6 +27,25 @@ import {
   DRIVE_KINDS,
   DRIVE_SOPS,
 } from '@/data/drive';
+// Phase 4: the primitives below now delegate to the real design system, so
+// every builder still living in this file is restyled at its source rather
+// than screen by screen. What remains here is layout and behaviour only.
+import {
+  Avatar as DsAvatar,
+  Badge as DsBadge,
+  Button as DsButton,
+  Card as DsCard,
+  Dialog as DsDialog,
+  Drawer as DsDrawer,
+  MetricCard as DsMetricCard,
+  Switch as DsSwitch,
+  Tabs as DsTabs,
+} from '@/design-system';
+import {
+  BarChart3, Building2, CheckSquare, ChevronRight, CircleDot, Contact, Database,
+  Gauge, Hash, KeyRound, Linkedin, Mail, MessageSquare, Mic, PenLine, Plug, Radio,
+  Server, ShieldCheck, Slack, Star, Target, ThumbsUp, Ticket, Users,
+} from 'lucide-react';
 
 import {
   HashRouter,
@@ -139,46 +158,40 @@ const taskSourceMeta = (t) => TASK_SOURCES[(t && t.source) || 'manual'] || TASK_
 function Avatar({ user, size='sm' }) {
   const u = typeof user === 'string' ? USERS[user] : user;
   if(!u) return null;
-  const sz = size === 'sm' ? 'w-7 h-7 text-xs' : size === 'lg' ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs';
-  return React.createElement('div', { className: `${sz} rounded-full flex items-center justify-center font-semibold text-white flex-shrink-0`, style: { background: u.color || '#4f46e5' } }, u.initials);
+  // Hue is derived from the name now, not carried on the record, so an avatar
+  // is the same colour everywhere the person appears.
+  return React.createElement(DsAvatar, { name: u.name, size: size === 'lg' ? 'lg' : size === 'md' ? 'md' : 'sm' });
 }
 
 function HealthBadge({ band, score, size='sm' }) {
   const cfg = {
-    red: { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500', label: 'At risk' },
-    yellow: { bg: 'bg-amber-100', text: 'text-amber-700', dot: 'bg-amber-500', label: 'Needs attention' },
-    green: { bg: 'bg-green-100', text: 'text-green-700', dot: 'bg-green-500', label: 'Healthy' },
-  }[band] || { bg: 'bg-gray-100', text: 'text-gray-500', dot: 'bg-gray-400', label: 'No data' };
-  return React.createElement('span', { className: `inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.text}` },
-    React.createElement('span', { className: `w-1.5 h-1.5 rounded-full ${cfg.dot}` }),
-    cfg.label, score != null && React.createElement('span', { className: 'font-bold' }, score)
+    red:    { tone:'danger',  label:'At risk' },
+    yellow: { tone:'warning', label:'Needs attention' },
+    green:  { tone:'success', label:'Healthy' },
+  }[band] || { tone:'neutral', label:'No data' };
+  return React.createElement(DsBadge, { tone: cfg.tone, dot: true, raw: true },
+    cfg.label,
+    score != null && React.createElement('span', { className:'font-semibold tabular-nums' }, score)
   );
 }
 
 function SeverityBadge({ severity }) {
-  const cfg = { critical: 'bg-red-100 text-red-700', high: 'bg-orange-100 text-orange-700', medium: 'bg-amber-100 text-amber-700', low: 'bg-gray-100 text-gray-600' }[severity] || 'bg-gray-100 text-gray-600';
-  return React.createElement('span', { className: `px-2 py-0.5 rounded text-xs font-medium ${cfg} capitalize` }, severity);
+  const tone = { critical:'danger', high:'danger', medium:'warning', low:'neutral' }[severity] || 'neutral';
+  return React.createElement(DsBadge, { tone }, severity);
 }
 
 function StatusBadge({ status }) {
-  const cfg = {
-    not_started: 'bg-gray-100 text-gray-600',
-    in_progress: 'bg-blue-100 text-blue-700',
-    at_risk: 'bg-red-100 text-red-700',
-    completed: 'bg-green-100 text-green-700',
-    abandoned: 'bg-gray-100 text-gray-500',
-    todo: 'bg-gray-100 text-gray-600',
-    done: 'bg-green-100 text-green-700',
-    skipped: 'bg-gray-100 text-gray-400',
-    upcoming: 'bg-amber-100 text-amber-700',
-  }[status] || 'bg-gray-100 text-gray-600';
-  const label = { not_started: 'Not started', in_progress: 'In progress', at_risk: 'At risk', completed: 'Completed', abandoned: 'Abandoned', todo: 'To do', done: 'Done', skipped: 'Skipped', upcoming: 'Upcoming' }[status] || status;
-  return React.createElement('span', { className: `px-2 py-0.5 rounded text-xs font-medium ${cfg}` }, label);
+  const tone = {
+    not_started:'neutral', in_progress:'info', at_risk:'danger', completed:'success',
+    abandoned:'neutral', todo:'neutral', done:'success', skipped:'neutral', upcoming:'warning',
+  }[status] || 'neutral';
+  const label = { not_started:'Not started', in_progress:'In progress', at_risk:'At risk', completed:'Completed', abandoned:'Abandoned', todo:'To do', done:'Done', skipped:'Skipped', upcoming:'Upcoming' }[status] || status;
+  return React.createElement(DsBadge, { tone }, label);
 }
 
 function Card({ children, className='', onClick, ...rest }) {
-  return React.createElement('div', Object.assign({
-    className: `bg-white rounded-xl border border-slate-200 shadow-sm ${className}`,
+  return React.createElement(DsCard, Object.assign({
+    className: (onClick ? 'transition-colors duration-[120ms] hover:bg-hover cursor-pointer ' : '') + className,
     onClick,
     role: onClick ? 'button' : undefined,
     tabIndex: onClick ? 0 : undefined,
@@ -186,78 +199,61 @@ function Card({ children, className='', onClick, ...rest }) {
   }, rest), children);
 }
 
-function MetricCard({ label, value, sub, subColor='text-slate-500', onClick }) {
-  return React.createElement(Card, { className: `p-4 ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`, onClick },
-    React.createElement('p', { className: 'text-xs font-medium text-slate-500 uppercase tracking-wide' }, label),
-    React.createElement('p', { className: 'text-2xl font-bold text-slate-900 mt-1' }, value),
-    sub && React.createElement('p', { className: `text-xs mt-0.5 ${subColor}` }, sub)
-  );
+function MetricCard({ label, value, sub, subColor, onClick }) {
+  return React.createElement(DsMetricCard, {
+    label, value, hint: sub,
+    className: onClick ? 'cursor-pointer transition-colors duration-[120ms] hover:bg-hover' : undefined,
+    onClick,
+  });
 }
 
 function Btn({ children, variant='primary', size='sm', onClick, disabled, className='' }) {
-  const base = 'inline-flex items-center gap-1.5 font-medium rounded-lg transition-all cursor-pointer border ';
-  const sz = size === 'sm' ? 'px-3 py-1.5 text-sm' : size === 'xs' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm';
-  const variants = {
-    primary: 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700',
-    secondary: 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50',
-    danger: 'bg-red-600 text-white border-red-600 hover:bg-red-700',
-    ghost: 'bg-transparent text-slate-600 border-transparent hover:bg-slate-100',
-    success: 'bg-green-600 text-white border-green-600 hover:bg-green-700',
-    teal: 'bg-teal-600 text-white border-teal-600 hover:bg-teal-700',
-  };
-  return React.createElement('button', { className: `${base}${sz} ${variants[variant]||variants.secondary} ${disabled?'opacity-50 cursor-not-allowed':''} ${className}`, onClick, disabled }, children);
+  // The MVP's six variants collapse onto the four the design system offers:
+  // success and teal were both just "a primary button that felt positive".
+  const v = { primary:'primary', success:'primary', teal:'primary',
+              secondary:'secondary', ghost:'ghost', danger:'danger' }[variant] || 'secondary';
+  return React.createElement(DsButton,
+    { variant: v, size: size === 'xs' ? 'sm' : size === 'lg' ? 'md' : 'sm', onClick, disabled, className },
+    children);
 }
 
 function Progress({ value, max=100, color='indigo' }) {
   const pct = Math.min(100, Math.round((value/max)*100));
-  const colors = { indigo: 'bg-indigo-500', green: 'bg-green-500', amber: 'bg-amber-500', red: 'bg-red-500' };
+  const colors = { indigo:'bg-accent', green:'bg-success-solid', amber:'bg-warning-solid', red:'bg-danger-solid' };
   return React.createElement('div', { className: 'w-full' },
-    React.createElement('div', { className: 'flex justify-between text-xs text-slate-500 mb-1' }, React.createElement('span', null), React.createElement('span', null, `${pct}%`)),
-    React.createElement('div', { className: 'w-full bg-slate-100 rounded-full h-2' },
-      React.createElement('div', { className: `h-2 rounded-full ${colors[color]||colors.indigo} transition-all`, style: { width: `${pct}%` } })
+    React.createElement('div', { className: 'flex justify-between text-caption text-on-surface-subtle mb-1' }, React.createElement('span', null), React.createElement('span', { className:'tabular-nums' }, `${pct}%`)),
+    React.createElement('div', { className: 'w-full bg-subtle rounded-full h-1.5 overflow-hidden' },
+      React.createElement('div', { className: `h-1.5 rounded-full ${colors[color]||colors.indigo} transition-all`, style: { width: `${pct}%` } })
     )
   );
 }
 
 function Tabs({ tabs, active, onChange }) {
-  return React.createElement('div', { className: 'flex gap-1 border-b border-slate-200' },
-    tabs.map(tab => React.createElement('button', { key: tab.id, onClick: () => onChange(tab.id), className: `px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${active===tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}` }, tab.label))
-  );
+  return React.createElement(DsTabs, {
+    value: active, onChange,
+    items: tabs.map(t => ({ value: t.id, label: t.label })),
+  });
 }
 
 function Drawer({ open, onClose, title, children, width='w-[480px]' }) {
-  if(!open) return null;
-  return React.createElement('div', { className: 'fixed inset-0 z-40 flex justify-end' },
-    React.createElement('div', { className: 'absolute inset-0 bg-black/30', onClick: onClose }),
-    React.createElement('div', { className: `relative ${width} h-full bg-white shadow-2xl flex flex-col animate-slide-in` },
-      React.createElement('div', { className: 'flex items-center justify-between px-6 py-4 border-b' },
-        React.createElement('h3', { className: 'font-semibold text-slate-900' }, title),
-        React.createElement('button', { onClick: onClose, className: 'text-slate-400 hover:text-slate-600 text-xl' }, '×')
-      ),
-      React.createElement('div', { className: 'flex-1 overflow-y-auto p-6' }, children)
-    )
-  );
+  return React.createElement(DsDrawer, {
+    open: !!open, onOpenChange: (o) => { if (!o) onClose(); },
+    title, width: /560|640|\[6/.test(String(width)) ? 'lg' : 'md',
+  }, children);
 }
 
 function Modal({ open, onClose, title, children, size='md' }) {
-  if(!open) return null;
-  const sz = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' }[size] || 'max-w-lg';
-  return React.createElement('div', { className: 'fixed inset-0 z-50 flex items-center justify-center p-4' },
-    React.createElement('div', { className: 'absolute inset-0 bg-black/40', onClick: onClose }),
-    React.createElement('div', { className: `relative w-full ${sz} bg-white rounded-2xl shadow-2xl animate-fade-in max-h-[90vh] flex flex-col` },
-      React.createElement('div', { className: 'flex items-center justify-between px-6 py-4 border-b flex-shrink-0' },
-        React.createElement('h3', { className: 'font-semibold text-slate-900' }, title),
-        React.createElement('button', { onClick: onClose, className: 'text-slate-400 hover:text-slate-600 text-xl' }, '×')
-      ),
-      React.createElement('div', { className: 'overflow-y-auto flex-1 p-6' }, children)
-    )
-  );
+  const sz = { sm:'max-w-md', md:'max-w-lg', lg:'max-w-2xl', xl:'max-w-4xl' }[size] || 'max-w-lg';
+  return React.createElement(DsDialog, {
+    open: !!open, onOpenChange: (o) => { if (!o) onClose(); },
+    title, className: sz,
+  }, children);
 }
 
 function Toast({ toasts, dispatch }) {
   return React.createElement('div', { className: 'fixed bottom-4 right-4 z-50 flex flex-col gap-2' },
     toasts.map(t => React.createElement('div', { key: t.id, className: `flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium animate-fade-in ${t.type==='success'?'bg-green-600 text-white':t.type==='danger'?'bg-red-600 text-white':'bg-slate-800 text-white'}` },
-      React.createElement('span', null, t.type==='success'?'✓':'ℹ'),
+      React.createElement('span', null, t.type==='success'?'':'ℹ'),
       React.createElement('span', null, t.msg),
       React.createElement('button', { onClick: ()=>dispatch({type:'DISMISS_TOAST',id:t.id}), className:'ml-2 opacity-70 hover:opacity-100' }, '×')
     ))
@@ -461,14 +457,14 @@ function parsePromptToWidget(prompt) {
 // ============================================================
 
 const NAV = [
-  { label:'Dashboard', path:'/dashboard', icon:'▦' },
-  { label:'My Work', path:'/work', icon:'✓' },
-  { label:'Customers', path:'/customers', icon:'⬛' },
-  { label:'Risks', path:'/risks', icon:'⚠' },
-  { label:'Expansion', path:'/expansion', icon:'↗' },
-  { label:'Actions', path:'/actions', icon:'⚡' },
-  { label:'CX42 Drive', path:'/drive', icon:'📁' },
-  { label:'Admin', path:'/admin', icon:'⚙' },
+  { label:'Dashboard', path:'/dashboard', icon:'' },
+  { label:'My Work', path:'/work', icon:'' },
+  { label:'Customers', path:'/customers', icon:'' },
+  { label:'Risks', path:'/risks', icon:'' },
+  { label:'Expansion', path:'/expansion', icon:'' },
+  { label:'Actions', path:'/actions', icon:'' },
+  { label:'CX42 Drive', path:'/drive', icon:'' },
+  { label:'Admin', path:'/admin', icon:'' },
 ];
 
 
@@ -491,7 +487,7 @@ const roleIdFromLabel = (label) => (APP_ROLES.find(r => r.label === label) || AP
 // Every privilege is listed individually and granted per role.
 // Key: [csm, senior_csm, team_lead, manager, support]
 const PRIVILEGE_GROUPS = [
-  { group:'Customers', icon:'\u{1F3E2}', items:[
+  { group:'Customers', icon:'', items:[
     { key:'cust.view_own',      label:'View own portfolio',            desc:'See accounts where the user is the assigned owner.',            roles:[1,1,1,1,1] },
     { key:'cust.view_all',      label:'View all accounts',             desc:'See every account regardless of ownership.',                    roles:[0,1,1,1,0] },
     { key:'cust.edit_fields',   label:'Edit account fields',           desc:'Change health inputs, churn status, sentiment and segment.',    roles:[1,1,1,1,0] },
@@ -499,7 +495,7 @@ const PRIVILEGE_GROUPS = [
     { key:'cust.export',        label:'Export customer data',          desc:'Download account lists and health history as CSV.',             roles:[0,1,1,1,0] },
     { key:'cust.delete',        label:'Delete an account',             desc:'Permanently remove an account record.',                         roles:[0,0,0,1,0] },
   ]},
-  { group:'Goals & tasks', icon:'\u{1F3AF}', items:[
+  { group:'Goals & tasks', icon:'', items:[
     { key:'goal.create',        label:'Create goals',                  desc:'Raise a new goal on any account they can view.',                roles:[1,1,1,1,0] },
     { key:'goal.edit_own',      label:'Edit own goals',                desc:'Amend goals they own.',                                          roles:[1,1,1,1,0] },
     { key:'goal.edit_any',      label:'Edit any goal',                 desc:'Amend goals owned by other users.',                              roles:[0,0,1,1,0] },
@@ -507,7 +503,7 @@ const PRIVILEGE_GROUPS = [
     { key:'task.complete',      label:'Complete tasks',                desc:'Mark tasks done or skipped.',                                    roles:[1,1,1,1,1] },
     { key:'task.reassign',      label:'Reassign tasks',                desc:'Move a task to another owner.',                                  roles:[0,1,1,1,0] },
   ]},
-  { group:'Tickets', icon:'\u{1F3AB}', items:[
+  { group:'Tickets', icon:'', items:[
     { key:'tkt.view',           label:'View tickets',                  desc:'Read tickets on accounts they can view.',                        roles:[1,1,1,1,1] },
     { key:'tkt.reply',          label:'Reply to tickets',              desc:'Post public replies to the customer.',                           roles:[0,0,0,0,1] },
     { key:'tkt.note',           label:'Add private notes',             desc:'Post internal-only notes on a ticket.',                          roles:[1,1,1,1,1] },
@@ -515,30 +511,30 @@ const PRIVILEGE_GROUPS = [
     { key:'tkt.escalate',       label:'Escalate a ticket',             desc:'Push a ticket to tier 2 or engineering.',                        roles:[1,1,1,1,1] },
     { key:'tkt.close',          label:'Close tickets',                 desc:'Resolve or close a ticket.',                                     roles:[0,0,1,1,1] },
   ]},
-  { group:'Actions', icon:'\u26A1', items:[
+  { group:'Actions', icon:'', items:[
     { key:'act.view',           label:'View the action library',       desc:'See published actions and what they do.',                        roles:[1,1,1,1,1] },
     { key:'act.edit_message',   label:'Edit action messages',          desc:'Personalise the email or chat copy an action sends.',            roles:[1,1,1,1,0] },
     { key:'act.pause',          label:'Pause or resume an action',     desc:'Temporarily stop an action from running.',                       roles:[0,1,1,1,0] },
     { key:'act.clone',          label:'Publish an action from an automation', desc:'Clone a customer automation into the action library.',    roles:[0,0,0,1,0] },
   ]},
-  { group:'Automation (admin)', icon:'\u{1F9E9}', items:[
+  { group:'Automation (admin)', icon:'', items:[
     { key:'auto.view',          label:'View automations',              desc:'Open the automation builder in read mode.',                      roles:[0,0,1,1,0] },
     { key:'auto.create',        label:'Create or edit automations',    desc:'Build triggers, conditions and actions.',                        roles:[0,0,0,1,0] },
     { key:'auto.delete',        label:'Delete automations',            desc:'Permanently remove an automation.',                              roles:[0,0,0,1,0] },
   ]},
-  { group:'CX42 Drive', icon:'\u{1F4C1}', items:[
+  { group:'CX42 Drive', icon:'', items:[
     { key:'drive.view',         label:'View Drive content',            desc:'Read SOPs, QBR decks and goal templates.',                  roles:[1,1,1,1,1] },
     { key:'drive.upload',       label:'Upload templates and SOPs',     desc:'Add new files to the Drive library.',                            roles:[0,1,1,1,0] },
     { key:'drive.publish',      label:'Publish or unpublish',          desc:'Move a Drive item between draft and published.',                 roles:[0,0,1,1,0] },
     { key:'drive.delete',       label:'Delete Drive content',          desc:'Permanently remove a template or SOP.',                          roles:[0,0,0,1,0] },
   ]},
-  { group:'Reporting', icon:'\u{1F4C8}', items:[
+  { group:'Reporting', icon:'', items:[
     { key:'rpt.own',            label:'View own performance',          desc:'See their own portfolio metrics.',                               roles:[1,1,1,1,1] },
     { key:'rpt.team',           label:'View team performance',         desc:'See metrics across a pod of users.',                             roles:[0,0,1,1,0] },
     { key:'rpt.org',            label:'View org-wide reporting',       desc:'See metrics across the whole customer base.',                    roles:[0,0,0,1,0] },
     { key:'rpt.export',         label:'Export reports',                desc:'Download report data.',                                          roles:[0,1,1,1,0] },
   ]},
-  { group:'Administration', icon:'\u2699', items:[
+  { group:'Administration', icon:'', items:[
     { key:'adm.fields',         label:'Manage field manager',          desc:'Add or retire fields on any object.',                            roles:[0,0,0,1,0] },
     { key:'adm.sla',            label:'Manage SLA configuration',      desc:'Edit targets, calendars, escalation and pause rules.',           roles:[0,0,0,1,0] },
     { key:'adm.assignment',     label:'Manage assignment policies',    desc:'Edit ticket and company routing rules.',                         roles:[0,0,0,1,0] },
@@ -547,7 +543,7 @@ const PRIVILEGE_GROUPS = [
     { key:'adm.signals',        label:'Manage signal sources',         desc:'Tune the sources feeding health and triggers.',                   roles:[0,0,0,1,0] },
     { key:'adm.roles',          label:'Manage roles and privileges',   desc:'Grant or revoke privileges on this page.',                        roles:[0,0,0,1,0] },
   ]},
-  { group:'Data & privacy', icon:'\u{1F512}', items:[
+  { group:'Data & privacy', icon:'', items:[
     { key:'data.pii',           label:'View contact PII',              desc:'See contact email addresses and phone numbers.',                 roles:[1,1,1,1,1] },
     { key:'data.bulk_edit',     label:'Bulk edit records',             desc:'Apply a change across many records at once.',                    roles:[0,0,1,1,0] },
     { key:'data.audit',         label:'View the audit log',            desc:'See who changed what and when.',                                 roles:[0,0,0,1,0] },
@@ -566,9 +562,9 @@ const PROFILE_TIMEZONES = [
   'Australia/Sydney (AEST, UTC+10)','UTC',
 ];
 const PROFILE_MAILBOXES = [
-  { id:'gmail',   label:'Google Workspace', icon:'\u2709', note:'Gmail, Calendar and contact sync' },
-  { id:'o365',    label:'Microsoft 365',    icon:'\u{1F4E7}', note:'Outlook, Calendar and Teams presence' },
-  { id:'imap',    label:'Other (IMAP/SMTP)',icon:'\u{1F5A5}', note:'Manual server configuration' },
+  { id:'gmail',   label:'Google Workspace', icon:'', note:'Gmail, Calendar and contact sync' },
+  { id:'o365',    label:'Microsoft 365',    icon:'', note:'Outlook, Calendar and Teams presence' },
+  { id:'imap',    label:'Other (IMAP/SMTP)',icon:Server, note:'Manual server configuration' },
 ];
 const PROFILE_TEMPLATES = [
   { id:'pt1', name:'Check-in \u2014 quiet account',      kind:'Email', uses:42, updated:'Aug 02, 2025' },
@@ -626,7 +622,7 @@ function ProfileSettings(){
           React.createElement('p', { className:'text-lg font-bold text-slate-900' }, user.name),
           React.createElement('p', { className:'text-sm text-slate-500' }, agent.role + ' \u00b7 ' + mailbox.address),
           React.createElement('div', { className:'flex gap-2 mt-2 flex-wrap' },
-            React.createElement(CxPill, { tone: mailbox.connected ? 'green':'amber' }, mailbox.connected ? '\u25CF Mailbox connected' : '\u25CB Mailbox not connected'),
+            React.createElement(CxPill, { tone: mailbox.connected ? 'green':'amber' }, mailbox.connected ? 'Mailbox connected' : 'Mailbox not connected'),
             React.createElement(CxPill, { tone:'slate' }, tz.split(' ')[0]),
             React.createElement(CxPill, { tone:'blue' }, 'Mailbox ready'))
         )
@@ -661,8 +657,8 @@ function ProfileSettings(){
         React.createElement('div', {
           onDragOver:e=>{ e.preventDefault(); setDragAvatar(true); },
           onDragLeave:()=>setDragAvatar(false),
-          onDrop:e=>{ e.preventDefault(); setDragAvatar(false); setAvatar('\u{1F464}'); toast('Profile picture uploaded'); },
-          onClick:()=>{ setAvatar('\u{1F464}'); toast('Profile picture uploaded'); },
+          onDrop:e=>{ e.preventDefault(); setDragAvatar(false); setAvatar(''); toast('Profile picture uploaded'); },
+          onClick:()=>{ setAvatar(''); toast('Profile picture uploaded'); },
           className:`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${dragAvatar?'border-indigo-400 bg-indigo-50':'border-slate-200 hover:border-indigo-300'}`
         },
           React.createElement('div', { className:'w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-2xl mx-auto mb-2' },
@@ -684,7 +680,7 @@ function ProfileSettings(){
         mailbox.connected
           ? React.createElement('div', null,
               React.createElement('div', { className:'flex items-center gap-3 border border-green-200 bg-green-50/60 rounded-xl p-3 flex-wrap' },
-                React.createElement('span', { className:'w-9 h-9 rounded-lg bg-white border border-green-200 flex items-center justify-center text-base flex-shrink-0' }, '\u2709'),
+                React.createElement('span', { className:'w-9 h-9 rounded-lg bg-white border border-green-200 flex items-center justify-center text-base flex-shrink-0' }, ''),
                 React.createElement('div', { className:'flex-1 min-w-0' },
                   React.createElement('p', { className:'text-sm font-semibold text-slate-800' },
                     (PROFILE_MAILBOXES.find(m=>m.id===mailbox.provider)||{}).label + ' \u2014 ' + mailbox.address),
@@ -710,7 +706,7 @@ function ProfileSettings(){
                 key:m.id, onClick:()=>setOauth(m.id),
                 className:'text-left border border-slate-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-sm transition-all'
               },
-                React.createElement('div', { className:'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-base mb-2' }, m.icon),
+                React.createElement('div', { className:'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-base mb-2' }, renderIcon(m.icon)),
                 React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, m.label),
                 React.createElement('p', { className:'text-[11px] text-slate-500 mt-0.5' }, m.note)
               ))
@@ -722,7 +718,7 @@ function ProfileSettings(){
         React.createElement('div', { className:'space-y-3' },
           React.createElement('div', { className:'flex items-center gap-3 border border-slate-200 rounded-xl p-3' },
             React.createElement('span', { className:'w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-lg flex-shrink-0' },
-              (PROFILE_MAILBOXES.find(m=>m.id===oauth)||{}).icon || '\u2709'),
+              (PROFILE_MAILBOXES.find(m=>m.id===oauth)||{}).icon || ''),
             React.createElement('div', null,
               React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, 'CX42 wants access to your mailbox'),
               React.createElement('p', { className:'text-[11px] text-slate-500' }, user.name + ' \u00b7 ' + (mailbox.address || 'maya.chen@cx42.io')))),
@@ -733,7 +729,7 @@ function ProfileSettings(){
                ['Send mail on your behalf', 'Only when you press Send \u2014 automations use the support mailbox, not yours.'],
                ['Read your calendar', 'Used to schedule QBRs and show availability.']].map(r =>
                 React.createElement('div', { key:r[0], className:'flex items-start gap-2' },
-                  React.createElement('span', { className:'text-green-600 text-xs mt-0.5' }, '\u2713'),
+                  React.createElement('span', { className:'text-green-600 text-xs mt-0.5' }, ''),
                   React.createElement('div', null,
                     React.createElement('p', { className:'text-sm text-slate-800' }, r[0]),
                     React.createElement('p', { className:'text-[11px] text-slate-500' }, r[1])))))),
@@ -815,7 +811,7 @@ function ProfileSettings(){
             React.createElement('div', { className:'flex items-center gap-2' },
               React.createElement('label', { className:lbl }, f.label),
               f.req && React.createElement(CxPill, { tone:'amber' }, 'Required'),
-              readOnly && React.createElement(CxPill, { tone:'slate' }, '\u{1F512} Read-only')),
+              readOnly && React.createElement(CxPill, { tone:'slate' }, 'Read-only')),
             f.key === 'role'
               ? React.createElement('select', { value:agent.role, onChange:e=>setAgent(a=>({...a,role:e.target.value})), className:'mt-1 '+inp },
                   roleOptions.map(r=>React.createElement('option',{key:r},r)))
@@ -867,21 +863,21 @@ function Sidebar({ activeRole }) {
       navItems.map(item => {
         const isActive = item.path === '/admin' ? location.pathname.startsWith('/admin') : (location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path)));
         return React.createElement(NavLink, { key:item.path, to:item.path, className:() => `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors mb-1 ${isActive ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}` },
-          React.createElement('span', { className:'text-base' }, item.icon),
+          React.createElement('span', { className:'text-base' }, renderIcon(item.icon)),
           item.label
         );
       })
     ),
     // Manager/Exec shortcut (if CSM)
     activeRole === 'csm' && React.createElement('div', { className:'px-2 pb-2' },
-      React.createElement('button', { onClick:() => navigate('/manager'), className:'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:bg-slate-700 hover:text-white transition-colors' }, '📊 Manager view')
+      React.createElement('button', { onClick:() => navigate('/manager'), className:'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:bg-slate-700 hover:text-white transition-colors' }, 'Manager view')
     ),
     // Profile settings — pinned to the bottom of the nav
     React.createElement('div', { className:'px-2 pb-2' },
       React.createElement('button', {
         onClick:() => navigate('/profile'),
         className:`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${location.pathname === '/profile' ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`
-      }, React.createElement('span', { className:'text-base' }, '\u2699'), 'Profile settings')
+      }, React.createElement('span', { className:'text-base' }, ''), 'Profile settings')
     ),
     // User
     React.createElement('div', { className:'px-3 py-3 border-t border-slate-700 relative' },
@@ -924,21 +920,21 @@ function SpotlightSearch({ open, onClose }) {
     const groups = [];
 
     const NAV = [
-      { label:'Dashboard', path:'/dashboard', icon:'\u25EB' },
-      { label:'My Work', path:'/work', icon:'\u2713' },
-      { label:'Customers', path:'/customers', icon:'\u{1F3E2}' },
-      { label:'Risks', path:'/risks', icon:'\u26A0' },
-      { label:'Expansion', path:'/expansion', icon:'\u2197' },
-      { label:'Actions', path:'/actions', icon:'\u26A1' },
-      { label:'Profile settings', path:'/profile', icon:'\u2699' },
-      { label:'CX42 Drive', path:'/drive', icon:'\u{1F4C1}' },
-      { label:'Admin', path:'/admin', icon:'\u2699' },
+      { label:'Dashboard', path:'/dashboard', icon:'' },
+      { label:'My Work', path:'/work', icon:'' },
+      { label:'Customers', path:'/customers', icon:'' },
+      { label:'Risks', path:'/risks', icon:'' },
+      { label:'Expansion', path:'/expansion', icon:'' },
+      { label:'Actions', path:'/actions', icon:'' },
+      { label:'Profile settings', path:'/profile', icon:'' },
+      { label:'CX42 Drive', path:'/drive', icon:'' },
+      { label:'Admin', path:'/admin', icon:'' },
     ];
     const ACTIONS = [
-      { label:'Ask CX42 assistant', icon:'\u2726', run:()=>{ onClose(); dispatch({type:'TOGGLE_ASSISTANT'}); } },
-      { label:'Go to Field Manager', icon:'\u{1F5C3}', run:()=>go('/admin') },
-      { label:'Go to Triggers', icon:'\u26A1', run:()=>go('/admin') },
-      { label:'View my portfolio', icon:'\u{1F464}', run:()=>go('/customers?owner=' + (state.activeUser||'maya')) },
+      { label:'Ask CX42 assistant', icon:'', run:()=>{ onClose(); dispatch({type:'TOGGLE_ASSISTANT'}); } },
+      { label:'Go to Field Manager', icon:'', run:()=>go('/admin') },
+      { label:'Go to Triggers', icon:'', run:()=>go('/admin') },
+      { label:'View my portfolio', icon:'', run:()=>go('/customers?owner=' + (state.activeUser||'maya')) },
       { label:'Renewals in next 30 days', icon:'\u23F1', run:()=>go('/customers?owner=' + (state.activeUser||'maya') + '&renewalWithin=30') },
     ];
 
@@ -952,7 +948,7 @@ function SpotlightSearch({ open, onClose }) {
     const custs = state.customers.filter(c => hit(c.name) || hit(c.domain) || hit(c.segment)).slice(0,6);
     if (custs.length) groups.push({ label:'Customers', items: custs.map(c => {
       const h = HEALTH_SIGNALS[c.healthId];
-      return { icon:'\u{1F3E2}', title:c.name, sub:`${c.domain} \u00b7 ${formatARR(c.arr)} \u00b7 ${c.segment.replace('_',' ')}`,
+      return { icon:'', title:c.name, sub:`${c.domain} \u00b7 ${formatARR(c.arr)} \u00b7 ${c.segment.replace('_',' ')}`,
                tag: h ? { text:h.band, tone: h.band==='red'?'red':h.band==='yellow'?'amber':'green' } : null,
                run:()=>go('/customers/' + c.id) };
     })});
@@ -960,25 +956,25 @@ function SpotlightSearch({ open, onClose }) {
     const goals = Object.values(state.goals).filter(g => hit(g.title) || hit(g.type)).slice(0,5);
     if (goals.length) groups.push({ label:'Goals', items: goals.map(g => {
       const c = state.customers.find(x=>x.id===g.customerId);
-      return { icon:'\u{1F3AF}', title:g.title, sub:(c?c.name:'') + ' \u00b7 ' + g.status.replace('_',' '),
+      return { icon:'', title:g.title, sub:(c?c.name:'') + ' \u00b7 ' + g.status.replace('_',' '),
                run:()=>go('/customers/' + g.customerId + '?tab=goals&goal=' + g.id) };
     })});
 
     const tasks = Object.values(state.tasks).filter(t => hit(t.title)).slice(0,5);
     if (tasks.length) groups.push({ label:'Tasks', items: tasks.map(t => ({
-      icon:'\u2713', title:t.title, sub:(t.type||'custom').replace('_',' ') + ' \u00b7 ' + t.status,
+      icon:'', title:t.title, sub:(t.type||'custom').replace('_',' ') + ' \u00b7 ' + t.status,
       run:()=>go('/work?task=' + t.id) })) });
 
     const contacts = Object.values(CONTACTS).filter(c => hit(c.name) || hit(c.role) || hit(c.email)).slice(0,4);
     if (contacts.length) groups.push({ label:'Contacts', items: contacts.map(c => {
       const cust = state.customers.find(x=>(x.contactIds||[]).includes(c.id));
-      return { icon:'\u{1F464}', title:c.name, sub:c.role + (cust ? ' \u00b7 ' + cust.name : ''),
+      return { icon:'', title:c.name, sub:c.role + (cust ? ' \u00b7 ' + cust.name : ''),
                run:()=>cust ? go('/customers/' + cust.id + '?tab=contacts') : go('/customers') };
     })});
 
     const risks = Object.values(state.risks).filter(r => hit(r.title)).slice(0,4);
     if (risks.length) groups.push({ label:'Risks', items: risks.map(r => ({
-      icon:'\u26A0', title:r.title, sub:formatARR(r.amountAtRisk) + ' at risk \u00b7 ' + r.severity,
+      icon:'', title:r.title, sub:formatARR(r.amountAtRisk) + ' at risk \u00b7 ' + r.severity,
       tag:{ text:r.severity, tone:r.severity==='critical'?'red':'amber' }, run:()=>go('/risks') })) });
 
     const navHits = NAV.filter(n => hit(n.label));
@@ -1037,13 +1033,13 @@ function SpotlightSearch({ open, onClose }) {
                   key:group.label + myIdx, onClick:item.run, onMouseEnter:()=>setCursor(myIdx),
                   className:`w-full text-left px-4 py-2.5 flex items-center gap-3 transition-colors ${active ? 'bg-indigo-50' : 'hover:bg-slate-50'}`
                 },
-                  React.createElement('span', { className:`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${active?'bg-indigo-100':'bg-slate-100'}` }, item.icon),
+                  React.createElement('span', { className:`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${active?'bg-indigo-100':'bg-slate-100'}` }, renderIcon(item.icon)),
                   React.createElement('span', { className:'flex-1 min-w-0' },
                     React.createElement('span', { className:'block text-sm font-medium text-slate-900 truncate' }, item.title),
                     React.createElement('span', { className:'block text-xs text-slate-400 truncate' }, item.sub)
                   ),
                   item.tag && React.createElement('span', { className:`px-2 py-0.5 rounded-full text-[10px] font-bold capitalize flex-shrink-0 ${toneCls[item.tag.tone]}` }, item.tag.text),
-                  active && React.createElement('span', { className:'text-[10px] text-indigo-400 font-semibold flex-shrink-0' }, '\u21B5')
+                  active && React.createElement('span', { className:'text-[10px] text-indigo-400 font-semibold flex-shrink-0' }, '')
                 );
               })
             ))
@@ -1051,7 +1047,7 @@ function SpotlightSearch({ open, onClose }) {
 
       // Footer hints
       React.createElement('div', { className:'flex items-center gap-4 px-4 py-2 border-t border-slate-100 bg-slate-50' },
-        [['\u2191\u2193','Navigate'],['\u21B5','Open'],['esc','Close']].map(h =>
+        [['','Navigate'],['','Open'],['esc','Close']].map(h =>
           React.createElement('span', { key:h[1], className:'flex items-center gap-1.5 text-[11px] text-slate-400' },
             React.createElement('kbd', { className:'px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[10px] font-semibold text-slate-500' }, h[0]),
             h[1])),
@@ -1095,14 +1091,14 @@ function Header({ title, subtitle, actions, pageActions }) {
     // Notifications
     React.createElement('div', { className:'relative' },
       React.createElement('button', { onClick:()=>setShowNotif(!showNotif), className:'relative p-1.5 rounded-lg hover:bg-slate-100 text-slate-600' },
-        '🔔',
+        '',
         React.createElement('span', { className:'absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center' }, '5')
       )
     ),
     // Ask CX42 — hidden on customer detail, where the page header carries its own
     // account-scoped button. Two entry points there would be ambiguous.
     !/^\/customers\/[^/]+/.test(location.pathname) && React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>dispatch({type:'TOGGLE_ASSISTANT'}) },
-      '✦ Ask CX42'
+      'Ask CX42'
     ),
     // Page actions
     ...(pageActions || [])
@@ -1116,7 +1112,7 @@ function Header({ title, subtitle, actions, pageActions }) {
 const ASSISTANT_RESPONSES = {
   portfolio_attention: {
     text: "Three accounts need your attention today. Acme Analytics moved to red three days ago—a critical data sync failure is blocking 47 users and renewal is in 74 days. Globex Cloud's executive sponsor position is vacant with only 28 days to renewal. HelioWorks has a critical ticket open for 5 days without CSM follow-up.",
-    chips: [{ label:'Acme: Health → Red', type:'usage' }, { label:'Globex: Renewal 28d', type:'commercial' }, { label:'HelioWorks: Critical ticket', type:'ticket' }],
+    chips: [{ label:'Acme: Health Red', type:'usage' }, { label:'Globex: Renewal 28d', type:'commercial' }, { label:'HelioWorks: Critical ticket', type:'ticket' }],
     actions:['Review Acme recovery plan','Update Globex renewal forecast','Follow up on HelioWorks ticket']
   },
   portfolio_renewals: {
@@ -1158,27 +1154,27 @@ const ASSISTANT_RESPONSES = {
 // global; every other module opens scoped to itself with a toggle to widen.
 // ============================================================
 const ASSISTANT_SCOPES = {
-  global:      { id:'global',      label:'All of CX42',      short:'Global',       icon:'\u2726',
+  global:      { id:'global',      label:'All of CX42',      short:'Global',       icon:'',
                  prompts:['What needs my attention today?','Which renewals are most exposed?','Where do we have expansion evidence?'] },
-  work:        { id:'work',        label:'My Work',          short:'My Work',      icon:'\u2713',
+  work:        { id:'work',        label:'My Work',          short:'My Work',      icon:'',
                  prompts:['What should I pick up first today?','Which tasks are overdue?','Summarise my unread email'] },
-  customers:   { id:'customers',   label:'Customer list',    short:'Customers',    icon:'\u{1F3E2}',
+  customers:   { id:'customers',   label:'Customer list',    short:'Customers',    icon:'',
                  prompts:['Which accounts are trending down?','Who is renewing in the next 60 days?','Which accounts have no active goal?'] },
-  customer:    { id:'customer',    label:'this account',     short:'This account', icon:'\u{1F3E2}',
+  customer:    { id:'customer',    label:'this account',     short:'This account', icon:'',
                  prompts:["Why did this customer's health change?",'Prepare me for the next meeting','Draft a customer follow-up'] },
-  health:      { id:'health',      label:'Customer Health',  short:'Health',       icon:'\u2665',
+  health:      { id:'health',      label:'Customer Health',  short:'Health',       icon:'',
                  prompts:['Which accounts moved band this month?','What is driving the red accounts?','Where is health data stale?'] },
-  renewals:    { id:'renewals',    label:'Renewals',         short:'Renewals',     icon:'\u{1F504}',
+  renewals:    { id:'renewals',    label:'Renewals',         short:'Renewals',     icon:'',
                  prompts:['Which renewals are at risk?','What is my forecast this quarter?','Which renewals have no owner action?'] },
-  risks:       { id:'risks',       label:'Risks',            short:'Risks',        icon:'\u26A0',
+  risks:       { id:'risks',       label:'Risks',            short:'Risks',        icon:'',
                  prompts:['What are my highest-value open risks?','Which risks have no mitigation plan?','What changed on risks this week?'] },
-  expansion:   { id:'expansion',   label:'Expansion',        short:'Expansion',    icon:'\u{1F4C8}',
+  expansion:   { id:'expansion',   label:'Expansion',        short:'Expansion',    icon:'',
                  prompts:['Where is the strongest expansion evidence?','Which opportunities are unqualified?','Draft a discovery outreach'] },
-  actions:     { id:'actions',       label:'Actions',          short:'Actions',      icon:'\u26A1',
+  actions:     { id:'actions',       label:'Actions',          short:'Actions',      icon:'',
                  prompts:['Which actions fired most this month?','What does this action actually do?','Which actions send customer emails?'] },
-  drive:       { id:'drive',       label:'CX42 Drive',       short:'Drive',        icon:'\u{1F4C1}',
+  drive:       { id:'drive',       label:'CX42 Drive',       short:'Drive',        icon:'',
                  prompts:['Which SOP applies to a churn risk?','What is in the onboarding SOP?','Find the QBR template for enterprise'] },
-  admin:       { id:'admin',       label:'Admin',            short:'Admin',        icon:'\u2699',
+  admin:       { id:'admin',       label:'Admin',            short:'Admin',        icon:'',
                  prompts:['Which roles can edit SLA settings?','Who has not connected a mailbox?','What automations are active?'] },
 };
 
@@ -1265,10 +1261,10 @@ Customer Success Manager`);
     // Header
     React.createElement('div', { className:'flex items-center justify-between px-4 py-3 border-b bg-slate-800' },
       React.createElement('div', { className:'flex items-center gap-2 min-w-0' },
-        React.createElement('div', { className:'w-6 h-6 bg-indigo-500 rounded flex items-center justify-center text-white text-xs font-bold' }, '✦'),
+        React.createElement('div', { className:'w-6 h-6 bg-indigo-500 rounded flex items-center justify-center text-white text-xs font-bold' }, ''),
         React.createElement('span', { className:'text-white font-semibold text-sm' }, 'Ask CX42'),
         React.createElement('span', { className:'px-2 py-0.5 bg-slate-700 text-slate-200 text-[11px] rounded-full truncate max-w-[150px]' },
-          scope.icon + ' ' + scopeLabel)
+          scopeLabel)
       ),
       React.createElement('button', { onClick:()=>dispatch({type:'TOGGLE_ASSISTANT'}), className:'text-slate-400 hover:text-white' }, '×')
     ),
@@ -1300,7 +1296,7 @@ Customer Success Manager`);
               React.createElement('p', { className:'text-sm text-slate-700 leading-relaxed' }, msg.text),
               msg.chips && msg.chips.length > 0 && React.createElement('div', { className:'flex flex-wrap gap-1.5 mt-2' }, msg.chips.map((c,j) => React.createElement(EvidenceChip, { key:j, label:c.label, type:c.type }))),
               msg.actions && msg.actions.length > 0 && React.createElement('div', { className:'flex flex-col gap-1 mt-2' },
-                msg.actions.map((a,j) => React.createElement('button', { key:j, onClick:()=>{ if(a.includes('Draft outreach')||a.includes('Draft a customer')||a.includes('Draft discovery')) setShowDraft(true); else handlePrompt(a); }, className:'text-left text-xs text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors' }, '→ ' + a))
+                msg.actions.map((a,j) => React.createElement('button', { key:j, onClick:()=>{ if(a.includes('Draft outreach')||a.includes('Draft a customer')||a.includes('Draft discovery')) setShowDraft(true); else handlePrompt(a); }, className:'text-left text-xs text-indigo-600 hover:text-indigo-800 font-medium px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors' }, '' + a))
               )
             )
       ))
@@ -1309,7 +1305,7 @@ Customer Success Manager`);
     React.createElement('div', { className:'px-4 py-3 border-t' },
       React.createElement('div', { className:'flex gap-2' },
         React.createElement('input', { value:input, onChange:e=>setInput(e.target.value), onKeyDown:e=>e.key==='Enter'&&input&&handlePrompt(input), placeholder:'Ask anything about your portfolio...', className:'flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500' }),
-        React.createElement('button', { onClick:()=>input&&handlePrompt(input), className:'px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700' }, '→')
+        React.createElement('button', { onClick:()=>input&&handlePrompt(input), className:'px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700' }, '')
       )
     ),
     // Draft modal
@@ -1327,7 +1323,7 @@ Customer Success Manager`);
           React.createElement('label', { className:'text-xs font-medium text-slate-500' }, 'Message'),
           React.createElement('textarea', { value:draftBody, onChange:e=>setDraftBody(e.target.value), rows:10, className:'w-full text-sm border border-slate-200 rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono' })
         ),
-        React.createElement('p', { className:'text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg' }, '⚠ This email will be sent to the customer. Please review before sending.'),
+        React.createElement('p', { className:'text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg' }, 'This email will be sent to the customer. Please review before sending.'),
         React.createElement('div', { className:'flex gap-2 pt-2' },
           React.createElement(Btn, { variant:'primary', onClick:handleSendEmail }, 'Send email'),
           React.createElement(Btn, { variant:'secondary', onClick:()=>setShowDraft(false) }, 'Cancel')
@@ -1356,7 +1352,7 @@ function Dashboard() {
   // Every item is a usage/health/expansion signal \u2014 opening one creates a task
   const priorityItems = [
     { id:'p1', kind:'usage',  severity:'critical', customer:'Acme Analytics', customerId:'acme',
-      reason:'Health moved yellow \u2192 red. Weekly active users down 64% over 12 weeks.', arr:'$240K', due:'Renewal in 74d',
+      reason:'Health moved yellow  red. Weekly active users down 64% over 12 weeks.', arr:'$240K', due:'Renewal in 74d',
       taskTitle:'Investigate usage decline at Acme Analytics', taskType:'custom' },
     { id:'p2', kind:'usage',  severity:'high', customer:'Globex Cloud', customerId:'globex',
       reason:'Renewal in 28 days with no executive sponsor identified.', arr:'$195K', due:'Renewal in 28d',
@@ -1398,17 +1394,17 @@ function Dashboard() {
 
   return React.createElement('div', { className:'space-y-6 max-w-[1400px]' },
 
-    // \u2500\u2500 Header \u2500\u2500
+    //  Header 
     React.createElement('div', null,
       React.createElement('h2', { className:'text-xl font-semibold text-slate-900' }, 'Good morning, Maya \ud83d\udc4b'),
       React.createElement('p', { className:'text-slate-500 text-sm mt-0.5' }, "Here's what changed across your portfolio.")
     ),
 
-    // \u2500\u2500 Metrics \u2014 each scoped to the signed-in CSM \u2500\u2500
+    //  Metrics \u2014 each scoped to the signed-in CSM 
     React.createElement('div', { className:'grid grid-cols-4 gap-4' },
       React.createElement(MetricCard, { label:'Managed ARR', value:'$3.84M', sub:'24 accounts',
         onClick:()=>navigate('/customers?owner=' + me) }),
-      React.createElement(MetricCard, { label:'Revenue at risk', value:'$620K', sub:'\u2191 $80K from last week', subColor:'text-red-600',
+      React.createElement(MetricCard, { label:'Revenue at risk', value:'$620K', sub:' $80K from last week', subColor:'text-red-600',
         onClick:()=>navigate('/risks?owner=' + me) }),
       React.createElement(MetricCard, { label:'Upcoming renewals', value:'8', sub:'Next 30 days', subColor:'text-amber-600',
         onClick:()=>navigate('/customers?owner=' + me + '&renewalWithin=30') }),
@@ -1416,7 +1412,7 @@ function Dashboard() {
         onClick:()=>navigate('/expansion?owner=' + me) })
     ),
 
-    // \u2500\u2500 Two-column working area \u2500\u2500
+    //  Two-column working area 
     React.createElement('div', { className:'grid grid-cols-3 gap-5 items-start' },
 
       // Priority queue
@@ -1428,12 +1424,12 @@ function Dashboard() {
           ),
           React.createElement('div', { className:'flex items-center gap-3' },
             React.createElement('span', { className:'text-xs text-slate-400' }, priorityItems.length + ' open'),
-            React.createElement('button', { onClick:()=>navigate('/work'), className:'text-xs text-indigo-600 hover:underline font-medium' }, 'View all \u2192')
+            React.createElement('button', { onClick:()=>navigate('/work'), className:'text-xs text-indigo-600 hover:underline font-medium' }, 'View all ')
           )
         ),
         priorityItems.length === 0
           ? React.createElement('div', { className:'px-5 py-12 text-center' },
-              React.createElement('p', { className:'text-2xl mb-1' }, '\u2713'),
+              React.createElement('p', { className:'text-2xl mb-1' }, ''),
               React.createElement('p', { className:'text-sm text-slate-400' }, 'All caught up \u2014 nothing needs attention')
             )
           : React.createElement('div', null,
@@ -1448,7 +1444,7 @@ function Dashboard() {
                 ),
                 React.createElement('div', { className:'flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity' },
                   React.createElement('button', { onClick:()=>dispatch({type:'SNOOZE_PRIORITY',itemId:item.id}), title:'Snooze 7 days', className:'p-1.5 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-lg text-xs' }, '\u23f0'),
-                  React.createElement('button', { onClick:()=>dispatch({type:'DISMISS_PRIORITY',itemId:item.id}), title:'Dismiss', className:'p-1.5 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-lg text-xs' }, '\u2715')
+                  React.createElement('button', { onClick:()=>dispatch({type:'DISMISS_PRIORITY',itemId:item.id}), title:'Dismiss', className:'p-1.5 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-lg text-xs' }, '')
                 ),
                 React.createElement(Btn, { variant:'secondary', size:'xs',
                   onClick:()=>openItem(item),
@@ -1463,7 +1459,7 @@ function Dashboard() {
 
         React.createElement(Card, { className:'p-4 border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white' },
           React.createElement('div', { className:'flex items-center gap-2 mb-2' },
-            React.createElement('div', { className:'w-5 h-5 bg-indigo-600 rounded flex items-center justify-center text-white text-xs' }, '\u2726'),
+            React.createElement('div', { className:'w-5 h-5 bg-indigo-600 rounded flex items-center justify-center text-white text-xs' }, ''),
             React.createElement('h3', { className:'font-semibold text-slate-900 text-sm' }, 'CX42 Brief')
           ),
           React.createElement('p', { className:'text-sm text-slate-700 leading-relaxed' }, "Three accounts need attention today. Acme's usage decline and unresolved sync issue put $240K at risk. Northstar shows the strongest expansion evidence, but no opportunity exists.")
@@ -1489,7 +1485,7 @@ function Dashboard() {
                 React.createElement('p', { className:'text-sm font-medium text-slate-900 leading-snug' }, tk.title),
                 React.createElement('p', { className:'text-xs text-slate-400 mt-0.5' },
                   (c ? c.name : '') + (tk.dueDate ? ' \u00b7 Due ' + new Date(tk.dueDate).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '')),
-                parent && React.createElement('p', { className:'text-[11px] text-indigo-600 mt-1 truncate' }, '\u25CE ' + parent.title)
+                parent && React.createElement('p', { className:'text-[11px] text-indigo-600 mt-1 truncate' }, ' ' + parent.title)
               );
             }),
             tasksShown.length === 0 && React.createElement('div', { className:'px-4 py-6 text-xs text-slate-400 text-center' }, 'Nothing here')
@@ -1499,7 +1495,7 @@ function Dashboard() {
       )
     ),
 
-    // \u2500\u2500 Portfolio health strip \u2500\u2500
+    //  Portfolio health strip 
     React.createElement(Card, { className:'p-5' },
       React.createElement('div', { className:'flex items-center justify-between mb-4' },
         React.createElement('h3', { className:'font-semibold text-slate-900 text-sm' }, 'Portfolio health'),
@@ -1508,7 +1504,7 @@ function Dashboard() {
             React.createElement('button', { onClick:()=>setHealthView('count'), className:'px-2.5 py-1 text-xs rounded-md transition-colors ' + (healthView==='count'?'bg-white text-slate-900 shadow-sm font-medium':'text-slate-500') }, 'Customers'),
             React.createElement('button', { onClick:()=>setHealthView('arr'), className:'px-2.5 py-1 text-xs rounded-md transition-colors ' + (healthView==='arr'?'bg-white text-slate-900 shadow-sm font-medium':'text-slate-500') }, 'ARR')
           ),
-          React.createElement('button', { onClick:()=>navigate('/customers'), className:'text-xs text-indigo-600 hover:underline font-medium' }, 'View all \u2192')
+          React.createElement('button', { onClick:()=>navigate('/customers'), className:'text-xs text-indigo-600 hover:underline font-medium' }, 'View all ')
         )
       ),
       React.createElement('div', { className:'w-full h-2 flex rounded-full overflow-hidden gap-0.5' },
@@ -1758,10 +1754,10 @@ function CustomersList() {
       React.createElement('span', { className:'text-xs text-slate-400' }, 'Filtered by:'),
       ownerFilter && React.createElement('span', { className:'inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold' },
         (USERS[ownerFilter] ? USERS[ownerFilter].name : ownerFilter) + "'s portfolio",
-        React.createElement('button', { onClick:()=>navigate(renewalWithinQ != null ? '/customers?renewalWithin=' + renewalWithinQ : '/customers'), className:'text-indigo-400 hover:text-indigo-700' }, '\u2715')),
+        React.createElement('button', { onClick:()=>navigate(renewalWithinQ != null ? '/customers?renewalWithin=' + renewalWithinQ : '/customers'), className:'text-indigo-400 hover:text-indigo-700' }, '')),
       renewalWithinQ != null && React.createElement('span', { className:'inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold' },
         'Renewal within ' + renewalWithinQ + ' days',
-        React.createElement('button', { onClick:()=>navigate(ownerFilter ? '/customers?owner=' + ownerFilter : '/customers'), className:'text-amber-400 hover:text-amber-700' }, '\u2715')),
+        React.createElement('button', { onClick:()=>navigate(ownerFilter ? '/customers?owner=' + ownerFilter : '/customers'), className:'text-amber-400 hover:text-amber-700' }, '')),
       React.createElement('button', { onClick:()=>navigate('/customers'), className:'text-xs text-slate-400 hover:text-slate-600 underline' }, 'Clear all')
     ),
 
@@ -1775,11 +1771,11 @@ function CustomersList() {
         className:'px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500' }),
       React.createElement('button', { onClick:()=>setShowFilters(v=>!v),
         className:`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${showFilters||activeFilterCount?'bg-indigo-50 text-indigo-700 border-indigo-200':'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}` },
-        '\u2699 Filters' + (activeFilterCount ? ' \u00b7 ' + activeFilterCount : '')),
+        'Filters' + (activeFilterCount ? ' \u00b7 ' + activeFilterCount : '')),
       React.createElement('div', { className:'relative' },
         React.createElement('button', { onClick:()=>setShowCols(v=>!v),
           className:`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${showCols?'bg-indigo-50 text-indigo-700 border-indigo-200':'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}` },
-          '\u25A6 Columns \u00b7 ' + (visibleCols.length + 1)),
+          'Columns \u00b7 ' + (visibleCols.length + 1)),
         showCols && React.createElement('div', { className:'absolute right-0 mt-1 w-64 bg-white border border-slate-200 rounded-xl shadow-lg z-30 p-3' },
           React.createElement('div', { className:'flex items-center justify-between mb-2' },
             React.createElement('p', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider' }, 'Visible columns'),
@@ -1810,7 +1806,7 @@ function CustomersList() {
     // Conversational filter
     React.createElement(Card, { className:'p-3' },
       React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
-        React.createElement('span', { className:'w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs flex-shrink-0' }, '\u2726'),
+        React.createElement('span', { className:'w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs flex-shrink-0' }, ''),
         React.createElement('input', { value:convo, onChange:e=>setConvo(e.target.value),
           onKeyDown:e=>{ if(e.key==='Enter') applyPrompt(); },
           placeholder:'Describe what you want to see \u2014 e.g. "enterprise accounts at risk renewing in 60 days over $100k"',
@@ -2070,19 +2066,25 @@ function getCustomerDetail(customer, health){
 }
 
 // ── Small presentational atoms used across the new tabs ──
+/**
+ * Icons are lucide components now. Legacy records that still carry a glyph
+ * string render as nothing rather than leaking an emoji into the interface.
+ */
+function renderIcon(v, cls='size-4'){
+  return typeof v === 'function' ? React.createElement(v, { className: cls, strokeWidth: 1.75 }) : null;
+}
+
 function CxPill({ tone='slate', children, className='' }){
-  const map = {
-    green:'bg-green-100 text-green-700', amber:'bg-amber-100 text-amber-700',
-    red:'bg-red-100 text-red-700', blue:'bg-blue-100 text-blue-700',
-    purple:'bg-purple-100 text-purple-700', slate:'bg-slate-100 text-slate-600',
-    teal:'bg-teal-100 text-teal-700',
-  };
-  return React.createElement('span', { className:`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${map[tone]||map.slate} ${className}` }, children);
+  // The MVP's seven hues carried no meaning; blue/purple/teal all collapse to
+  // neutral or accent, and only green/amber/red were ever semantic.
+  const map = { green:'success', amber:'warning', red:'danger',
+                blue:'info', purple:'neutral', teal:'accent', slate:'neutral' };
+  return React.createElement(DsBadge, { tone: map[tone] || 'neutral', className }, children);
 }
 
 function CxLabel({ children, right }){
-  return React.createElement('div', { className:'flex items-center justify-between mb-3' },
-    React.createElement('p', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider' }, children),
+  return React.createElement('div', { className:'flex items-center justify-between gap-3 mb-3' },
+    React.createElement('p', { className:'text-caption font-semibold uppercase tracking-wide text-on-surface-subtle' }, children),
     right || null
   );
 }
@@ -2104,7 +2106,7 @@ function CxAIBox({ title='AI generated', children, onRegenerate, right }){
       React.createElement('span', { className:'w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse' }),
       React.createElement('p', { className:'text-[10px] font-bold text-indigo-700 uppercase tracking-wider' }, title),
       right || null,
-      onRegenerate && React.createElement('button', { onClick:onRegenerate, className:'ml-auto text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 border border-indigo-200 rounded-md px-2 py-0.5 bg-white/70' }, '↻ Regenerate')
+      onRegenerate && React.createElement('button', { onClick:onRegenerate, className:'ml-auto text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 border border-indigo-200 rounded-md px-2 py-0.5 bg-white/70' }, 'Regenerate')
     ),
     React.createElement('div', { className:'text-sm text-slate-700 leading-relaxed' }, children)
   );
@@ -2252,12 +2254,12 @@ function ArtifactsCard({ customer, dispatch, className='' }){
     React.createElement(CxLabel, null, 'Artifacts'),
     React.createElement('div', { className:'space-y-2.5' },
       artifacts.map(a => React.createElement('div', { key:a.name, className:'flex items-center gap-2.5 min-w-0' },
-        React.createElement('div', { className:'w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm flex-shrink-0' }, a.icon),
+        React.createElement('div', { className:'w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm flex-shrink-0' }, renderIcon(a.icon)),
         React.createElement('div', { className:'flex-1 min-w-0' },
           React.createElement('p', { className:'text-xs font-semibold text-slate-800 truncate capitalize' }, a.name),
           React.createElement('p', { className:'text-[10px] text-slate-400' }, a.meta)
         ),
-        React.createElement('button', { onClick:()=>dispatch && dispatch({ type:'ADD_TOAST', msg:'Downloading '+a.name, toastType:'info' }), className:'text-slate-300 hover:text-indigo-600 text-sm flex-shrink-0' }, '\u2b07')
+        React.createElement('button', { onClick:()=>dispatch && dispatch({ type:'ADD_TOAST', msg:'Downloading '+a.name, toastType:'info' }), className:'text-slate-300 hover:text-indigo-600 text-sm flex-shrink-0' }, '')
       ))
     )
   );
@@ -2316,7 +2318,7 @@ function SupportTab({ tickets, customer, health, dispatch }){
             d.sentiment.charAt(0).toUpperCase()+d.sentiment.slice(1))
         )
       ),
-      React.createElement(MetricCard, { label:'Escalation score', value: d.escalation+'/100', sub: d.escalation>60?'⚠ Elevated':'Within range', subColor: d.escalation>60?'text-red-600':'text-slate-500' }),
+      React.createElement(MetricCard, { label:'Escalation score', value: d.escalation+'/100', sub: d.escalation>60?'Elevated':'Within range', subColor: d.escalation>60?'text-red-600':'text-slate-500' }),
       React.createElement(MetricCard, { label:'Unresolved', value: open.length, sub: bySeverity.critical ? `${bySeverity.critical} critical` : 'None critical', subColor: bySeverity.critical?'text-red-600':'text-slate-500' })
     ),
 
@@ -2371,11 +2373,11 @@ function SupportTab({ tickets, customer, health, dispatch }){
         ),
         React.createElement('div', { className:'absolute rounded-full border-2 border-red-500 bg-red-500/40', style:{ width:'22px', height:'22px', top:'44%', right:'28%', animation:'cxRage .8s ease-out infinite' } }),
         React.createElement('div', { className:'absolute inset-0 flex items-center justify-center' },
-          React.createElement('div', { className:'w-12 h-12 rounded-full bg-white/15 border border-white/25 backdrop-blur flex items-center justify-center text-white text-lg' }, playing ? '❚❚' : '▶')
+          React.createElement('div', { className:'w-12 h-12 rounded-full bg-white/15 border border-white/25 backdrop-blur flex items-center justify-center text-white text-lg' }, playing ? '' : '')
         )
       ),
       React.createElement('div', { className:'flex items-center gap-3 bg-slate-900 rounded-b-xl px-3 py-2 -mt-1' },
-        React.createElement('button', { onClick:()=>setPlaying(p=>!p), className:'w-6 h-6 rounded-full bg-white/10 text-white text-[10px] flex items-center justify-center hover:bg-white/20' }, playing ? '❚❚' : '▶'),
+        React.createElement('button', { onClick:()=>setPlaying(p=>!p), className:'w-6 h-6 rounded-full bg-white/10 text-white text-[10px] flex items-center justify-center hover:bg-white/20' }, playing ? '' : ''),
         React.createElement('div', { className:'flex-1 h-1 bg-white/15 rounded-full' },
           React.createElement('div', { className:'h-1 bg-indigo-400 rounded-full transition-all', style:{ width: playing ? '68%' : '32%' } })
         ),
@@ -2387,10 +2389,10 @@ function SupportTab({ tickets, customer, health, dispatch }){
     React.createElement('div', { className:'grid grid-cols-2 gap-5 items-stretch' },
       // Recent errors
       React.createElement(Card, { className:'p-5' },
-        React.createElement(CxLabel, { right: React.createElement('button',{ onClick:()=>dispatch && dispatch({type:'ADD_TOAST',msg:'Opening error explorer',toastType:'info'}), className:'text-[11px] text-indigo-600 font-semibold hover:underline'}, 'All errors ↗') }, 'Recent errors encountered'),
+        React.createElement(CxLabel, { right: React.createElement('button',{ onClick:()=>dispatch && dispatch({type:'ADD_TOAST',msg:'Opening error explorer',toastType:'info'}), className:'text-[11px] text-indigo-600 font-semibold hover:underline'}, 'All errors') }, 'Recent errors encountered'),
         React.createElement('div', { className:'space-y-3' },
           d.errors.map(e=>React.createElement('div', { key:e.msg, className:'flex items-start gap-3' },
-            React.createElement('div', { className:`w-6 h-6 rounded-md flex items-center justify-center text-[11px] flex-shrink-0 ${e.sev==='critical'?'bg-red-100 text-red-600':e.sev==='high'?'bg-amber-100 text-amber-600':'bg-slate-100 text-slate-500'}` }, '⚠'),
+            React.createElement('div', { className:`w-6 h-6 rounded-md flex items-center justify-center text-[11px] flex-shrink-0 ${e.sev==='critical'?'bg-red-100 text-red-600':e.sev==='high'?'bg-amber-100 text-amber-600':'bg-slate-100 text-slate-500'}` }, ''),
             React.createElement('div', { className:'flex-1 min-w-0' },
               React.createElement('p', { className:'text-xs font-semibold text-slate-800' }, e.msg),
               React.createElement('a', { href:'#', onClick:ev=>{ev.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening stack trace for '+e.path,toastType:'info'});}, className:'text-[11px] text-indigo-600 underline underline-offset-2 break-all' }, e.path),
@@ -2405,13 +2407,13 @@ function SupportTab({ tickets, customer, health, dispatch }){
         React.createElement(CxLabel, null, 'Community — posts & comments'),
         React.createElement('div', { className:'space-y-3' },
           d.community.map(c=>React.createElement('div', { key:c.title, className:'flex items-start gap-3' },
-            React.createElement('div', { className:`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${c.kind==='Initiated'?'bg-indigo-100 text-indigo-600':'bg-slate-100 text-slate-500'}` }, c.kind==='Initiated'?'✍':'💬'),
+            React.createElement('div', { className:`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${c.kind==='Initiated'?'bg-indigo-100 text-indigo-600':'bg-slate-100 text-slate-500'}` }, c.kind==='Initiated'?'':''),
             React.createElement('div', { className:'flex-1 min-w-0' },
               React.createElement('p', { className:'text-xs font-semibold text-slate-800' },
                 React.createElement('span', { className:'text-slate-400 font-normal' }, c.kind+': '), c.title),
               React.createElement('p', { className:'text-[10px] text-slate-400 mt-0.5' },
                 `${c.replies} replies · `,
-                React.createElement('a', { href:'#', onClick:ev=>{ev.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening community thread',toastType:'info'});}, className:'text-indigo-600 underline underline-offset-2' }, 'View thread ↗'))
+                React.createElement('a', { href:'#', onClick:ev=>{ev.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening community thread',toastType:'info'});}, className:'text-indigo-600 underline underline-offset-2' }, 'View thread'))
             ),
             React.createElement(CxPill, { tone: c.tag==='Hot'?'red':c.tag==='Active'?'amber':'slate' }, c.tag)
           ))
@@ -2435,7 +2437,7 @@ function SupportTab({ tickets, customer, health, dispatch }){
                 React.createElement('td', { className:'px-4 py-3' }, React.createElement(SeverityBadge, { severity:t.severity })),
                 React.createElement('td', { className:'px-4 py-3 capitalize text-slate-600' }, t.status.replace('_',' ')),
                 React.createElement('td', { className:'px-4 py-3 text-slate-500' }, t.age + 'd'),
-                React.createElement('td', { className:'px-4 py-3' }, React.createElement('span', { className:`text-xs font-medium ${t.sla==='breached'?'text-red-600':t.sla==='at_risk'?'text-amber-600':'text-green-600'}` }, t.sla==='breached'?'⚠ Breached':t.sla==='at_risk'?'⚠ At risk':'✓ On track'))
+                React.createElement('td', { className:'px-4 py-3' }, React.createElement('span', { className:`text-xs font-medium ${t.sla==='breached'?'text-red-600':t.sla==='at_risk'?'text-amber-600':'text-green-600'}` }, t.sla==='breached'?'Breached':t.sla==='at_risk'?'At risk':'On track'))
               ))
         )
       )
@@ -2459,14 +2461,14 @@ function UsageTab({ customer, health, dispatch }){
   const usageLink = (label) => React.createElement('a', {
     href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening usage data — '+label,toastType:'info'});},
     className:'text-[11px] text-indigo-600 font-semibold underline underline-offset-2 hover:text-indigo-800'
-  }, 'Usage data ↗');
+  }, 'Usage data');
 
   const statCard = (label, value, sub, tone, linkLabel) => React.createElement(Card, { className:'p-4' },
     React.createElement('p', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider' }, label),
     React.createElement('p', { className:'text-base font-bold text-slate-900 mt-1.5' }, value),
     React.createElement('p', { className:'text-[11px] text-slate-500 mt-0.5' }, sub),
     React.createElement('div', { className:'flex items-center justify-between mt-2' },
-      React.createElement(CxPill, { tone }, tone==='green'?'↑ Trending up':tone==='red'?'↓ Trending down':'→ Flat'),
+      React.createElement(CxPill, { tone }, tone==='green'?'Trending up':tone==='red'?'Trending down':'Flat'),
       usageLink(label)
     )
   );
@@ -2691,7 +2693,7 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
       React.createElement(Card, { className:'p-5' },
         React.createElement(CxLabel, { right: React.createElement('div',{className:'flex items-center gap-2'},
           React.createElement(CxPill,{tone:'blue'},'AI generated'),
-          React.createElement('button',{ onClick:()=>setStratVariant(v=>v+1), className:'text-[11px] font-semibold text-indigo-600 border border-indigo-200 rounded-md px-2 py-0.5 hover:bg-indigo-50' },'↻')
+          React.createElement('button',{ onClick:()=>setStratVariant(v=>v+1), className:'text-[11px] font-semibold text-indigo-600 border border-indigo-200 rounded-md px-2 py-0.5 hover:bg-indigo-50' },'')
         ) }, 'Strategy — based on business objective'),
         React.createElement('div', { className:'space-y-3' },
           strategy.map(s=>React.createElement('div', { key:s.ph },
@@ -2705,13 +2707,13 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
         React.createElement(CxLabel, null, 'Engagement'),
         React.createElement('div', { className:'space-y-3' },
           React.createElement('div', { className:'flex items-start gap-3 pb-3 border-b border-slate-50' },
-            React.createElement('div', { className:'w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-sm flex-shrink-0' }, '📊'),
+            React.createElement('div', { className:'w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-sm flex-shrink-0' }, ''),
             React.createElement('div', { className:'flex-1 min-w-0' },
               React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, 'Last QBR'),
               React.createElement('p', { className:'text-[11px] text-slate-500' }, lastQBR ? (lastQBR.title || lastQBR.subject) + ' · ' + (lastQBR.date || 'recent') : 'No QBR recorded yet'),
               React.createElement('div', { className:'flex gap-3 mt-1' },
-                React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening QBR recording',toastType:'info'});}, className:'text-[11px] text-indigo-600 underline underline-offset-2' }, 'Recording ↗'),
-                React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); navigate && navigate('/drive');}, className:'text-[11px] text-indigo-600 underline underline-offset-2' }, 'Slides ↗')
+                React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening QBR recording',toastType:'info'});}, className:'text-[11px] text-indigo-600 underline underline-offset-2' }, 'Recording'),
+                React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); navigate && navigate('/drive');}, className:'text-[11px] text-indigo-600 underline underline-offset-2' }, 'Slides')
               )
             ),
             React.createElement(CxPill, { tone: lastQBR ? 'green':'slate' }, lastQBR ? 'Completed' : 'None')
@@ -2721,7 +2723,7 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
             React.createElement('div', { className:'flex gap-1.5 flex-wrap' },
               ['Q1 2025','Q4 2024','Q3 2024','Q2 2024'].map((q,i)=>React.createElement(CxPill, {
                 key:q, tone: (cxHash(customer.id+q) % 5) === 0 ? 'slate' : 'green'
-              }, (cxHash(customer.id+q) % 5) === 0 ? q + ' skipped' : q + ' ✓'))
+              }, (cxHash(customer.id+q) % 5) === 0 ? q + ' skipped' : q + ''))
             )
           ),
           React.createElement('div', { className:'pt-3 border-t border-slate-50' },
@@ -2757,7 +2759,7 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
                 React.createElement('p', { className:'text-[11px] text-slate-400' },
                   (g.taskIds || []).length + ' task' + ((g.taskIds||[]).length===1?'':'s') +
                   (g.dueDate ? ' \u00b7 due ' + new Date(g.dueDate).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : ''))),
-              React.createElement('span', { className:'text-slate-300' }, '\u2192')))),
+              React.createElement('span', { className:'text-slate-300' }, '')))),
 
       // Create goal
       showGoal && React.createElement(Modal, { open:true, onClose:()=>{ setShowGoal(false); resetGoal(); }, title:'Create a goal on ' + customer.name },
@@ -2803,7 +2805,7 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
                   onChange:e=>setGTasks(l=>l.map((x,j)=>j===i?{ title:e.target.value }:x)),
                   className:'flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 outline-none focus:border-indigo-400' }),
                 gTasks.length > 1 && React.createElement('button', { onClick:()=>setGTasks(l=>l.filter((_,j)=>j!==i)),
-                  className:'text-slate-300 hover:text-red-500 text-sm' }, '\u2715'))))),
+                  className:'text-slate-300 hover:text-red-500 text-sm' }, ''))))),
           React.createElement('div', { className:'flex justify-end gap-2 pt-1' },
             React.createElement(Btn, { variant:'secondary', onClick:()=>{ setShowGoal(false); resetGoal(); } }, 'Cancel'),
             React.createElement(Btn, { variant:'primary', disabled:!gTitle.trim(), onClick:saveGoal }, 'Create goal')))
@@ -2814,7 +2816,7 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
     React.createElement(Card, { className:'p-5' },
       React.createElement(CxLabel, { right: React.createElement('div',{className:'flex items-center gap-2'},
         React.createElement(CxPill,{tone:'blue'},'AI generated'),
-        React.createElement('button',{ onClick:()=>setNbaVariant(v=>v+1), className:'text-[11px] font-semibold text-indigo-600 border border-indigo-200 rounded-md px-2 py-0.5 hover:bg-indigo-50' },'↻')
+        React.createElement('button',{ onClick:()=>setNbaVariant(v=>v+1), className:'text-[11px] font-semibold text-indigo-600 border border-indigo-200 rounded-md px-2 py-0.5 hover:bg-indigo-50' },'')
       ) }, 'Next best actions'),
       React.createElement('div', { className:'space-y-3' },
         actions.map((a,i)=>React.createElement('div', { key:i, className:'flex gap-3 pb-3 border-b border-slate-50 last:border-0 last:pb-0' },
@@ -2832,7 +2834,7 @@ function SuccessTab({ customer, health, contacts, goals, meetings, dispatch, nav
     React.createElement('div', { className:'grid grid-cols-2 gap-5 items-stretch' },
       // Feature requests
       React.createElement(Card, { className:'p-5' },
-        React.createElement(CxLabel, { right: React.createElement('a',{ href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening raw feature request data',toastType:'info'});}, className:'text-[11px] text-indigo-600 font-semibold underline underline-offset-2'},'Raw data ↗') }, 'Feature requests'),
+        React.createElement(CxLabel, { right: React.createElement('a',{ href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening raw feature request data',toastType:'info'});}, className:'text-[11px] text-indigo-600 font-semibold underline underline-offset-2'},'Raw data') }, 'Feature requests'),
         React.createElement(CxAIBox, { title:'AI summary' },
           `${d.featureRequests.length} open request${d.featureRequests.length===1?'':'s'} from this account. The dominant theme is control and governance — export automation, permissioning, and audit-grade reporting. These map closely to the stated business objective, which makes them unusually good renewal leverage if any ship.`),
         React.createElement('div', { className:'mt-3 space-y-0' },
@@ -2928,12 +2930,12 @@ function ContactsTab({ customer, contacts, dispatch }){
               React.createElement(CxPill, { tone:sentTone(c.sentiment) }, c.sentiment)
             ),
             React.createElement('div', { className:'space-y-1 text-[11px] text-slate-500' },
-              React.createElement('div', { className:'flex items-center gap-1.5' }, '✉ ',
+              React.createElement('div', { className:'flex items-center gap-1.5' }, '',
                 c.email
                   ? React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Composing email to '+c.name,toastType:'info'});}, className:'text-indigo-600 underline underline-offset-2 truncate' }, c.email)
                   : React.createElement('span', { className:'text-slate-400 italic' }, 'No email on file')),
-              React.createElement('div', { className:'flex items-center gap-1.5' }, '🔗 ',
-                React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening LinkedIn profile',toastType:'info'});}, className:'text-blue-600 font-semibold' }, 'LinkedIn ↗')),
+              React.createElement('div', { className:'flex items-center gap-1.5' }, '',
+                React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening LinkedIn profile',toastType:'info'});}, className:'text-blue-600 font-semibold' }, 'LinkedIn')),
               React.createElement('div', null, 'Last activity: ', React.createElement('span',{className:'font-semibold text-slate-700'}, c.lastActivity))
             )
           ))
@@ -2980,10 +2982,10 @@ function IntelligenceTab({ customer, contacts, health, dispatch }){
   }
 
   const typeMeta = {
-    champion:   { label:'★ Champion',      ring:'ring-green-300  border-green-500',  chip:'bg-green-100 text-green-700' },
+    champion:   { label:'Champion',      ring:'ring-green-300  border-green-500',  chip:'bg-green-100 text-green-700' },
     decision:   { label:'Decision maker',  ring:'ring-blue-300   border-blue-500',   chip:'bg-blue-100 text-blue-700' },
     influencer: { label:'Influencer',      ring:'ring-purple-300 border-purple-500', chip:'bg-purple-100 text-purple-700' },
-    blocker:    { label:'⚠ Blocker',       ring:'ring-red-300    border-red-500',    chip:'bg-red-100 text-red-700' },
+    blocker:    { label:'Blocker',       ring:'ring-red-300    border-red-500',    chip:'bg-red-100 text-red-700' },
     user:       { label:'End user',        ring:'ring-slate-200  border-slate-300',  chip:'bg-slate-100 text-slate-500' },
   };
 
@@ -3018,9 +3020,9 @@ function IntelligenceTab({ customer, contacts, health, dispatch }){
 
   const newsTypes = [
     { id:'all', label:'All news' },
-    { id:'funding', label:'💰 Funding' },
-    { id:'acquisition', label:'🤝 Acquisition' },
-    { id:'merger', label:'🔄 Merger' },
+    { id:'funding', label:'Funding' },
+    { id:'acquisition', label:'Acquisition' },
+    { id:'merger', label:'Merger' },
   ];
   const visibleNews = d.news.filter(n=>newsFilter==='all' || n.type===newsFilter);
 
@@ -3033,7 +3035,7 @@ function IntelligenceTab({ customer, contacts, health, dispatch }){
           React.createElement('p', { className:'text-[11px] text-slate-400 mt-0.5' }, 'Reporting structure with buying-role markings · click any card for detail')
         ),
         React.createElement('div', { className:'flex gap-1.5 flex-wrap' },
-          [['all','All'],['champion','★ Champion'],['decision','Decision maker'],['influencer','Influencer'],['blocker','Blocker']].map(f=>
+          [['all','All'],['champion','Champion'],['decision','Decision maker'],['influencer','Influencer'],['blocker','Blocker']].map(f=>
             React.createElement('button', {
               key:f[0], onClick:()=>setFilter(f[0]),
               className:`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-colors ${filter===f[0] ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`
@@ -3125,13 +3127,13 @@ function IntelligenceTab({ customer, contacts, health, dispatch }){
                 React.createElement('div', { className:'flex flex-col items-end gap-1.5 flex-shrink-0' },
                   React.createElement(CxPill, { tone: n.impact==='high'?'green':n.impact==='risk'?'red':'slate' },
                     n.impact==='high'?'High impact':n.impact==='risk'?'Watch closely':'Historical'),
-                  React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening article at '+n.src,toastType:'info'});}, className:'text-[11px] text-indigo-600 underline underline-offset-2' }, 'Read ↗')
+                  React.createElement('a', { href:'#', onClick:e=>{e.preventDefault(); dispatch && dispatch({type:'ADD_TOAST',msg:'Opening article at '+n.src,toastType:'info'});}, className:'text-[11px] text-indigo-600 underline underline-offset-2' }, 'Read')
                 )
               ),
               n.signal && React.createElement('div', { className:'mt-3 ml-12 bg-green-50 border border-green-100 rounded-lg px-3 py-2 text-xs text-green-800 leading-relaxed' },
-                React.createElement('span',{className:'font-bold'},'✦ Account signal: '), n.signal),
+                React.createElement('span',{className:'font-bold'},'Account signal:'), n.signal),
               n.risk && React.createElement('div', { className:'mt-3 ml-12 bg-red-50 border border-red-100 rounded-lg px-3 py-2 text-xs text-red-800 leading-relaxed' },
-                React.createElement('span',{className:'font-bold'},'⚠ Renewal risk: '), n.risk)
+                React.createElement('span',{className:'font-bold'},'Renewal risk:'), n.risk)
             ))
           )
     )
@@ -3251,7 +3253,7 @@ function CustomerActionsTab({ customer, health, state, dispatch, navigate }){
 
   if (runs.length === 0) {
     return React.createElement(Card, { className:'p-12 text-center' },
-      React.createElement('p', { className:'text-3xl mb-2' }, '\u26A1'),
+      React.createElement('p', { className:'text-3xl mb-2' }, ''),
       React.createElement('p', { className:'text-sm text-slate-500' }, 'No actions have run on this account yet'),
       React.createElement('p', { className:'text-xs text-slate-400 mt-1' }, 'Published actions run automatically when their trigger conditions are met'),
       React.createElement('div', { className:'mt-3' },
@@ -3272,13 +3274,13 @@ function CustomerActionsTab({ customer, health, state, dispatch, navigate }){
     // Which actions are applied to this account
     React.createElement(Card, { className:'p-4' },
       React.createElement(CxLabel, { right:React.createElement('button', { onClick:()=>navigate('/actions'),
-        className:'text-[11px] text-indigo-600 hover:underline' }, 'Action library \u2192') }, 'Actions applied to this account'),
+        className:'text-[11px] text-indigo-600 hover:underline' }, 'Action library ') }, 'Actions applied to this account'),
       React.createElement('div', { className:'space-y-2' },
         applied.map(a => {
           const n = runs.filter(r=>r.action.id===a.id).length;
           const comms = a.steps.filter(s=>s.editable).length;
           return React.createElement('div', { key:a.id, className:'flex items-center gap-3 border border-slate-200 rounded-lg p-2.5' },
-            React.createElement('span', { className:'w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm flex-shrink-0' }, '\u26A1'),
+            React.createElement('span', { className:'w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm flex-shrink-0' }, ''),
             React.createElement('div', { className:'flex-1 min-w-0' },
               React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, a.name),
               React.createElement('p', { className:'text-[11px] text-slate-500' },
@@ -3307,7 +3309,7 @@ function CustomerActionsTab({ customer, health, state, dispatch, navigate }){
           const isSup = r.status === 'suppressed';
           return React.createElement('div', { key:r.id, className:'flex gap-3' },
             React.createElement('div', { className:'flex flex-col items-center flex-shrink-0' },
-              React.createElement('span', { className:`w-7 h-7 rounded-full flex items-center justify-center text-xs ${isSup?'bg-slate-100 text-slate-400':'bg-indigo-100 text-indigo-600'}` }, isSup ? '\u23F8' : '\u26A1'),
+              React.createElement('span', { className:`w-7 h-7 rounded-full flex items-center justify-center text-xs ${isSup?'bg-slate-100 text-slate-400':'bg-indigo-100 text-indigo-600'}` }, isSup ? '\u23F8' : ''),
               idx < shown.length-1 && React.createElement('span', { className:'w-px flex-1 bg-slate-200 mt-1' })
             ),
             React.createElement('div', { className:'flex-1 min-w-0 pb-3' },
@@ -3327,11 +3329,11 @@ function CustomerActionsTab({ customer, health, state, dispatch, navigate }){
                     open && React.createElement('div', { className:'mt-2 space-y-1.5 bg-slate-50 rounded-lg p-2.5' },
                       r.steps.map((st,i)=>React.createElement('div', { key:i, className:'flex items-start gap-2.5' },
                         React.createElement('span', { className:'w-5 h-5 rounded-md bg-white border border-slate-200 flex items-center justify-center text-[10px] flex-shrink-0' },
-                          st.meta ? st.meta.icon : '\u2713'),
+                          renderIcon(st.meta && st.meta.icon)),
                         React.createElement('div', { className:'flex-1 min-w-0' },
                           React.createElement('p', { className:'text-xs font-semibold text-slate-700' }, st.meta ? st.meta.label : st.id),
                           React.createElement('p', { className:'text-[11px] text-slate-500' }, st.note)),
-                        React.createElement('span', { className:'text-green-500 text-xs flex-shrink-0' }, '\u2713')
+                        React.createElement('span', { className:'text-green-500 text-xs flex-shrink-0' }, '')
                       ))
                     )
                   )
@@ -3354,16 +3356,16 @@ function CustomerActionsTab({ customer, health, state, dispatch, navigate }){
 function getAccountActivity(customer, goals, risks, attrChanges){
   const out = [];
   const h = HEALTH_SIGNALS[customer.healthId];
-  if (h) out.push({ at:'2025-08-16T09:00:00', kind:'health', icon:'\u2665', tone:'blue',
+  if (h) out.push({ at:'2025-08-16T09:00:00', kind:'health', icon:'', tone:'blue',
     title:'Health score computed: ' + h.compositeScore, detail:'Band ' + h.band + (h.previousBand ? ' (was ' + h.previousBand + ')' : '') });
-  (risks||[]).forEach(r => out.push({ at:r.createdAt, kind:'risk', icon:'\u26A0', tone:'red',
+  (risks||[]).forEach(r => out.push({ at:r.createdAt, kind:'risk', icon:'', tone:'red',
     title:'Risk opened: ' + r.title, detail: r.amountAtRisk ? formatARR(r.amountAtRisk) + ' at risk' : null }));
-  (goals||[]).forEach(g => out.push({ at:g.startDate||g.dueDate, kind:'goal', icon:'\u25CE', tone:'purple',
+  (goals||[]).forEach(g => out.push({ at:g.startDate||g.dueDate, kind:'goal', icon:'', tone:'purple',
     title:'Goal ' + String(g.status).replace('_',' ') + ': ' + g.title, detail:null }));
   (attrChanges||[]).filter(c=>c.customerId===customer.id).forEach(c => {
     const m = ATTR_LABELS[c.field] || { label:c.field, values:{} };
-    out.push({ at:c.at, kind:'attribute', icon:'\u270E', tone:'amber',
-      title:m.label + ' changed: ' + (m.values[c.from]||c.from) + ' \u2192 ' + (m.values[c.to]||c.to),
+    out.push({ at:c.at, kind:'attribute', icon:'', tone:'amber',
+      title:m.label + ' changed: ' + (m.values[c.from]||c.from) + '  ' + (m.values[c.to]||c.to),
       detail:c.reason, by:c.by, isReason:true });
   });
   return out.filter(e=>e.at).sort((a,b)=>new Date(b.at)-new Date(a.at));
@@ -3382,7 +3384,7 @@ function getTouchpoints(customer, emails, meetings){
       d.setDate(d.getDate() - Math.max(0, (t.age || 3) - i));
       out.push({
         at: d.toISOString(), kind:'ticket',
-        icon: a.dir === 'inbound' ? '\u{1F3AB}' : '\u21A9',
+        icon: a.dir === 'inbound' ? '' : '',
         tone: a.dir === 'inbound' ? 'red' : 'blue',
         title: a.dir === 'inbound' ? ('Ticket message from ' + a.who) : ('Agent replied on ' + t.id.toUpperCase()),
         detail: a.dir === 'inbound' ? t.subject : a.body,
@@ -3392,11 +3394,11 @@ function getTouchpoints(customer, emails, meetings){
     });
   });
   (emails||[]).filter(e=>e.customerId===customer.id).forEach(e => out.push({
-    at:e.receivedIso || '2025-08-17T08:12:00', kind:'email', icon:'\u2709', tone:'purple',
+    at:e.receivedIso || '2025-08-17T08:12:00', kind:'email', icon:'', tone:'purple',
     title:'Email received from ' + e.from, detail:e.subject, meta:e.received, emailId:e.id,
     direction:'inbound' }));
   (meetings||[]).forEach(m => out.push({
-    at:(m.date||'') + 'T10:00:00', kind:'meeting', icon:'\u{1F4C5}', tone:'blue',
+    at:(m.date||'') + 'T10:00:00', kind:'meeting', icon:'', tone:'blue',
     title:(m.type === 'QBR' ? 'QBR' : 'Meeting') + ' ' + (m.status==='completed'?'held':'scheduled') + ': ' + m.title,
     detail:(m.participants||[]).slice(0,3).join(', ') || null, meta:m.date, direction:'meeting' }));
   return out.filter(e=>e.at && !isNaN(new Date(e.at))).sort((a,b)=>new Date(b.at)-new Date(a.at));
@@ -3419,7 +3421,7 @@ function AttrReasonModal({ open, field, from, to, onCancel, onConfirm }){
       React.createElement('div', { className:'flex items-center gap-2 flex-wrap bg-slate-50 rounded-lg px-3 py-2' },
         React.createElement('span', { className:'text-xs font-semibold text-slate-600' }, m.label),
         React.createElement(CxPill, { tone:'slate' }, m.values[from] || from),
-        React.createElement('span', { className:'text-slate-400' }, '\u2192'),
+        React.createElement('span', { className:'text-slate-400' }, ''),
         React.createElement(CxPill, { tone:'blue' }, m.values[to] || to)
       ),
       React.createElement('p', { className:'text-xs text-slate-500 leading-relaxed' },
@@ -3471,19 +3473,19 @@ function InteractionsTab({ customer, state, dispatch, navigate, meetings }){
 
     shown.length === 0
       ? React.createElement(Card, { className:'p-12 text-center' },
-          React.createElement('p', { className:'text-3xl mb-2' }, '\u2709'),
+          React.createElement('p', { className:'text-3xl mb-2' }, ''),
           React.createElement('p', { className:'text-sm text-slate-500' }, 'No interactions recorded for this account yet'))
       : React.createElement(Card, { className:'overflow-hidden' },
           shown.map((p,i) => React.createElement('div', { key:i,
             onClick:()=>{ if(p.emailId) setOpenId(p.emailId); },
             className:`px-4 py-3 border-b border-slate-50 last:border-0 flex items-start gap-3 ${p.emailId?'cursor-pointer hover:bg-slate-50':''}` },
-            React.createElement('span', { className:`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${ADMIN_TONES[p.tone]}` }, p.icon),
+            React.createElement('span', { className:`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${ADMIN_TONES[p.tone]}` }, renderIcon(p.icon)),
             React.createElement('div', { className:'flex-1 min-w-0' },
               React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, p.title),
               p.detail && React.createElement('p', { className:'text-xs text-slate-500 mt-0.5 truncate' }, p.detail),
               React.createElement('p', { className:'text-[11px] text-slate-400 mt-0.5' }, p.meta || fmtWhen(p.at))),
             React.createElement(CxPill, { tone: p.kind==='email'?'purple':p.kind==='ticket'?'red':'blue' }, p.kind),
-            p.emailId && React.createElement('span', { className:'text-slate-300 flex-shrink-0' }, '\u2192')
+            p.emailId && React.createElement('span', { className:'text-slate-300 flex-shrink-0' }, '')
           ))
         )
   );
@@ -3756,14 +3758,14 @@ function parseTranscriptText(raw){
 }
 
 const TX_CONNECTORS = [
-  { id:'granola',   name:'Granola',       icon:'🥣', note:'AI meeting notes' },
-  { id:'gong',      name:'Gong',          icon:'🎙', note:'Revenue intelligence' },
-  { id:'fireflies', name:'Fireflies.ai',  icon:'🪰', note:'Meeting recorder' },
-  { id:'otter',     name:'Otter.ai',      icon:'🦦', note:'Live transcription' },
-  { id:'zoom',      name:'Zoom',          icon:'🎥', note:'Cloud recordings' },
-  { id:'teams',     name:'Microsoft Teams',icon:'👥', note:'Meeting transcripts' },
-  { id:'meet',      name:'Google Meet',   icon:'📹', note:'Gemini notes' },
-  { id:'chorus',    name:'Chorus by ZoomInfo', icon:'📊', note:'Conversation intel' },
+  { id:'granola',   name:'Granola',       icon:'', note:'AI meeting notes' },
+  { id:'gong',      name:'Gong',          icon:'', note:'Revenue intelligence' },
+  { id:'fireflies', name:'Fireflies.ai',  icon:'', note:'Meeting recorder' },
+  { id:'otter',     name:'Otter.ai',      icon:'', note:'Live transcription' },
+  { id:'zoom',      name:'Zoom',          icon:'', note:'Cloud recordings' },
+  { id:'teams',     name:'Microsoft Teams',icon:Users, note:'Meeting transcripts' },
+  { id:'meet',      name:'Google Meet',   icon:'', note:'Gemini notes' },
+  { id:'chorus',    name:'Chorus by ZoomInfo', icon:'', note:'Conversation intel' },
 ];
 
 function TranscriptsTab({ customer, health, meetings, dispatch }){
@@ -3831,7 +3833,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
   };
 
   const createTaskBtn = (a) => createdTasks[a.key]
-    ? React.createElement('span', { className:'text-[10px] font-semibold text-green-600 whitespace-nowrap flex-shrink-0' }, '✓ Task created')
+    ? React.createElement('span', { className:'text-[10px] font-semibold text-green-600 whitespace-nowrap flex-shrink-0' }, 'Task created')
     : React.createElement('button', {
         onClick:()=>createTaskFromAction(a),
         className:'text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline whitespace-nowrap flex-shrink-0'
@@ -3906,7 +3908,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
     React.createElement(Card, { className:'p-4' },
       React.createElement('div', { className:'flex items-center justify-between mb-3' },
         React.createElement('div', { className:'flex items-center gap-2' },
-          React.createElement('div', { className:'w-4 h-4 bg-indigo-600 rounded flex items-center justify-center text-white text-[10px]' }, '✦'),
+          React.createElement('div', { className:'w-4 h-4 bg-indigo-600 rounded flex items-center justify-center text-white text-[10px]' }, ''),
           React.createElement('h4', { className:'font-semibold text-slate-900 text-sm' }, 'AI highlights across last ' + recent.length + ' calls'),
           React.createElement(CxPill, { tone: sentTone[mood] }, moodWord + ' tone')
         ),
@@ -3928,7 +3930,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
                 React.createElement('p', { className:'text-xs text-slate-700 leading-snug' }, m.text),
                 React.createElement('p', { className:'text-[10px] text-slate-400' }, m.from + ' · ' + new Date(m.date).toLocaleDateString())
               ),
-              React.createElement('span', { className:'text-[10px] font-semibold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap flex-shrink-0 mt-0.5' }, 'Jump to ↓')
+              React.createElement('span', { className:'text-[10px] font-semibold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap flex-shrink-0 mt-0.5' }, 'Jump to')
             ))
           )
         ),
@@ -3939,7 +3941,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
             ? React.createElement('p', { className:'text-xs text-slate-400' }, 'No risks raised on these calls')
             : React.createElement('div', { className:'space-y-1.5' },
                 allRisks.slice(0, 5).map((r, i) => React.createElement('div', { key:i, className:'flex items-start gap-2 p-2 bg-red-50 rounded-lg' },
-                  React.createElement('span', { className:'text-red-500 text-xs flex-shrink-0' }, '⚠'),
+                  React.createElement('span', { className:'text-red-500 text-xs flex-shrink-0' }, ''),
                   React.createElement('p', { className:'text-xs text-slate-700 leading-snug' }, r)
                 ))
               )
@@ -3950,7 +3952,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
             'Action items · ' + openActions.length + ' open'),
           React.createElement('div', { className:'space-y-1.5' },
             allActions.slice(0, 6).map((a, i) => React.createElement('div', { key:a.key, className:'flex items-start gap-2 group' },
-              React.createElement('span', { className:`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] flex-shrink-0 mt-0.5 ${a.status==='done'?'bg-green-500 border-green-500 text-white':'border-slate-300 text-transparent'}` }, '✓'),
+              React.createElement('span', { className:`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] flex-shrink-0 mt-0.5 ${a.status==='done'?'bg-green-500 border-green-500 text-white':'border-slate-300 text-transparent'}` }, ''),
               React.createElement('div', { className:'min-w-0 flex-1' },
                 React.createElement('p', { className:`text-xs leading-snug ${a.status==='done'?'text-slate-400 line-through':'text-slate-700'}` }, a.text),
                 React.createElement('p', { className:'text-[10px] text-slate-400' }, a.owner === 'csm' ? 'Us' : customer.name)
@@ -3974,7 +3976,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
       React.createElement(Btn, {
         variant:'secondary', size:'sm', className:'ml-auto',
         onClick:()=>{ setUploadMode('upload'); setShowUpload(true); }
-      }, '⬆ Upload transcript')
+      }, 'Upload transcript')
     ),
 
     // ── Transcript list ──
@@ -4000,7 +4002,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
                 new Date(t.date).toLocaleDateString() + ' · ' + t.durationMin + ' min · ' + t.source + ' · ' + t.participants.join(', ')),
               React.createElement('p', { className:'text-xs text-slate-600 leading-snug mt-1.5' }, highlight(t.summary))
             ),
-            React.createElement('span', { className:'text-slate-300 text-xs flex-shrink-0 mt-1' }, isOpen ? '▲ Hide' : '▼ Read')
+            React.createElement('span', { className:'text-slate-300 text-xs flex-shrink-0 mt-1' }, isOpen ? 'Hide' : 'Read')
           )
         ),
 
@@ -4034,7 +4036,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
                     moment && React.createElement('span', {
                       className:'text-[9px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 rounded px-1 py-0.5',
                       title:moment.text
-                    }, '★ Key moment'),
+                    }, 'Key moment'),
                     React.createElement('span', { className:'text-[10px] font-mono text-slate-300 ml-auto' }, l.at || '')
                   ),
                   React.createElement('p', { className:'text-xs text-slate-700 leading-relaxed mt-0.5' }, highlight(l.text))
@@ -4051,7 +4053,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
                     t.actions.map((a, i) => {
                       const item = Object.assign({}, a, { from:t.type, date:t.date, key:t.id + '#' + i });
                       return React.createElement('div', { key:item.key, className:'flex items-start gap-2' },
-                        React.createElement('span', { className:'text-slate-300 text-xs mt-0.5' }, '→'),
+                        React.createElement('span', { className:'text-slate-300 text-xs mt-0.5' }, ''),
                         React.createElement('p', { className:`text-xs flex-1 leading-snug ${a.status==='done'?'text-slate-400 line-through':'text-slate-600'}` }, a.text),
                         a.status !== 'done' && createTaskBtn(item)
                       );
@@ -4063,7 +4065,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
               t.risks.length === 0
                 ? React.createElement('p', { className:'text-xs text-slate-400' }, 'None captured')
                 : t.risks.map((r, i) => React.createElement('p', { key:i, className:'text-xs text-slate-600 flex items-start gap-1.5' },
-                    React.createElement('span', { className:'text-red-400' }, '⚠'), r))
+                    React.createElement('span', { className:'text-red-400' }, ''), r))
             )
           )
         )
@@ -4074,7 +4076,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
     showUpload && React.createElement(Modal, { open:true, onClose:()=>setShowUpload(false), title:'Add a transcript', size:'lg' },
 
       React.createElement('div', { className:'flex gap-1 bg-slate-100 rounded-lg p-1 mb-5' },
-        [['upload','⬆ Upload a file'],['paste','📋 Paste text'],['connect','🔗 Connect an app']].map(([id, label]) =>
+        [['upload','Upload a file'],['paste','Paste text'],['connect','Connect an app']].map(([id, label]) =>
           React.createElement('button', {
             key:id,
             onClick:()=>setUploadMode(id),
@@ -4092,7 +4094,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
           onDrop:e=>{ e.preventDefault(); setDragOver(false); readFile(e.dataTransfer.files && e.dataTransfer.files[0]); },
           className:`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${dragOver?'border-indigo-400 bg-indigo-50':'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'}`
         },
-          React.createElement('div', { className:'text-3xl mb-2' }, '📄'),
+          React.createElement('div', { className:'text-3xl mb-2' }, ''),
           React.createElement('p', { className:'text-sm font-medium text-slate-700' }, 'Drop a transcript here, or click to browse'),
           React.createElement('p', { className:'text-xs text-slate-400 mt-1' }, 'TXT, VTT, SRT or MD · up to 25 MB'),
           pickedFile && React.createElement('p', { className:'text-xs text-indigo-600 font-medium mt-3' }, 'Selected: ' + pickedFile.name)
@@ -4146,7 +4148,7 @@ function TranscriptsTab({ customer, health, meetings, dispatch }){
             key:c.id,
             className:'flex items-center gap-3 p-3 border border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-slate-50 transition-colors'
           },
-            React.createElement('div', { className:'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-lg flex-shrink-0' }, c.icon),
+            React.createElement('div', { className:'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-lg flex-shrink-0' }, renderIcon(c.icon)),
             React.createElement('div', { className:'min-w-0 flex-1' },
               React.createElement('p', { className:'text-sm font-semibold text-slate-800 truncate' }, c.name),
               React.createElement('p', { className:'text-[11px] text-slate-400 truncate' }, c.note)
@@ -4197,7 +4199,7 @@ function Customer360() {
             ),
             React.createElement('p', { className:'text-slate-500 text-sm' }, customer.domain + ' · ' + customer.segment.replace('_',' ')),
             React.createElement('div', { className:'flex items-center gap-4 mt-2 text-sm' },
-              React.createElement('span', { className:'text-slate-600' }, React.createElement('span',{className:'font-semibold text-slate-900'},formatARR(customer.arr)), ' ARR'),
+              React.createElement('span', { className:'text-slate-600' }, React.createElement('span',{className:'font-semibold text-slate-900'},formatARR(customer.arr)), 'ARR'),
               renewal && React.createElement('span', { className:`${renewal.daysRemaining < 60 ? 'text-red-600 font-semibold' : 'text-slate-600'}` }, 'Renews in ', renewal.daysRemaining, 'd'),
               risks.length > 0 && React.createElement('span', { className:'text-red-600' }, formatARR(risks.reduce((s,r)=>s+r.amountAtRisk,0)) + ' at risk'),
               expOpps.filter(e=>e.qualificationStatus!=='dismissed').length > 0 && React.createElement('span', { className:'text-teal-600' }, '+' + formatARR(expOpps.filter(e=>e.qualificationStatus!=='dismissed').reduce((s,e)=>s+e.estimatedArr,0)) + ' potential')
@@ -4205,8 +4207,8 @@ function Customer360() {
           )
         ),
         React.createElement('div', { className:'flex gap-2' },
-          React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>dispatch({type:'TOGGLE_ASSISTANT'}) }, '✦ Ask CX42 about ' + customer.name.split(' ')[0]),
-          React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>navigate(`/portal-preview/${customerId}`) }, '👁 Portal preview'),
+          React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>dispatch({type:'TOGGLE_ASSISTANT'}) }, 'Ask CX42 about' + customer.name.split(' ')[0]),
+          React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>navigate(`/portal-preview/${customerId}`) }, 'Portal preview'),
         )
       )
     ),
@@ -4268,7 +4270,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
       // Account summary
       React.createElement(Card, { className:'p-4 ' + brk },
         React.createElement('div', { className:'flex items-center gap-2 mb-2' },
-          React.createElement('div', { className:'w-4 h-4 bg-indigo-600 rounded flex items-center justify-center text-white text-xs' }, '\u2726'),
+          React.createElement('div', { className:'w-4 h-4 bg-indigo-600 rounded flex items-center justify-center text-white text-xs' }, ''),
           React.createElement('h4', { className:'font-semibold text-slate-900 text-sm' }, 'Account summary')
         ),
         React.createElement('p', { className:'text-sm text-slate-700 leading-relaxed' }, summary)
@@ -4281,7 +4283,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
       health && React.createElement(Card, { className:'p-4 ' + brk },
         React.createElement('div', { className:'flex items-center justify-between mb-3' },
           React.createElement('h4', { className:'font-semibold text-slate-900 text-sm' }, 'Health snapshot'),
-          React.createElement('button', { onClick:()=>navigate(`/customers/${customer.id}?tab=health`), className:'text-xs text-indigo-600 hover:underline' }, 'Full health \u2192')
+          React.createElement('button', { onClick:()=>navigate(`/customers/${customer.id}?tab=health`), className:'text-xs text-indigo-600 hover:underline' }, 'Full health ')
         ),
         React.createElement('div', { className:'flex items-center gap-4 mb-3' },
           React.createElement('div', null,
@@ -4311,7 +4313,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
             React.createElement('h4', { className:'font-semibold text-slate-900 text-sm' }, 'Actions'),
             runs.length > 0 && React.createElement('button', {
               onClick:()=>navigate('/actions'),
-              className:'text-xs text-indigo-600 hover:underline' }, 'Action library \u2192')
+              className:'text-xs text-indigo-600 hover:underline' }, 'Action library ')
           ),
           runs.length > 0 && React.createElement('div', { className:'mb-3' },
             React.createElement('p', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5' },
@@ -4319,7 +4321,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
             React.createElement('div', { className:'space-y-1.5' },
               runs.slice(0,3).map(r => React.createElement('div', { key:r.id, className:'flex items-start gap-2.5 p-2 bg-slate-50 rounded-lg' },
                 React.createElement('span', { className:`w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0 ${r.status==='suppressed'?'bg-slate-200 text-slate-500':'bg-indigo-100 text-indigo-600'}` },
-                  r.status==='suppressed' ? '\u23F8' : '\u26A1'),
+                  r.status==='suppressed' ? '\u23F8' : ''),
                 React.createElement('div', { className:'flex-1 min-w-0' },
                   React.createElement('p', { className:'text-xs font-semibold text-slate-800 truncate' }, r.action.name),
                   React.createElement('p', { className:'text-[10px] text-slate-500' },
@@ -4345,7 +4347,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
       React.createElement(Card, { className:'p-4 ' + brk },
         React.createElement('div', { className:'flex items-center justify-between mb-3' },
           React.createElement('h4', { className:'font-semibold text-slate-900 text-sm' }, 'Key contacts'),
-          React.createElement('button', { onClick:()=>navigate(`/customers/${customer.id}?tab=contacts`), className:'text-xs text-indigo-600 hover:underline' }, 'All contacts \u2192')
+          React.createElement('button', { onClick:()=>navigate(`/customers/${customer.id}?tab=contacts`), className:'text-xs text-indigo-600 hover:underline' }, 'All contacts ')
         ),
         contacts.length === 0
           ? React.createElement('p', { className:'text-sm text-slate-400' }, 'No contacts recorded')
@@ -4365,7 +4367,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
       activeGoals.length > 0 && React.createElement(Card, { className:'p-4 ' + brk },
         React.createElement('div', { className:'flex items-center justify-between mb-3' },
           React.createElement('h4', { className:'font-semibold text-slate-900 text-sm' }, 'Active goals'),
-          React.createElement('button', { onClick:()=>navigate(`/customers/${customer.id}?tab=goals`), className:'text-xs text-indigo-600 hover:underline' }, 'View all \u2192')
+          React.createElement('button', { onClick:()=>navigate(`/customers/${customer.id}?tab=goals`), className:'text-xs text-indigo-600 hover:underline' }, 'View all ')
         ),
         React.createElement('div', { className:'space-y-2.5' },
           activeGoals.map(g => {
@@ -4380,7 +4382,7 @@ function OverviewTab({ customer, health, risks, expOpps, goals, contacts, renewa
                   ),
                   React.createElement('span', { className:'text-xs text-slate-500' }, `${prog}%`)
                 ),
-                g.status === 'not_started' && g.source === 'signal_triggered' && React.createElement('p', { className:'text-xs text-amber-600 font-medium mt-1' }, '\u26a0 Needs acknowledgement')
+                g.status === 'not_started' && g.source === 'signal_triggered' && React.createElement('p', { className:'text-xs text-amber-600 font-medium mt-1' }, 'Needs acknowledgement')
               )
             );
           })
@@ -4467,7 +4469,7 @@ function HealthTab({ health, customer }) {
               ),
               React.createElement('td', { className:'py-3 pr-4' }, Math.round(dim.weight*100) + '%'),
               React.createElement('td', { className:'py-3 pr-4 font-semibold text-indigo-700' }, dim.contribution.toFixed(1)),
-              React.createElement('td', { className:'py-3 pr-4' }, React.createElement('span',{className:dim.trend==='up'?'text-green-600':dim.trend==='down'?'text-red-600':'text-slate-500'}, dim.trend==='up'?'↑':dim.trend==='down'?'↓':'→')),
+              React.createElement('td', { className:'py-3 pr-4' }, React.createElement('span',{className:dim.trend==='up'?'text-green-600':dim.trend==='down'?'text-red-600':'text-slate-500'}, dim.trend==='up'?'':dim.trend==='down'?'':'')),
               React.createElement('td', { className:'py-3 pr-4 text-slate-400 text-xs' }, dim.freshness),
               React.createElement('td', { className:'py-3' },
                 React.createElement('div', { className:'flex flex-wrap gap-1' },
@@ -4479,7 +4481,7 @@ function HealthTab({ health, customer }) {
             React.createElement('tr', { className:'bg-slate-50 font-semibold' },
               React.createElement('td', { className:'py-3 pr-4', colSpan:3 }, 'Composite score'),
               React.createElement('td', { className:'py-3 pr-4' }, '100%'),
-              React.createElement('td', { className:'py-3 pr-4 text-lg text-slate-900' }, health.dimensions.reduce((s,d)=>s+d.contribution,0).toFixed(1) + ' → ' + health.compositeScore),
+              React.createElement('td', { className:'py-3 pr-4 text-lg text-slate-900' }, health.dimensions.reduce((s,d)=>s+d.contribution,0).toFixed(1) + '' + health.compositeScore),
               React.createElement('td', { colSpan:3 })
             )
           )
@@ -4536,17 +4538,17 @@ function GoalsTab({ customer, goals, state, dispatch, navigate, focusGoalId }) {
                 React.createElement('h4', { className:'font-semibold text-slate-900' }, g.title),
                 React.createElement(StatusBadge, { status:g.status }),
                 React.createElement(SeverityBadge, { severity:g.priority }),
-                g.visibility === 'shared' && React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium ${g.publicationStatus==='published'?'bg-teal-100 text-teal-700':'bg-amber-100 text-amber-700'}` }, g.publicationStatus === 'published' ? '👁 Published' : '👁 Shared draft'),
-                g.source === 'signal_triggered' && React.createElement('span', { className:'px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full' }, '⚡ Auto-created')
+                g.visibility === 'shared' && React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium ${g.publicationStatus==='published'?'bg-teal-100 text-teal-700':'bg-amber-100 text-amber-700'}` }, g.publicationStatus === 'published' ? 'Published' : 'Shared draft'),
+                g.source === 'signal_triggered' && React.createElement('span', { className:'px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full' }, 'Auto-created')
               ),
               React.createElement('p', { className:'text-xs text-slate-500 mt-1' }, `Due: ${g.dueDate ? new Date(g.dueDate).toLocaleDateString() : 'No date'} · Owner: ${USERS[g.ownerId]?.name}`),
               React.createElement('p', { className:'text-sm text-slate-600 mt-1.5' }, g.description.substring(0,120) + (g.description.length > 120 ? '...' : ''))
             ),
             React.createElement('div', { className:'flex gap-2 ml-4' },
-              isAcceptable && React.createElement(Btn, { variant:'success', size:'sm', onClick:()=>dispatch({type:'ACCEPT_GOAL',goalId:g.id}) }, '✓ Accept plan'),
+              isAcceptable && React.createElement(Btn, { variant:'success', size:'sm', onClick:()=>dispatch({type:'ACCEPT_GOAL',goalId:g.id}) }, 'Accept plan'),
               !isAcceptable && g.status !== 'completed' && g.status !== 'abandoned' && g.visibility === 'internal' && React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>dispatch({type:'CHANGE_GOAL_VISIBILITY',goalId:g.id,visibility:'shared'}) }, 'Share with customer'),
-              g.visibility === 'shared' && g.publicationStatus === 'draft' && React.createElement(Btn, { variant:'teal', size:'xs', onClick:()=>setShowPublish(g.id) }, '📢 Publish'),
-              React.createElement(Btn, { variant:'ghost', size:'xs', onClick:()=>navigate(`/goals/${g.id}`) }, 'Full detail →')
+              g.visibility === 'shared' && g.publicationStatus === 'draft' && React.createElement(Btn, { variant:'teal', size:'xs', onClick:()=>setShowPublish(g.id) }, 'Publish'),
+              React.createElement(Btn, { variant:'ghost', size:'xs', onClick:()=>navigate(`/goals/${g.id}`) }, 'Full detail')
             )
           ),
           // Progress
@@ -4563,20 +4565,20 @@ function GoalsTab({ customer, goals, state, dispatch, navigate, focusGoalId }) {
         React.createElement('div', { className:'divide-y' },
           tasks.map(t => React.createElement('div', { key:t.id, className:'px-4 py-3 flex items-center gap-3 hover:bg-slate-50' },
             React.createElement('div', { className:`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${t.status==='done'?'bg-green-500 border-green-500':t.status==='skipped'?'bg-gray-200 border-gray-300':'border-slate-300'}` },
-              t.status === 'done' && React.createElement('span', { className:'text-white text-xs' }, '✓'),
+              t.status === 'done' && React.createElement('span', { className:'text-white text-xs' }, ''),
               t.status === 'skipped' && React.createElement('span', { className:'text-gray-400 text-xs' }, '—')
             ),
             React.createElement('div', { className:'flex-1 min-w-0' },
               React.createElement('p', { className:`text-sm ${t.status==='skipped'?'line-through text-slate-400':'text-slate-800'}` }, t.title),
               React.createElement('div', { className:'flex items-center gap-2 mt-0.5' },
-                React.createElement('span', { className:`px-1.5 py-0.5 text-xs rounded ${t.visibility==='shared'?'bg-teal-100 text-teal-700':'bg-gray-100 text-gray-500'}` }, t.visibility === 'shared' ? '👁 Shared' : '🔒 Internal'),
+                React.createElement('span', { className:`px-1.5 py-0.5 text-xs rounded ${t.visibility==='shared'?'bg-teal-100 text-teal-700':'bg-gray-100 text-gray-500'}` }, t.visibility === 'shared' ? 'Shared' : 'Internal'),
                 t.dueDate && React.createElement('span', { className:'text-xs text-slate-400' }, 'Due ' + new Date(t.dueDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})),
-                t.outcomeNote && React.createElement('span', { className:'text-xs text-green-600' }, '✓ ' + t.outcomeNote.substring(0,40))
+                t.outcomeNote && React.createElement('span', { className:'text-xs text-green-600' }, '' + t.outcomeNote.substring(0,40))
               )
             ),
             React.createElement('div', { className:'flex gap-1 flex-shrink-0' },
               t.status === 'todo' && React.createElement(Btn, { variant:'primary', size:'xs', onClick:()=>dispatch({type:'START_TASK',taskId:t.id}) }, 'Start'),
-              t.status === 'in_progress' && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>dispatch({type:'COMPLETE_TASK',taskId:t.id}) }, '✓ Done'),
+              t.status === 'in_progress' && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>dispatch({type:'COMPLETE_TASK',taskId:t.id}) }, 'Done'),
               t.status !== 'done' && t.status !== 'skipped' && React.createElement(Btn, { variant:'ghost', size:'xs', onClick:()=>setShowSkip(t.id) }, 'Skip')
             )
           ))
@@ -4597,9 +4599,9 @@ function GoalsTab({ customer, goals, state, dispatch, navigate, focusGoalId }) {
     // Publish modal
     showPublish && React.createElement(Modal, { open:true, onClose:()=>setShowPublish(null), title:'Publish success plan' },
       React.createElement('p', { className:'text-sm text-slate-600 mb-4' }, 'Publishing this goal will make it visible to the customer in their portal. Only shared tasks will be shown. Internal tasks remain hidden.'),
-      React.createElement('p', { className:'text-xs text-amber-600 bg-amber-50 p-3 rounded-lg' }, '⚠ This cannot be undone without explicitly unpublishing.'),
+      React.createElement('p', { className:'text-xs text-amber-600 bg-amber-50 p-3 rounded-lg' }, 'This cannot be undone without explicitly unpublishing.'),
       React.createElement('div', { className:'flex gap-2 mt-4' },
-        React.createElement(Btn, { variant:'teal', onClick:()=>{ dispatch({type:'PUBLISH_GOAL',goalId:showPublish}); setShowPublish(null); } }, '📢 Publish plan'),
+        React.createElement(Btn, { variant:'teal', onClick:()=>{ dispatch({type:'PUBLISH_GOAL',goalId:showPublish}); setShowPublish(null); } }, 'Publish plan'),
         React.createElement(Btn, { variant:'ghost', onClick:()=>setShowPublish(null) }, 'Cancel')
       )
     )
@@ -4633,7 +4635,7 @@ function TimelineTab({ customer, goals, risks, state, meetings, navigate }) {
         : React.createElement('div', null,
             events.map((e,i) => React.createElement('div', { key:i, className:'flex gap-3' },
               React.createElement('div', { className:'flex flex-col items-center flex-shrink-0' },
-                React.createElement('span', { className:`w-8 h-8 rounded-full flex items-center justify-center text-sm ${ADMIN_TONES[e.tone]||ADMIN_TONES.slate}` }, e.icon),
+                React.createElement('span', { className:`w-8 h-8 rounded-full flex items-center justify-center text-sm ${ADMIN_TONES[e.tone]||ADMIN_TONES.slate}` }, renderIcon(e.icon)),
                 i < events.length-1 && React.createElement('span', { className:'w-px flex-1 bg-slate-200 my-1' })),
               React.createElement('div', { className:'flex-1 min-w-0 pb-5' },
                 React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
@@ -4693,8 +4695,8 @@ function GoalDetail() {
               React.createElement('div', { className:'flex items-center gap-2 flex-wrap mb-2' },
                 React.createElement(StatusBadge, { status:goal.status }),
                 React.createElement(SeverityBadge, { severity:goal.priority }),
-                goal.visibility === 'shared' && React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium ${goal.publicationStatus==='published'?'bg-teal-100 text-teal-700':'bg-amber-100 text-amber-700'}` }, goal.publicationStatus === 'published' ? '👁 Published' : '📋 Shared draft'),
-                goal.source === 'signal_triggered' && React.createElement('span', { className:'px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full' }, '⚡ Auto-created')
+                goal.visibility === 'shared' && React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium ${goal.publicationStatus==='published'?'bg-teal-100 text-teal-700':'bg-amber-100 text-amber-700'}` }, goal.publicationStatus === 'published' ? 'Published' : 'Shared draft'),
+                goal.source === 'signal_triggered' && React.createElement('span', { className:'px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full' }, 'Auto-created')
               ),
               React.createElement('h2', { className:'text-xl font-bold text-slate-900' }, goal.title),
               React.createElement('p', { className:'text-sm text-slate-500 mt-1' }, customer?.name + ' · ' + goal.type.replace('_',' ')),
@@ -4707,10 +4709,10 @@ function GoalDetail() {
               goal.visibility === 'shared' && React.createElement('p', { className:'text-xs text-teal-600 mt-1' }, `Customer sees: ${sharedProg}% (shared tasks only)`)
             ),
             React.createElement('div', { className:'flex flex-col gap-2' },
-              isAcceptable && React.createElement(Btn, { variant:'success', onClick:()=>dispatch({type:'ACCEPT_GOAL',goalId}) }, '✓ Accept plan'),
-              goal.visibility === 'shared' && goal.publicationStatus === 'draft' && React.createElement(Btn, { variant:'teal', size:'sm', onClick:()=>setShowPublish(true) }, '📢 Publish'),
+              isAcceptable && React.createElement(Btn, { variant:'success', onClick:()=>dispatch({type:'ACCEPT_GOAL',goalId}) }, 'Accept plan'),
+              goal.visibility === 'shared' && goal.publicationStatus === 'draft' && React.createElement(Btn, { variant:'teal', size:'sm', onClick:()=>setShowPublish(true) }, 'Publish'),
               goal.visibility === 'internal' && goal.status !== 'completed' && React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>dispatch({type:'CHANGE_GOAL_VISIBILITY',goalId,visibility:'shared'}) }, 'Share with customer'),
-              React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>navigate(`/portal-preview/${goal.customerId}`) }, '👁 Preview portal')
+              React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>navigate(`/portal-preview/${goal.customerId}`) }, 'Preview portal')
             )
           )
         ),
@@ -4735,7 +4737,7 @@ function GoalDetail() {
             tasks.map(t => React.createElement('div', { key:t.id, className:'px-5 py-4' },
               React.createElement('div', { className:'flex items-start gap-3' },
                 React.createElement('div', { className:`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${t.status==='done'?'bg-green-500 border-green-500 text-white':t.status==='in_progress'?'border-indigo-500':t.status==='skipped'?'border-gray-300 bg-gray-100':'border-slate-300'}` },
-                  t.status === 'done' && '✓',
+                  t.status === 'done' && '',
                   t.status === 'in_progress' && React.createElement('div',{className:'w-2 h-2 bg-indigo-500 rounded-full'}),
                   t.status === 'skipped' && React.createElement('span',{className:'text-xs text-gray-400'},'—')
                 ),
@@ -4744,15 +4746,15 @@ function GoalDetail() {
                   React.createElement('p', { className:'text-xs text-slate-500 mt-0.5' }, t.description.substring(0,100) + (t.description.length>100?'...':'')),
                   React.createElement('div', { className:'flex items-center gap-2 mt-1' },
                     React.createElement(StatusBadge, { status:t.status }),
-                    React.createElement('span', { className:`px-1.5 py-0.5 text-xs rounded ${t.visibility==='shared'?'bg-teal-100 text-teal-700':'bg-gray-100 text-gray-500'}` }, t.visibility === 'shared' ? '👁 Customer-visible' : '🔒 Internal'),
+                    React.createElement('span', { className:`px-1.5 py-0.5 text-xs rounded ${t.visibility==='shared'?'bg-teal-100 text-teal-700':'bg-gray-100 text-gray-500'}` }, t.visibility === 'shared' ? 'Customer-visible' : 'Internal'),
                     t.dueDate && React.createElement('span', { className:'text-xs text-slate-400' }, 'Due ' + new Date(t.dueDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})),
                     React.createElement('span', { className:'text-xs text-slate-400' }, USERS[t.ownerId]?.name)
                   ),
-                  t.outcomeNote && React.createElement('p', { className:'text-xs text-green-600 mt-1 font-medium' }, '✓ ' + t.outcomeNote)
+                  t.outcomeNote && React.createElement('p', { className:'text-xs text-green-600 mt-1 font-medium' }, '' + t.outcomeNote)
                 ),
                 React.createElement('div', { className:'flex gap-1' },
                   t.status === 'todo' && React.createElement(Btn, { variant:'primary', size:'xs', onClick:()=>dispatch({type:'START_TASK',taskId:t.id}) }, 'Start'),
-                  t.status === 'in_progress' && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>dispatch({type:'COMPLETE_TASK',taskId:t.id}) }, '✓ Done'),
+                  t.status === 'in_progress' && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>dispatch({type:'COMPLETE_TASK',taskId:t.id}) }, 'Done'),
                   t.status !== 'done' && t.status !== 'skipped' && React.createElement(Btn, { variant:'ghost', size:'xs', onClick:()=>setShowSkip(t.id) }, 'Skip')
                 )
               )
@@ -4781,7 +4783,7 @@ function GoalDetail() {
         goal.source === 'signal_triggered' && React.createElement(Card, { className:'p-4' },
           React.createElement('h4', { className:'font-semibold text-slate-900 text-sm mb-2' }, 'Source'),
           React.createElement('div', { className:'p-2 bg-purple-50 rounded-lg' },
-            React.createElement('p', { className:'text-xs font-medium text-purple-700' }, '⚡ Signal-triggered'),
+            React.createElement('p', { className:'text-xs font-medium text-purple-700' }, 'Signal-triggered'),
           )
         ),
         
@@ -4807,9 +4809,9 @@ function GoalDetail() {
     
     showPublish && React.createElement(Modal, { open:true, onClose:()=>setShowPublish(false), title:'Publish success plan' },
       React.createElement('p', { className:'text-sm text-slate-600 mb-4' }, 'Publishing makes this goal visible to the customer. Only shared tasks will be shown.'),
-      React.createElement('p', { className:'text-xs text-amber-600 bg-amber-50 p-3 rounded-lg' }, '⚠ Requires explicit confirmation. Customer can view this in their portal after publishing.'),
+      React.createElement('p', { className:'text-xs text-amber-600 bg-amber-50 p-3 rounded-lg' }, 'Requires explicit confirmation. Customer can view this in their portal after publishing.'),
       React.createElement('div', { className:'flex gap-2 mt-4' },
-        React.createElement(Btn, { variant:'teal', onClick:()=>{ dispatch({type:'PUBLISH_GOAL',goalId}); setShowPublish(false); } }, '📢 Publish plan'),
+        React.createElement(Btn, { variant:'teal', onClick:()=>{ dispatch({type:'PUBLISH_GOAL',goalId}); setShowPublish(false); } }, 'Publish plan'),
         React.createElement(Btn, { variant:'ghost', onClick:()=>setShowPublish(false) }, 'Cancel')
       )
     )
@@ -4844,9 +4846,9 @@ function HealthPortfolio() {
     // Summary
     React.createElement('div', { className:'grid grid-cols-4 gap-4' },
       React.createElement(MetricCard, { label:'Total customers', value:customers.length }),
-      React.createElement(MetricCard, { label:'At risk (red)', value:byBand.red.length, sub:formatARR(byBand.red.reduce((s,c)=>s+c.arr,0)) + ' ARR', subColor:'text-red-600' }),
-      React.createElement(MetricCard, { label:'Needs attention (yellow)', value:byBand.yellow.length, sub:formatARR(byBand.yellow.reduce((s,c)=>s+c.arr,0)) + ' ARR', subColor:'text-amber-600' }),
-      React.createElement(MetricCard, { label:'Healthy (green)', value:byBand.green.length, sub:formatARR(byBand.green.reduce((s,c)=>s+c.arr,0)) + ' ARR', subColor:'text-green-600' })
+      React.createElement(MetricCard, { label:'At risk (red)', value:byBand.red.length, sub:formatARR(byBand.red.reduce((s,c)=>s+c.arr,0)) + 'ARR', subColor:'text-red-600' }),
+      React.createElement(MetricCard, { label:'Needs attention (yellow)', value:byBand.yellow.length, sub:formatARR(byBand.yellow.reduce((s,c)=>s+c.arr,0)) + 'ARR', subColor:'text-amber-600' }),
+      React.createElement(MetricCard, { label:'Healthy (green)', value:byBand.green.length, sub:formatARR(byBand.green.reduce((s,c)=>s+c.arr,0)) + 'ARR', subColor:'text-green-600' })
     ),
     
     React.createElement('div', { className:'grid grid-cols-2 gap-5 items-stretch' },
@@ -4943,7 +4945,7 @@ function Risks() {
       React.createElement('span', { className:'text-xs text-slate-400' }, 'Filtered by:'),
       React.createElement('span', { className:'inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold' },
         (USERS[ownerFilter] ? USERS[ownerFilter].name : ownerFilter) + "'s portfolio",
-        React.createElement('button', { onClick:()=>navigate('/risks'), className:'text-indigo-400 hover:text-indigo-700' }, '\u2715'))
+        React.createElement('button', { onClick:()=>navigate('/risks'), className:'text-indigo-400 hover:text-indigo-700' }, ''))
     ),
     // Summary
     React.createElement('div', { className:'grid grid-cols-4 gap-4' },
@@ -4958,13 +4960,13 @@ function Risks() {
       React.createElement(CxLabel, { right:React.createElement('span',{className:'text-[11px] text-slate-400'},
         shownRisks.filter(r=>r.status!=='resolved').length + ' of ' + risks.filter(r=>r.status!=='resolved').length + ' shown') }, 'Risk signals'),
       React.createElement('div', { className:'grid grid-cols-9 gap-2' },
-        [{ id:'all', label:'All signals', icon:'\u25C9', tone:'slate', what:'Every open risk across the eight signal types.' }]
+        [{ id:'all', label:'All signals', icon:'', tone:'slate', what:'Every open risk across the eight signal types.' }]
           .concat(Object.values(RISK_SIGNALS)).map(sig => {
             const n = sig.id==='all' ? risks.filter(r=>r.status!=='resolved').length : (bySignal[sig.id]||0);
             const on = sigFilter === sig.id;
             return React.createElement('button', { key:sig.id, onClick:()=>setSigFilter(sig.id), title:sig.what,
               className:`text-left rounded-xl border p-2 transition-all ${on?'border-indigo-400 bg-indigo-50/60 ring-1 ring-indigo-200':'border-slate-200 hover:border-slate-300'}` },
-              React.createElement('span', { className:`inline-flex w-6 h-6 rounded-lg items-center justify-center text-xs mb-1 ${ADMIN_TONES[sig.tone]||ADMIN_TONES.slate}` }, sig.icon),
+              React.createElement('span', { className:`inline-flex w-6 h-6 rounded-lg items-center justify-center text-xs mb-1 ${ADMIN_TONES[sig.tone]||ADMIN_TONES.slate}` }, renderIcon(sig.icon)),
               React.createElement('p', { className:'text-[10px] font-bold text-slate-800 leading-tight' }, sig.label),
               React.createElement('p', { className:'text-[10px] text-slate-400 mt-0.5' }, n));
           })),
@@ -4991,13 +4993,13 @@ function Risks() {
                 ),
                 React.createElement('td', { className:'px-4 py-3' },
                   (function(){ const sig = RISK_SIGNALS[r.signal];
-                    return sig ? React.createElement(CxPill, { tone:sig.tone }, sig.icon + ' ' + sig.label)
+                    return sig ? React.createElement(CxPill, { tone:sig.tone }, sig.label)
                                : React.createElement('span', { className:'capitalize text-slate-600' }, r.category); })()),
                 React.createElement('td', { className:'px-4 py-3' }, React.createElement(SeverityBadge, { severity:r.severity })),
                 React.createElement('td', { className:'px-4 py-3 font-medium text-red-700' }, formatARR(r.amountAtRisk)),
                 React.createElement('td', { className:'px-4 py-3' }, Math.round(r.probability*100) + '%'),
                 React.createElement('td', { className:'px-4 py-3' }, React.createElement(Avatar, { user:USERS[r.ownerId] })),
-                React.createElement('td', { className:'px-4 py-3' }, goal ? React.createElement('span',{className:'text-xs text-indigo-600 font-medium'},'✓ Covered') : React.createElement('span',{className:'text-xs text-red-600 font-medium'},'⚠ None')),
+                React.createElement('td', { className:'px-4 py-3' }, goal ? React.createElement('span',{className:'text-xs text-indigo-600 font-medium'},'Covered') : React.createElement('span',{className:'text-xs text-red-600 font-medium'},'None')),
                 React.createElement('td', { className:'px-4 py-3 capitalize' }, React.createElement('span',{className:`text-xs px-2 py-0.5 rounded-full font-medium ${r.status==='open'?'bg-red-100 text-red-700':r.status==='mitigating'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}`},r.status))
               );
             })
@@ -5012,7 +5014,7 @@ function Risks() {
           React.createElement(SeverityBadge, { severity:drawer.severity }),
           React.createElement('span',{className:`px-2 py-0.5 text-xs rounded-full font-medium ${drawer.status==='open'?'bg-red-100 text-red-700':drawer.status==='mitigating'?'bg-blue-100 text-blue-700':'bg-green-100 text-green-700'}`},drawer.status),
           (function(){ const sig = RISK_SIGNALS[drawer.signal];
-            return sig ? React.createElement(CxPill, { tone:sig.tone }, sig.icon + ' ' + sig.label) : null; })()
+            return sig ? React.createElement(CxPill, { tone:sig.tone }, sig.label) : null; })()
         ),
 
         // Measured signal detail
@@ -5042,7 +5044,7 @@ function Risks() {
           React.createElement(StatusBadge,{status:drawerGoal.status})
         ),
         !drawerGoal && React.createElement('div', { className:'p-3 bg-red-50 rounded-lg' },
-          React.createElement('p',{className:'text-sm text-red-700 font-medium'},'⚠ No mitigation goal'),
+          React.createElement('p',{className:'text-sm text-red-700 font-medium'},'No mitigation goal'),
           React.createElement('p',{className:'text-xs text-red-600 mt-0.5'},'This risk has no active mitigation plan. Consider creating a goal.')
         ),
         React.createElement('div', { className:'flex flex-col gap-2 pt-2' },
@@ -5081,7 +5083,7 @@ function Expansion() {
       React.createElement('span', { className:'text-xs text-slate-400' }, 'Filtered by:'),
       React.createElement('span', { className:'inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold' },
         (USERS[ownerFilter] ? USERS[ownerFilter].name : ownerFilter) + "'s portfolio",
-        React.createElement('button', { onClick:()=>navigate('/expansion'), className:'text-indigo-400 hover:text-indigo-700' }, '\u2715'))
+        React.createElement('button', { onClick:()=>navigate('/expansion'), className:'text-indigo-400 hover:text-indigo-700' }, ''))
     ),
     // Summary
     React.createElement('div', { className:'grid grid-cols-4 gap-4' },
@@ -5096,14 +5098,14 @@ function Expansion() {
       React.createElement(CxLabel, { right:React.createElement('span',{className:'text-[11px] text-slate-400'},
         shownOpps.length + ' of ' + opps.length + ' shown') }, 'Expansion signals'),
       React.createElement('div', { className:'grid grid-cols-6 gap-2' },
-        [{ id:'all', label:'All signals', icon:'\u25C9', tone:'slate',
+        [{ id:'all', label:'All signals', icon:'', tone:'slate',
            what:'Every open expansion candidate across the five signal types.' }]
           .concat(Object.values(EXPANSION_SIGNALS)).map(sig => {
             const n = sig.id==='all' ? opps.length : (bySignal[sig.id]||0);
             const on = sigFilter === sig.id;
             return React.createElement('button', { key:sig.id, onClick:()=>setSigFilter(sig.id), title:sig.what,
               className:`text-left rounded-xl border p-2.5 transition-all ${on?'border-indigo-400 bg-indigo-50/60 ring-1 ring-indigo-200':'border-slate-200 hover:border-slate-300'}` },
-              React.createElement('span', { className:`inline-flex w-7 h-7 rounded-lg items-center justify-center text-sm mb-1.5 ${ADMIN_TONES[sig.tone]||ADMIN_TONES.slate}` }, sig.icon),
+              React.createElement('span', { className:`inline-flex w-7 h-7 rounded-lg items-center justify-center text-sm mb-1.5 ${ADMIN_TONES[sig.tone]||ADMIN_TONES.slate}` }, renderIcon(sig.icon)),
               React.createElement('p', { className:'text-[11px] font-bold text-slate-800 leading-tight' }, sig.label),
               React.createElement('p', { className:'text-[10px] text-slate-400 mt-0.5' }, n + ' account' + (n===1?'':'s')));
           })),
@@ -5133,7 +5135,7 @@ function Expansion() {
                 if (!sig) return React.createElement('p', { className:'text-sm text-slate-500 capitalize mt-0.5' }, opp.type.replace('_',' ') + ' expansion');
                 return React.createElement('div', { className:'mt-1.5' },
                   React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
-                    React.createElement(CxPill, { tone:sig.tone }, sig.icon + ' ' + sig.label),
+                    React.createElement(CxPill, { tone:sig.tone }, sig.label),
                     React.createElement('span', { className:'text-xs text-slate-400 capitalize' }, opp.type.replace('_',' ') + ' expansion')),
                   opp.headline && React.createElement('p', { className:'text-sm font-semibold text-slate-800 mt-1.5' }, opp.headline),
                   opp.metrics && React.createElement('div', { className:'flex gap-5 mt-2 flex-wrap' },
@@ -5156,7 +5158,7 @@ function Expansion() {
               opp.crmOpportunityState !== 'none' && React.createElement('p', { className:'text-xs text-indigo-600 font-medium mt-2' }, 'CRM: ' + opp.crmOpportunityState.replace('_',' '))
             ),
             React.createElement('div', { className:'flex flex-col gap-2 flex-shrink-0' },
-              opp.qualificationStatus === 'candidate' && React.createElement(Btn, { variant:'teal', size:'sm', onClick:()=>setConfirmQualify(opp.id) }, '✓ Qualify'),
+              opp.qualificationStatus === 'candidate' && React.createElement(Btn, { variant:'teal', size:'sm', onClick:()=>setConfirmQualify(opp.id) }, 'Qualify'),
               opp.crmOpportunityState === 'none' && React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>dispatch({type:'CREATE_CRM_OPP',oppId:opp.id}) }, 'Create CRM opp'),
               React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>navigate(`/customers/${opp.customerId}`) }, 'Open customer')
             )
@@ -5173,7 +5175,7 @@ function Expansion() {
         Object.values(state.expansionOpps).find(e=>e.id===confirmQualify)?.evidence.map((ev,i)=>React.createElement('p',{key:i,className:'text-xs text-teal-800 mt-0.5'},'• '+ev))
       ),
       React.createElement('div', { className:'flex gap-2' },
-        React.createElement(Btn, { variant:'teal', onClick:()=>{ dispatch({type:'QUALIFY_EXPANSION',oppId:confirmQualify}); setConfirmQualify(null); } }, '✓ Confirm qualification'),
+        React.createElement(Btn, { variant:'teal', onClick:()=>{ dispatch({type:'QUALIFY_EXPANSION',oppId:confirmQualify}); setConfirmQualify(null); } }, 'Confirm qualification'),
         React.createElement(Btn, { variant:'ghost', onClick:()=>setConfirmQualify(null) }, 'Cancel')
       )
     ),
@@ -5237,8 +5239,8 @@ function ManagerDashboard() {
               React.createElement(YAxis, { tick:{fontSize:11} }),
               React.createElement(Tooltip),
               React.createElement(Legend, { wrapperStyle:{fontSize:11} }),
-              React.createElement(Bar, { dataKey:'toRed', name:'→ Red', fill:'#ef4444' }),
-              React.createElement(Bar, { dataKey:'fromRed', name:'← From red', fill:'#22c55e' })
+              React.createElement(Bar, { dataKey:'toRed', name:'Red', fill:'#ef4444' }),
+              React.createElement(Bar, { dataKey:'fromRed', name:'From red', fill:'#22c55e' })
             )
           )
         )
@@ -5251,7 +5253,7 @@ function ManagerDashboard() {
           React.createElement('span', { className:'px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full font-medium' }, blindSpots.length + ' accounts')
         ),
         React.createElement('p', { className:'text-xs text-slate-500 mb-3' }, 'Red health with no active mitigation goal'),
-        blindSpots.length === 0 ? React.createElement('p',{className:'text-sm text-green-600'},'✓ No blind spots — all red accounts have active mitigation goals') :
+        blindSpots.length === 0 ? React.createElement('p',{className:'text-sm text-green-600'},'No blind spots — all red accounts have active mitigation goals') :
         React.createElement('div', { className:'space-y-2' },
           blindSpots.map(c => {
             const health = HEALTH_SIGNALS[c.healthId];
@@ -5260,7 +5262,7 @@ function ManagerDashboard() {
                 React.createElement('p', { className:'text-sm font-medium text-slate-900' }, c.name),
                 React.createElement('p', { className:'text-xs text-slate-500' }, formatARR(c.arr) + ' · Score ' + health?.compositeScore)
               ),
-              React.createElement('span', { className:'text-xs text-red-700 font-medium' }, 'No plan →')
+              React.createElement('span', { className:'text-xs text-red-700 font-medium' }, 'No plan')
             );
           })
         )
@@ -5301,7 +5303,7 @@ function ManagerDashboard() {
               React.createElement('p', { className:'text-sm font-medium text-slate-900' }, g.title),
               React.createElement('p', { className:'text-xs text-slate-500' }, c?.name + ' · ' + USERS[g.ownerId]?.name)
             ),
-            React.createElement('span', { className:'text-xs text-amber-600 font-medium' }, '⚠ Awaiting acknowledgement')
+            React.createElement('span', { className:'text-xs text-amber-600 font-medium' }, 'Awaiting acknowledgement')
           );
         })
       )
@@ -5385,7 +5387,7 @@ function PortalPreview() {
   return React.createElement('div', { className:'min-h-screen bg-slate-100' },
     // Preview banner
     React.createElement('div', { className:'bg-amber-500 text-white text-center py-2 text-sm font-semibold' },
-      '👁 PREVIEWING AS CUSTOMER — This is how ' + (customer?.name || 'the customer') + ' sees their portal',
+      'PREVIEWING AS CUSTOMER — This is how' + (customer?.name || 'the customer') + ' sees their portal',
       React.createElement('button', { onClick:()=>navigate(-1), className:'ml-4 underline text-xs' }, 'Exit preview')
     ),
     
@@ -5436,7 +5438,7 @@ function PortalPreview() {
             React.createElement('div', { className:'space-y-2' },
               tasks.map(t => React.createElement('div', { key:t.id, className:'flex items-center gap-3 p-3 bg-slate-50 rounded-lg' },
                 React.createElement('div', { className:`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${t.status==='done'?'bg-green-500 border-green-500 text-white':t.status==='in_progress'?'border-indigo-500':'border-slate-300'}` },
-                  t.status === 'done' && '✓',
+                  t.status === 'done' && '',
                   t.status === 'in_progress' && React.createElement('div',{className:'w-2 h-2 bg-indigo-500 rounded-full'})
                 ),
                 React.createElement('div', null,
@@ -5489,7 +5491,7 @@ function EmailDetail({ email, onBack, dispatch, navigate, customers }){
   };
   const addAttachment = () => {
     const n = attachments.length + 1;
-    setAttachments(a => a.concat({ name:'attachment-' + n + '.pdf', size:(120 * n) + ' KB' }));
+    setAttachments(a => a.concat({ name:'attachment-' + n + '.pdf', size:(120 * n) + 'KB' }));
     dispatch({ type:'ADD_TOAST', msg:'Attachment added', toastType:'info' });
   };
   const send = () => {
@@ -5508,9 +5510,9 @@ function EmailDetail({ email, onBack, dispatch, navigate, customers }){
 
   return React.createElement('div', { className:'space-y-4' },
     React.createElement('div', { className:'flex items-center justify-between gap-3 flex-wrap' },
-      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, '\u2190 Back to inbox'),
+      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, 'Back to inbox'),
       React.createElement('div', { className:'flex gap-2' },
-        React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setTaskOpen(v=>!v) }, '\u2713 Create task'),
+        React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setTaskOpen(v=>!v) }, 'Create task'),
         customer && React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>navigate('/customers/'+customer.id) }, 'Open account')
       )
     ),
@@ -5537,7 +5539,7 @@ function EmailDetail({ email, onBack, dispatch, navigate, customers }){
         React.createElement('div', { className:'flex-1 min-w-0' },
           React.createElement('p', { className:'text-base font-bold text-slate-900' }, email.subject),
           React.createElement('p', { className:'text-xs text-slate-500 mt-0.5' },
-            email.from + ' \u00b7 ' + email.fromEmail + ' \u2192 ' + email.to),
+            email.from + ' \u00b7 ' + email.fromEmail + '  ' + email.to),
           React.createElement('div', { className:'flex gap-2 mt-1.5 flex-wrap' },
             React.createElement('span', { className:'text-[11px] text-slate-400' }, email.received),
             customer && React.createElement('button', { onClick:()=>navigate('/customers/'+customer.id),
@@ -5551,7 +5553,7 @@ function EmailDetail({ email, onBack, dispatch, navigate, customers }){
           email.attachments.map(a=>React.createElement('button', { key:a.name,
             onClick:()=>dispatch({type:'ADD_TOAST',msg:'Downloading '+a.name,toastType:'info'}),
             className:'flex items-center gap-2 border border-slate-200 rounded-lg px-2.5 py-1.5 hover:border-indigo-300' },
-            React.createElement('span', null, '\u{1F4CE}'),
+            React.createElement('span', null, ''),
             React.createElement('span', { className:'text-xs font-medium text-slate-700' }, a.name),
             React.createElement('span', { className:'text-[10px] text-slate-400' }, a.size))))
       )
@@ -5579,7 +5581,7 @@ function EmailDetail({ email, onBack, dispatch, navigate, customers }){
     // Reply composer
     React.createElement(Card, { className:'p-4' },
       React.createElement(CxLabel, { right: React.createElement('div', { className:'relative' },
-        React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setTplOpen(v=>!v) }, '\u{1F4C4} Apply template'),
+        React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setTplOpen(v=>!v) }, 'Apply template'),
         tplOpen && React.createElement('div', { className:'absolute right-0 mt-1 w-72 bg-white border border-slate-200 rounded-xl shadow-lg z-30 p-1.5' },
           EMAIL_TEMPLATES.map(t=>React.createElement('button', { key:t.id, onClick:()=>applyTemplate(t),
             className:'w-full text-left px-2.5 py-2 rounded-lg hover:bg-slate-50' },
@@ -5591,13 +5593,13 @@ function EmailDetail({ email, onBack, dispatch, navigate, customers }){
         className:inp + ' resize-y' }),
       attachments.length > 0 && React.createElement('div', { className:'flex gap-2 flex-wrap mt-2' },
         attachments.map((a,i)=>React.createElement('span', { key:i, className:'inline-flex items-center gap-1.5 bg-slate-100 rounded-lg px-2 py-1' },
-          React.createElement('span', { className:'text-xs text-slate-600' }, '\u{1F4CE} ' + a.name),
+          React.createElement('span', { className:'text-xs text-slate-600' }, ' ' + a.name),
           React.createElement('button', { onClick:()=>setAttachments(l=>l.filter((_,j)=>j!==i)),
-            className:'text-slate-400 hover:text-red-500 text-xs' }, '\u2715')))),
+            className:'text-slate-400 hover:text-red-500 text-xs' }, '')))),
       React.createElement('div', { className:'flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 flex-wrap' },
         React.createElement(Btn, { variant:'primary', size:'sm', onClick:send, disabled:!reply.trim() }, 'Send reply'),
-        React.createElement(Btn, { variant:'secondary', size:'sm', onClick:addAttachment }, '\u{1F4CE} Attach file'),
-        React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>setTaskOpen(true) }, '\u2713 Create task'),
+        React.createElement(Btn, { variant:'secondary', size:'sm', onClick:addAttachment }, 'Attach file'),
+        React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>setTaskOpen(true) }, 'Create task'),
         React.createElement('span', { className:'text-[11px] text-slate-400 ml-auto' },
           attachments.length ? attachments.length + ' attachment(s)' : 'No attachments')
       )
@@ -5614,7 +5616,7 @@ function EmailInbox({ state, dispatch, navigate }){
 
   if (!mailbox.connected) {
     return React.createElement(Card, { className:'p-12 text-center' },
-      React.createElement('p', { className:'text-3xl mb-2' }, '\u2709'),
+      React.createElement('p', { className:'text-3xl mb-2' }, ''),
       React.createElement('p', { className:'text-sm font-semibold text-slate-700' }, 'Your mailbox is not connected'),
       React.createElement('p', { className:'text-xs text-slate-500 mt-1 max-w-md mx-auto' },
         'Connect a mailbox to pull emails addressed to you into CX42, reply without leaving the product, and convert messages into tasks.'),
@@ -5654,7 +5656,7 @@ function EmailInbox({ state, dispatch, navigate }){
         className:'px-3 py-1.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500' }),
       React.createElement('span', { className:'text-xs text-slate-400 ml-auto' },
         mailbox.address + ' \u00b7 synced ' + mailbox.synced),
-      React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>dispatch({type:'SYNC_MAILBOX'}) }, '\u21BB Sync')
+      React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>dispatch({type:'SYNC_MAILBOX'}) }, 'Sync')
     ),
 
     filter === 'unmapped' && React.createElement(Card, { className:'p-3 bg-slate-50 border-slate-200' },
@@ -5679,8 +5681,8 @@ function EmailInbox({ state, dispatch, navigate }){
                     ? React.createElement(CxPill, { tone:'green' }, c.name)
                     : React.createElement(CxPill, { tone: bucketOf(e)==='internal' ? 'slate' : 'amber' },
                         bucketOf(e)==='internal' ? 'Internal \u00b7 no account' : 'No account match'),
-                  e.starred && React.createElement('span', { className:'text-amber-400 text-xs' }, '\u2605'),
-                  e.hasAttachment && React.createElement('span', { className:'text-slate-400 text-xs' }, '\u{1F4CE}')),
+                  e.starred && React.createElement('span', { className:'text-amber-400 text-xs' }, ''),
+                  e.hasAttachment && React.createElement('span', { className:'text-slate-400 text-xs' }, '')),
                 React.createElement('p', { className:`text-sm truncate mt-0.5 ${e.unread?'font-semibold text-slate-800':'text-slate-600'}` }, e.subject),
                 React.createElement('p', { className:'text-xs text-slate-400 truncate mt-0.5' }, e.preview)),
               React.createElement('span', { className:'text-[11px] text-slate-400 flex-shrink-0 whitespace-nowrap' }, e.ago)
@@ -5710,7 +5712,7 @@ function TaskDetailDrawer({ task, state, dispatch, navigate, onClose }){
         React.createElement(CxLabel, null, 'Task fields'),
         // Source \u2014 where this task came from
         row('Source', React.createElement('span', { className:'inline-flex items-center gap-1.5' },
-          React.createElement(CxPill, { tone:src.tone }, src.icon + ' ' + src.label),
+          React.createElement(CxPill, { tone:src.tone }, src.label),
           task.source === 'action' && task.actionName &&
             React.createElement('span', { className:'text-[11px] text-slate-500' }, '\u201c' + task.actionName + '\u201d'),
           task.source === 'email' && task.emailSubject &&
@@ -5733,7 +5735,7 @@ function TaskDetailDrawer({ task, state, dispatch, navigate, onClose }){
       // Provenance detail per source
       task.source === 'action' && React.createElement(Card, { className:'p-4 bg-blue-50/60 border-blue-200' },
         React.createElement('div', { className:'flex items-center gap-2 mb-2.5' },
-          React.createElement('span', { className:'w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs' }, '\u26A1'),
+          React.createElement('span', { className:'w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs' }, ''),
           React.createElement('p', { className:'text-[10px] font-bold text-blue-700 uppercase tracking-wider' }, 'Why this task was raised')),
 
         // What fired it
@@ -5843,7 +5845,7 @@ function MyWork() {
   return React.createElement('div', { className:'space-y-4' },
     focusTask && React.createElement(Card, { className:'p-4 border-indigo-200 bg-indigo-50/60' },
       React.createElement('div', { className:'flex items-start gap-3' },
-        React.createElement('div', { className:'w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm flex-shrink-0' }, '\u2713'),
+        React.createElement('div', { className:'w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm flex-shrink-0' }, ''),
         React.createElement('div', { className:'flex-1 min-w-0' },
           React.createElement('p', { className:'text-[10px] font-bold text-indigo-600 uppercase tracking-wider' }, 'Opened from priority queue'),
           React.createElement('p', { className:'text-sm font-semibold text-slate-900 mt-0.5' }, focusTask.title),
@@ -5878,14 +5880,14 @@ function MyWork() {
           React.createElement('input', { type:'date', value:dateTo, onChange:e=>setDateTo(e.target.value), className:'border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500' })
         ),
         datePreset !== 'all' && React.createElement(Btn, { variant:'ghost', size:'xs', onClick:()=>handlePresetChange('all') }, 'Clear dates'),
-        React.createElement(Btn, { variant: showHistory ? 'primary' : 'secondary', size:'xs', onClick:()=>setShowHistory(h=>!h) }, showHistory ? '← Back to active' : 'View history')
+        React.createElement(Btn, { variant: showHistory ? 'primary' : 'secondary', size:'xs', onClick:()=>setShowHistory(h=>!h) }, showHistory ? 'Back to active' : 'View history')
       )
     ),
     showHistory && React.createElement('p', { className:'text-xs text-slate-500 -mt-2' }, 'History log — showing items already marked done, completed, or skipped.'),
     (function(){
       const n = items.filter(i => i.itemType === 'task' && i.source === 'action').length;
       return n > 0 && React.createElement('div', { className:'flex items-center gap-2 -mt-1' },
-        React.createElement('span', { className:'inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded font-semibold bg-indigo-100 text-indigo-700' }, '\u26A1 action'),
+        React.createElement('span', { className:'inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded font-semibold bg-indigo-100 text-indigo-700' }, ' action'),
         React.createElement('span', { className:'text-xs text-slate-500' },
           n + ' task' + (n===1?'':'s') + ' raised automatically by an Action \u2014 each shows the customer and why it was created. Tasks you create yourself appear plain.')
       );
@@ -5914,9 +5916,9 @@ function MyWork() {
                     React.createElement('td', { className:'px-4 py-3' },
                       React.createElement('span', { className:`text-xs font-semibold ${sla.breached?'text-red-600':sla.atRisk?'text-amber-600':'text-green-600'}` }, sla.label)),
                     React.createElement('td', { className:'px-4 py-3' },
-                      sops.length ? React.createElement(CxPill, { tone:'blue' }, '\u26A1 ' + sops.length + ' SOP' + (sops.length===1?'':'s'))
+                      sops.length ? React.createElement(CxPill, { tone:'blue' }, ' ' + sops.length + 'SOP' + (sops.length===1?'':'s'))
                                   : React.createElement('span',{className:'text-slate-300 text-xs'},'\u2014')),
-                    React.createElement('td', { className:'px-4 py-3 text-right text-slate-300' }, '\u2192')
+                    React.createElement('td', { className:'px-4 py-3 text-right text-slate-300' }, '')
                   );
                 })
           )
@@ -5948,7 +5950,7 @@ function MyWork() {
               React.createElement('td', { className:'px-4 py-3 font-medium max-w-md' },
                 React.createElement('p',{className:`truncate ${isRead ? 'text-slate-400' : 'text-slate-900'}`},item.title),
                 fromAction && React.createElement('p', { className:'text-[11px] text-indigo-700 font-medium mt-0.5 truncate' },
-                  '\u26A1 ' + item.actionName)
+                  ' ' + item.actionName)
               ),
               // A task belongs to a goal \u2014 goals are no longer listed on their own
               React.createElement('td', { className:'px-4 py-3 max-w-[200px]' },
@@ -5957,14 +5959,14 @@ function MyWork() {
                   if (g) return React.createElement('button', {
                     onClick:e=>{ e.stopPropagation(); navigate('/goals/' + g.id); },
                     className:'text-xs text-indigo-600 hover:underline truncate block max-w-full text-left', title:g.title },
-                    '\u25CE ' + g.title);
+                    ' ' + g.title);
                   return React.createElement('span', { className:'text-xs text-slate-300' },
                     item.itemType === 'task' ? 'Standalone' : '\u2014');
                 })()),
               React.createElement('td', { className:'px-4 py-3' },
                 item.itemType === 'task'
                   ? (function(){ const sm = taskSourceMeta(item);
-                      return React.createElement(CxPill, { tone:sm.tone }, sm.icon + ' ' + sm.label); })()
+                      return React.createElement(CxPill, { tone:sm.tone }, sm.label); })()
                   : React.createElement('span', { className:'text-slate-300 text-xs' }, '—')),
               React.createElement('td', { className:'px-4 py-3 text-slate-600' },
                 customer
@@ -6022,7 +6024,7 @@ function Renewals() {
               React.createElement('td', { className:'px-3 py-3' }, React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium capitalize ${r.forecast==='commit'?'bg-green-100 text-green-700':r.forecast==='likely'?'bg-blue-100 text-blue-700':r.forecast==='at_risk'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700'}` }, r.forecast.replace('_',' '))),
               React.createElement('td', { className:'px-3 py-3 text-slate-600' }, Math.round(r.probability*100) + '%'),
               React.createElement('td', { className:'px-3 py-3 text-red-700' }, r.riskAmount > 0 ? formatARR(r.riskAmount) : React.createElement('span',{className:'text-slate-400'},'—')),
-              React.createElement('td', { className:'px-3 py-3' }, r.goalCoverage ? React.createElement('span',{className:'text-green-600 text-xs'},'✓') : React.createElement('span',{className:'text-red-600 text-xs'},'✗')),
+              React.createElement('td', { className:'px-3 py-3' }, r.goalCoverage ? React.createElement('span',{className:'text-green-600 text-xs'},'') : React.createElement('span',{className:'text-red-600 text-xs'},'')),
               React.createElement('td', { className:'px-3 py-3' }, React.createElement(Avatar, { user:USERS[r.ownerId] })),
               React.createElement('td', { className:'px-3 py-3 text-xs text-slate-600 max-w-xs' }, React.createElement('p',{className:'truncate'},r.nextStep)),
               React.createElement('td', { className:'px-3 py-3' }, React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>{ setShowForecast(r.id); setNewForecast(r.forecast); } }, 'Update'))
@@ -6151,7 +6153,7 @@ function draftComposerHtml(mode, ticket, customer, sla){
       '<p><b>What we need:</b> a root-cause read and a realistic fix date we can commit to in writing.</p>',
       '<ul>',
       '<li>Severity: ' + esc(sev) + ', open ' + ticket.age + ' days' + (sla.breached ? ' (SLA breached)' : '') + '.</li>',
-      ticket.revenueImpact ? '<li>Commercial exposure: ' + esc(formatARR(ticket.revenueImpact)) + ' ARR.</li>' : '',
+      ticket.revenueImpact ? '<li>Commercial exposure: ' + esc(formatARR(ticket.revenueImpact)) + 'ARR.</li>' : '',
       '<li>Summary: ' + esc(ticket.summary || ticket.subject) + '</li>',
       '</ul>',
       '<p>Full thread is quoted below. Thanks,<br/>Maya</p>',
@@ -6238,27 +6240,27 @@ function RichTextEditor({ html, onChange, placeholder, accent='indigo' }){
           className:'w-0 h-0 opacity-0 absolute' })),
       React.createElement('label', { key:'bg', title:'Highlight',
         className:'w-7 h-7 rounded-md hover:bg-slate-100 flex items-center justify-center cursor-pointer flex-shrink-0 text-xs' },
-        '\u{1F58D}',
+        '',
         React.createElement('input', { type:'color', defaultValue:'#fef08a', onChange:e=>exec('hiliteColor', e.target.value),
           className:'w-0 h-0 opacity-0 absolute' })),
       divider('d3'),
       btn('\u2022', 'insertUnorderedList', null, 'Bulleted list'),
       btn('1.', 'insertOrderedList', null, 'Numbered list'),
-      btn('\u21E5', 'indent', null, 'Indent'),
-      btn('\u21E4', 'outdent', null, 'Outdent'),
+      btn('', 'indent', null, 'Indent'),
+      btn('', 'outdent', null, 'Outdent'),
       divider('d4'),
       btn('\u2261', 'justifyLeft', null, 'Align left'),
       btn('\u2016', 'justifyCenter', null, 'Align centre'),
-      btn('\u2637', 'justifyFull', null, 'Justify'),
+      btn('', 'justifyFull', null, 'Justify'),
       divider('d5'),
       React.createElement('button', { key:'link', type:'button', title:'Insert link',
         onMouseDown:(e)=>{ e.preventDefault(); const u = window.prompt('Link URL', 'https://'); if (u) exec('createLink', u); },
-        className:'w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 text-xs flex items-center justify-center flex-shrink-0' }, '\u{1F517}'),
-      btn('\u2702', 'unlink', null, 'Remove link'),
+        className:'w-7 h-7 rounded-md text-slate-600 hover:bg-slate-100 text-xs flex items-center justify-center flex-shrink-0' }, ''),
+      btn('', 'unlink', null, 'Remove link'),
       btn('\u2014', 'insertHorizontalRule', null, 'Divider'),
       divider('d6'),
-      btn('\u21B6', 'undo', null, 'Undo'),
-      btn('\u21B7', 'redo', null, 'Redo'),
+      btn('', 'undo', null, 'Undo'),
+      btn('', 'redo', null, 'Redo'),
       btn('\u2327', 'removeFormat', null, 'Clear formatting')
     ),
     React.createElement('div', {
@@ -6284,8 +6286,8 @@ function ticketNextActions(t, customer, sla){
 
 // ── Sentiment chip, shown in every ticket view ──
 function TicketSentiment({ sentiment, size='sm' }){
-  const m = { positive:{t:'green',i:'\u{1F642}',l:'Positive'}, neutral:{t:'slate',i:'\u{1F610}',l:'Neutral'},
-              negative:{t:'red',i:'\u{1F641}',l:'Negative'} }[sentiment] || { t:'slate', i:'\u{1F610}', l:'Unknown' };
+  const m = { positive:{t:'green',i:'',l:'Positive'}, neutral:{t:'slate',i:'',l:'Neutral'},
+              negative:{t:'red',i:'',l:'Negative'} }[sentiment] || { t:'slate', i:'', l:'Unknown' };
   return React.createElement(CxPill, { tone:m.t }, m.i + (size==='sm' ? ' ' + m.l : ''));
 }
 
@@ -6309,25 +6311,25 @@ function getTicketActivity(ticket, customer){
 
   const out = [
     { kind:'interaction', dir:'inbound',  at:fmt(day(ticket.age||3),'09:14'), who:contact,
-      title:'Customer raised the ticket', body:ticket.subject, icon:'\u2709', tone:'purple' },
+      title:'Customer raised the ticket', body:ticket.subject, icon:'', tone:'purple' },
     { kind:'system',      at:fmt(day(ticket.age||3),'09:14'), who:'System',
       title:'Ticket created from ' + cxPick(['support@cx42.io','the customer portal','the in-app widget'], s),
-      body:'Priority set to ' + ticket.severity + ' by the assignment policy.', icon:'\u2699', tone:'slate' },
+      body:'Priority set to ' + ticket.severity + ' by the assignment policy.', icon:'', tone:'slate' },
     { kind:'system',      at:fmt(day(ticket.age||3),'09:15'), who:'System',
-      title:'Assigned to ' + agent, body:'Round-robin within the ' + (ticket.severity==='critical'?'escalation':'standard') + ' queue.', icon:'\u2699', tone:'slate' },
+      title:'Assigned to ' + agent, body:'Round-robin within the ' + (ticket.severity==='critical'?'escalation':'standard') + ' queue.', icon:'', tone:'slate' },
     { kind:'interaction', dir:'outbound', at:fmt(day(Math.max(0,(ticket.age||3)-1)),'10:02'), who:agent,
-      title:'Agent replied', body:'Acknowledged and asked for the error log plus the affected user count.', icon:'\u21A9', tone:'blue' },
+      title:'Agent replied', body:'Acknowledged and asked for the error log plus the affected user count.', icon:'', tone:'blue' },
     { kind:'agent',       at:fmt(day(Math.max(0,(ticket.age||3)-1)),'10:05'), who:agent,
-      title:'Private note added', body:'Suspect the same root cause as the connector issue reported last month.', icon:'\u{1F4DD}', tone:'amber' },
+      title:'Private note added', body:'Suspect the same root cause as the connector issue reported last month.', icon:'', tone:'amber' },
   ];
 
   if (ticket.sentiment === 'negative')
     out.push({ kind:'interaction', dir:'inbound', at:fmt(day(1),'21:40'), who:contact,
-      title:'Customer chased for an update', body:'Tone has turned \u2014 sentiment scored negative on this reply.', icon:'\u2709', tone:'red' });
+      title:'Customer chased for an update', body:'Tone has turned \u2014 sentiment scored negative on this reply.', icon:'', tone:'red' });
 
   if (ticket.sla === 'breached')
     out.push({ kind:'system', at:fmt(day(1),'13:00'), who:'System',
-      title:'SLA breached', body:'First-response target of ' + (SLA_TARGET_HOURS[ticket.severity]||24) + 'h was exceeded.', icon:'\u26A0', tone:'red' });
+      title:'SLA breached', body:'First-response target of ' + (SLA_TARGET_HOURS[ticket.severity]||24) + 'h was exceeded.', icon:'', tone:'red' });
   else if (ticket.sla === 'at_risk')
     out.push({ kind:'system', at:fmt(day(0),'07:30'), who:'System',
       title:'SLA warning raised', body:'Ticket is inside 20% of its response target.', icon:'\u23F1', tone:'amber' });
@@ -6335,19 +6337,19 @@ function getTicketActivity(ticket, customer){
   const sops = (typeof actionsForTicket === 'function') ? actionsForTicket(ticket) : [];
   if (sops.length) out.push({ kind:'system', at:fmt(day(0),'07:31'), who:'Automation',
     title:sops.length + ' action' + (sops.length===1?'':'s') + ' applied',
-    body:sops.map(a=>a.name).join(', '), icon:'\u26A1', tone:'blue' });
+    body:sops.map(a=>a.name).join(', '), icon:'', tone:'blue' });
 
   if (ticket.severity === 'critical')
     out.push({ kind:'agent', at:fmt(day(0),'08:10'), who:agent,
-      title:'Priority raised to critical', body:'Production impact confirmed across ' + (20 + (s % 40)) + ' users.', icon:'\u2191', tone:'red' });
+      title:'Priority raised to critical', body:'Production impact confirmed across ' + (20 + (s % 40)) + ' users.', icon:'', tone:'red' });
 
   out.push({ kind:'agent', at:fmt(day(0),'08:22'), who:agent,
     title:'Category set to ' + cxPick(['Data pipeline','Authentication','Reporting','Integrations'], s),
-    body:'Applied from the field suggester.', icon:'\u{1F3F7}', tone:'slate' });
+    body:'Applied from the field suggester.', icon:'', tone:'slate' });
 
   if (ticket.status === 'resolved')
     out.push({ kind:'system', at:fmt(day(0),'11:00'), who:'System', title:'Ticket resolved',
-      body:'CSAT survey queued for delivery.', icon:'\u2713', tone:'green' });
+      body:'CSAT survey queued for delivery.', icon:'', tone:'green' });
 
   return out;
 }
@@ -6498,7 +6500,7 @@ function TicketFieldGateModal({ open, phase, cfg, ticket, customer, values, onCh
         missing.length > 0 && React.createElement('p', { className:'text-xs font-semibold text-amber-700 mt-2' },
           missing.length + ' mandatory field' + (missing.length===1?'':'s') + ' still to complete: ' + missing.join(', ')),
         missing.length === 0 && React.createElement('p', { className:'text-xs font-semibold text-green-700 mt-2' },
-          '\u2713 All mandatory fields complete')),
+          'All mandatory fields complete')),
 
       React.createElement('div', { className:'space-y-2.5 max-h-[46vh] overflow-y-auto pr-1' },
         defs.map(f => {
@@ -6555,7 +6557,7 @@ function TicketActionsPane({ ticket, customer, dispatch }){
 
   if (applicable.length === 0)
     return React.createElement(Card, { className:'p-10 text-center' },
-      React.createElement('p', { className:'text-2xl mb-2' }, '\u26A1'),
+      React.createElement('p', { className:'text-2xl mb-2' }, ''),
       React.createElement('p', { className:'text-sm text-slate-500' }, 'No actions apply to this ticket'));
 
   return React.createElement('div', { className:'space-y-3' },
@@ -6576,12 +6578,12 @@ function TicketActionsPane({ ticket, customer, dispatch }){
       return React.createElement(Card, { key:a.id, className:'overflow-hidden' },
         React.createElement('button', { onClick:()=>setOpenId(open?null:a.id),
           className:'w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-slate-50' },
-          React.createElement('span', { className:`w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${ADMIN_TONES[a.tone]}` }, a.icon),
+          React.createElement('span', { className:`w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${ADMIN_TONES[a.tone]}` }, renderIcon(a.icon)),
           React.createElement('span', { className:'flex-1 min-w-0' },
             React.createElement('span', { className:'flex items-center gap-2 flex-wrap' },
               React.createElement('span', { className:'text-sm font-semibold text-slate-900' }, a.name),
               React.createElement(CxPill, { tone:'slate' }, a.category),
-              aDone === a.steps.length && React.createElement(CxPill, { tone:'green' }, '\u2713 Complete')),
+              aDone === a.steps.length && React.createElement(CxPill, { tone:'green' }, 'Complete')),
             React.createElement('span', { className:'block text-[11px] text-slate-500 mt-0.5' },
               React.createElement('span', { className:'font-semibold text-slate-600' }, 'Applies when: '), a.when)),
           React.createElement('span', { className:'text-[11px] text-slate-400 flex-shrink-0' }, aDone + '/' + a.steps.length),
@@ -6593,7 +6595,7 @@ function TicketActionsPane({ ticket, customer, dispatch }){
             const key = a.id + '_' + i;
             return React.createElement('div', { key:i, className:'px-4 py-2.5 border-b border-slate-50 last:border-0 flex items-start gap-3 hover:bg-slate-50' },
               React.createElement('button', { onClick:()=>toggle(key),
-                className:`w-4 h-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] ${done[key]?'bg-green-500 border-green-500 text-white':'border-slate-300 text-transparent hover:border-slate-400'}` }, '\u2713'),
+                className:`w-4 h-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] ${done[key]?'bg-green-500 border-green-500 text-white':'border-slate-300 text-transparent hover:border-slate-400'}` }, ''),
               React.createElement('div', { className:'flex-1 min-w-0' },
                 React.createElement('p', { className:`text-sm leading-snug ${done[key]?'text-slate-400 line-through':'text-slate-700'}` }, st.t),
                 React.createElement('p', { className:'text-[10px] text-slate-400 mt-0.5' }, st.owner + ' \u00b7 ' + st.due)),
@@ -6786,7 +6788,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
       values: fields, onChange: (k,v)=>setFields(x=>({...x,[k]:v})),
       onCancel: ()=>setGate(null), onConfirm: confirmGate }),
     React.createElement('div', { className:'flex items-center justify-between gap-3 flex-wrap' },
-      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, '\u2190 Back to tickets'),
+      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, 'Back to tickets'),
       React.createElement('div', { className:'flex gap-2 flex-wrap items-center' },
 
         // Status menu — change to any status, from anywhere on the page
@@ -6800,7 +6802,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
               : 'bg-red-50 text-red-700 border-red-200 hover:border-red-400'}` },
             React.createElement('span', { className:'w-1.5 h-1.5 rounded-full bg-current opacity-70' }),
             fields['Status'] || 'Set status',
-            React.createElement('span', { className:'opacity-50' }, '\u25BE')),
+            React.createElement('span', { className:'opacity-50' }, '')),
           statusOpen && React.createElement('div', { className:'absolute left-0 mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg z-40 p-1.5' },
             React.createElement('p', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1' }, 'Change status to'),
             TICKET_FIELD_DEFS[0].options.map(o => {
@@ -6822,18 +6824,18 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
         React.createElement(Btn, { variant: following ? 'primary' : 'secondary', size:'xs',
           onClick:()=>dispatch({ type:'TOGGLE_FOLLOW_TICKET', ticketId:ticket.id }),
           title: following ? 'You are notified of every update on this ticket' : 'Get notified when this ticket is updated' },
-          following ? '\u{1F514} Following' : '\u{1F515} Follow'),
+          following ? 'Following' : 'Follow'),
         React.createElement(Btn, { variant: (replyOpen && mode==='reply') ? 'primary' : 'primary', size:'xs',
           onClick:()=>{ if (replyOpen && mode==='reply') { setReplyOpen(false); } else openComposer('reply'); } },
-          (replyOpen && mode==='reply') ? '\u2715 Close reply' : '\u21A9 Reply'),
+          (replyOpen && mode==='reply') ? 'Close reply' : 'Reply'),
         React.createElement(Btn, { variant:'secondary', size:'xs',
           onClick:()=>{ if (replyOpen && mode==='note') { setReplyOpen(false); setMode('reply'); } else openComposer('note'); },
           title:'Add an internal note \u2014 never sent to the customer' },
-          (replyOpen && mode==='note') ? '\u2715 Close note' : '\u{1F4DD} Add note'),
+          (replyOpen && mode==='note') ? 'Close note' : 'Add note'),
         React.createElement(Btn, { variant:'secondary', size:'xs',
           onClick:()=>{ if (replyOpen && mode==='forward') { setReplyOpen(false); setMode('reply'); } else openComposer('forward'); },
           title:'Forward the whole thread to a third party' },
-          (replyOpen && mode==='forward') ? '\u2715 Close forward' : '\u27A6 Forward'))
+          (replyOpen && mode==='forward') ? 'Close forward' : 'Forward'))
     ),
 
     // Header
@@ -6869,7 +6871,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                 className:`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${
                   cap ? 'bg-green-50 text-green-700 border-green-200 hover:border-green-400'
                       : 'bg-amber-50 text-amber-700 border-amber-200 hover:border-amber-400'}` },
-                (cap ? '\u2713 ' : '\u25CB ') + g[1],
+                (cap ? ' ' : ' ') + g[1],
                 React.createElement('span', { className:'font-normal opacity-70' },
                   cap ? cap.at : missingGateFields(gateCfg, g[0], fields).length + ' outstanding'));
             }))
@@ -6885,7 +6887,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
         // Composer — reply to the customer, add an internal note, or forward out
         replyOpen && React.createElement(Card, { className:`p-4 ${mode==='note'?'border-amber-200 bg-amber-50/40':mode==='forward'?'border-sky-200':'border-indigo-200'}` },
           React.createElement(CxLabel, { right: mode !== 'note' && React.createElement('div', { className:'relative' },
-            React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setTplOpen(v=>!v) }, '\u{1F4C4} Template'),
+            React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setTplOpen(v=>!v) }, 'Template'),
             tplOpen && React.createElement('div', { className:'absolute right-0 mt-1 w-72 bg-white border border-slate-200 rounded-xl shadow-lg z-30 p-1.5' },
               EMAIL_TEMPLATES.map(t=>React.createElement('button', { key:t.id, onClick:()=>applyTemplate(t),
                 className:'w-full text-left px-2.5 py-2 rounded-lg hover:bg-slate-50' },
@@ -6896,7 +6898,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
               : 'Reply to ' + (customer ? customer.name : 'the customer')),
 
           React.createElement('div', { className:'flex gap-1 flex-wrap mb-3' },
-            [['reply','\u21A9 Reply'],['note','\u{1F4DD} Add note'],['forward','\u27A6 Forward']].map(m =>
+            [['reply','Reply'],['note','Add note'],['forward','Forward']].map(m =>
               React.createElement('button', { key:m[0], onClick:()=>{ setMode(m[0]); setDrafted(false); },
                 className:`px-2.5 py-1 text-[11px] font-semibold rounded-lg border transition-colors ${mode===m[0]?'bg-slate-900 text-white border-slate-900':'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}` }, m[1]))),
 
@@ -6924,7 +6926,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                 placeholder:'Comma-separated \u2014 visible to everyone on the thread',
                 className:'flex-1 min-w-0 text-xs outline-none bg-transparent text-slate-800' }),
               React.createElement('button', { onClick:()=>{ setCc(''); setCcOpen(false); },
-                className:'text-slate-300 hover:text-red-500 text-xs flex-shrink-0' }, '\u2715')),
+                className:'text-slate-300 hover:text-red-500 text-xs flex-shrink-0' }, '')),
 
             bccOpen && React.createElement('div', { className:'flex items-center gap-2 px-2.5 py-1.5' },
               React.createElement('span', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider w-8 flex-shrink-0' }, 'Bcc'),
@@ -6932,7 +6934,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                 placeholder:'Comma-separated \u2014 hidden from other recipients',
                 className:'flex-1 min-w-0 text-xs outline-none bg-transparent text-slate-800' }),
               React.createElement('button', { onClick:()=>{ setBcc(''); setBccOpen(false); },
-                className:'text-slate-300 hover:text-red-500 text-xs flex-shrink-0' }, '\u2715')),
+                className:'text-slate-300 hover:text-red-500 text-xs flex-shrink-0' }, '')),
 
             React.createElement('div', { className:'flex items-center gap-2 px-2.5 py-1.5 bg-slate-50/60' },
               React.createElement('span', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider w-8 flex-shrink-0' }, 'From'),
@@ -6946,7 +6948,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
 
           React.createElement('div', { className:'flex items-center gap-2 flex-wrap mb-2' },
             React.createElement(Btn, { variant:'teal', size:'sm', onClick:autoDraft },
-              '\u2728 ' + (mode==='note' ? 'Draft note automatically' : mode==='forward' ? 'Draft forward automatically' : 'Draft reply automatically')),
+              ' ' + (mode==='note' ? 'Draft note automatically' : mode==='forward' ? 'Draft forward automatically' : 'Draft reply automatically')),
             React.createElement('span', { className:'text-[11px] text-slate-400' },
               drafted ? 'Draft generated \u2014 edit before sending' : 'Builds a draft from the ticket record')),
 
@@ -6959,15 +6961,15 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
 
           attachments.length > 0 && React.createElement('div', { className:'flex gap-2 flex-wrap mt-2' },
             attachments.map((a,i)=>React.createElement('span', { key:i, className:'inline-flex items-center gap-1.5 bg-slate-100 rounded-lg px-2 py-1' },
-              React.createElement('span', { className:'text-xs text-slate-600' }, '\u{1F4CE} ' + a),
-              React.createElement('button', { onClick:()=>setAttachments(l=>l.filter((_,j)=>j!==i)), className:'text-slate-400 hover:text-red-500 text-xs' }, '\u2715')))),
+              React.createElement('span', { className:'text-xs text-slate-600' }, ' ' + a),
+              React.createElement('button', { onClick:()=>setAttachments(l=>l.filter((_,j)=>j!==i)), className:'text-slate-400 hover:text-red-500 text-xs' }, '')))),
 
           React.createElement('div', { className:'flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 flex-wrap' },
             React.createElement(Btn, { variant:'primary', size:'sm', onClick:submitComposer,
               disabled: !replyText || (mode==='forward' && !fwdTo.trim()) },
               mode==='note' ? 'Save note' : mode==='forward' ? 'Forward thread' : 'Send reply'),
             React.createElement(Btn, { variant:'secondary', size:'sm',
-              onClick:()=>setAttachments(a=>a.concat('attachment-' + (a.length+1) + '.pdf')) }, '\u{1F4CE} Attach'),
+              onClick:()=>setAttachments(a=>a.concat('attachment-' + (a.length+1) + '.pdf')) }, 'Attach'),
             React.createElement(Btn, { variant:'ghost', size:'sm', onClick:()=>{ setReply(''); setFwdTo(''); setCc(''); setBcc(''); setCcOpen(false); setBccOpen(false); setReplyOpen(false); setMode('reply'); setDrafted(false); } }, 'Discard'),
             mode === 'forward' && React.createElement('span', { className:'text-[11px] text-slate-400' },
               'The full thread is attached below your note'),
@@ -7013,7 +7015,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                       : e.dir==='forward' ? 'bg-sky-600 text-white'
                       : e.dir==='outbound' ? 'bg-indigo-600 text-white'
                       : 'bg-slate-200 text-slate-600'}` },
-                      e.dir==='note' ? '\u{1F4DD}' : e.dir==='forward' ? '\u27A6'
+                      e.dir==='note' ? '' : e.dir==='forward' ? ''
                         : (String(e.sender).replace(/[^A-Za-z ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || '?')),
                     React.createElement('div', { className:'flex-1 min-w-0' },
                       React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
@@ -7021,7 +7023,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                         React.createElement(CxPill, { tone: e.dir==='note'?'amber' : e.dir==='forward'?'blue' : e.dir==='outbound'?'blue':'purple' },
                           e.dir==='note' ? 'Internal only' : e.dir==='forward' ? 'Forwarded' : e.dir==='outbound' ? 'Sent' : 'Received')),
                       React.createElement('p', { className:'text-[11px] text-slate-400 mt-0.5 truncate' },
-                        e.dir==='note' ? e.address : e.address + ' \u2192 ' + e.to),
+                        e.dir==='note' ? e.address : e.address + '  ' + e.to),
                       e.cc && React.createElement('p', { className:'text-[11px] text-slate-400 truncate' }, 'Cc: ' + e.cc),
                       e.bcc && React.createElement('p', { className:'text-[11px] text-slate-400 truncate' },
                         'Bcc: ' + e.bcc + ' (hidden from other recipients)'),
@@ -7033,13 +7035,13 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                     : React.createElement('p', { className:'px-3.5 py-3 text-sm text-slate-700 leading-relaxed whitespace-pre-line' }, e.body),
                   (e.attachments && e.attachments.length > 0) && React.createElement('div', { className:'px-3.5 pb-3 flex gap-2 flex-wrap' },
                     e.attachments.map((a,i)=>React.createElement('span', { key:i,
-                      className:'inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-600' }, '\u{1F4CE} ' + a)))
+                      className:'inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-600' }, ' ' + a)))
                 ))
               ),
           React.createElement('div', { className:'mt-3 pt-3 border-t border-slate-100 flex gap-2 flex-wrap' },
-            React.createElement(Btn, { variant:'primary', size:'sm', onClick:()=>openComposer('reply') }, '\u21A9 Reply'),
-            React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>openComposer('note') }, '\u{1F4DD} Add note'),
-            React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>openComposer('forward') }, '\u27A6 Forward'))
+            React.createElement(Btn, { variant:'primary', size:'sm', onClick:()=>openComposer('reply') }, 'Reply'),
+            React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>openComposer('note') }, 'Add note'),
+            React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>openComposer('forward') }, 'Forward'))
         ),
 
         // Actions — next best actions first, then the automation runbooks
@@ -7077,7 +7079,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
             : React.createElement('div', null,
                 shownActivity.map((a,i) => React.createElement('div', { key:i, className:'flex gap-3' },
                   React.createElement('div', { className:'flex flex-col items-center flex-shrink-0' },
-                    React.createElement('span', { className:`w-7 h-7 rounded-full flex items-center justify-center text-xs ${ADMIN_TONES[a.tone]||ADMIN_TONES.slate}` }, a.icon),
+                    React.createElement('span', { className:`w-7 h-7 rounded-full flex items-center justify-center text-xs ${ADMIN_TONES[a.tone]||ADMIN_TONES.slate}` }, renderIcon(a.icon)),
                     i < shownActivity.length-1 && React.createElement('span', { className:'w-px flex-1 bg-slate-200 my-1' })),
                   React.createElement('div', { className:'flex-1 min-w-0 pb-4' },
                     React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
@@ -7107,7 +7109,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
         customer && React.createElement(Card, { className:'p-4' },
           React.createElement(CxLabel, null, 'Company'),
           React.createElement('p', { className:'text-sm font-bold text-slate-900' }, customer.name),
-          React.createElement('p', { className:'text-[11px] text-slate-500 capitalize' }, customer.segment.replace('_',' ') + ' \u00b7 ' + formatARR(customer.arr) + ' ARR'),
+          React.createElement('p', { className:'text-[11px] text-slate-500 capitalize' }, customer.segment.replace('_',' ') + ' \u00b7 ' + formatARR(customer.arr) + 'ARR'),
           React.createElement('div', { className:'flex gap-1.5 flex-wrap mt-2' },
             health && React.createElement(HealthBadge, { band:health.band, score:health.compositeScore }),
             React.createElement(TicketSentiment, { sentiment:ticket.sentiment })),
@@ -7119,7 +7121,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                 React.createElement('span', { className:'text-xs text-slate-500' }, r[0]),
                 React.createElement('span', { className:'text-xs font-semibold text-slate-800' }, r[1])))),
           React.createElement(Btn, { variant:'primary', size:'xs', className:'mt-3 w-full justify-center',
-            onClick:()=>navigate('/customers/' + customer.id + '?tab=support') }, 'Open Support tab \u2192')
+            onClick:()=>navigate('/customers/' + customer.id + '?tab=support') }, 'Open Support tab ')
         ),
 
         React.createElement(Card, { className:'p-4 bg-indigo-50/40 border-indigo-100' },
@@ -7131,7 +7133,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
               const current = fields[f.field];
               const kept = current === f.value;
               return React.createElement('div', { key:f.field, className:'flex items-center gap-2' },
-                React.createElement('span', { className:`text-xs flex-shrink-0 ${kept?'text-green-500':'text-amber-500'}` }, kept ? '\u2713' : '\u270E'),
+                React.createElement('span', { className:`text-xs flex-shrink-0 ${kept?'text-green-500':'text-amber-500'}` }, kept ? '' : ''),
                 React.createElement('span', { className:'text-[11px] text-slate-500 flex-1 min-w-0 truncate' },
                   f.field + ': ' + (current || '\u2014')),
                 React.createElement('span', { className:'text-[10px] font-semibold text-slate-400 flex-shrink-0' }, Math.round(f.confidence*100) + '%'),
@@ -7163,8 +7165,8 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                 React.createElement('div', { className:'flex items-center gap-2 mb-1' },
                   React.createElement('label', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider' }, fd.key),
                   overridden[fd.key]
-                    ? React.createElement('span', { className:'text-[10px] font-semibold text-amber-600 ml-auto' }, '✎ overridden')
-                    : suggestions.some(f=>f.field===fd.key && f.value===val) && React.createElement('span', { className:'text-[10px] font-semibold text-indigo-600 ml-auto' }, '✦ AI')),
+                    ? React.createElement('span', { className:'text-[10px] font-semibold text-amber-600 ml-auto' }, 'overridden')
+                    : suggestions.some(f=>f.field===fd.key && f.value===val) && React.createElement('span', { className:'text-[10px] font-semibold text-indigo-600 ml-auto' }, 'AI')),
                 // The control is wrapped so we can draw our own affordance on top:
                 // a chevron on dropdowns, a pencil on free-text. Native select
                 // arrows are inconsistent across browsers and easy to miss.
@@ -7191,7 +7193,7 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
                           className:'w-full text-xs border border-slate-200 rounded-lg pl-2 pr-7 py-1.5 outline-none hover:border-indigo-300 focus:border-indigo-400 transition-colors' }),
                   React.createElement('span', { 'aria-hidden':true,
                     className:`absolute right-2 ${fd.type==='textarea'?'top-2':'top-1/2 -translate-y-1/2'} text-[10px] text-slate-400 pointer-events-none` },
-                    fd.type === 'select' ? '\u25BE' : '\u270E'))
+                    fd.type === 'select' ? '' : ''))
               );
             })
           ),
@@ -7199,8 +7201,8 @@ function TicketDetail({ ticket, customer, state, dispatch, navigate, onBack }){
           React.createElement('button', { onClick:()=>setAllFields(v=>!v),
             className:'w-full mt-3 pt-3 border-t border-slate-100 text-[11px] font-semibold text-indigo-600 hover:underline flex items-center justify-center gap-1.5' },
             allFields
-              ? '\u25B4 Show fewer fields'
-              : '\u25BE Show all ticket fields',
+              ? 'Show fewer fields'
+              : 'Show all ticket fields',
             React.createElement('span', { className:'font-normal text-slate-400' },
               allFields ? '' : '+' + (TICKET_FIELD_DEFS.length - TICKET_PRIMARY_FIELDS.length) + ' more')),
 
@@ -7297,7 +7299,7 @@ function TicketsPage() {
     // Conversational filter
     React.createElement(Card, { className:'p-3' },
       React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
-        React.createElement('span', { className:'w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs flex-shrink-0' }, '\u2726'),
+        React.createElement('span', { className:'w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs flex-shrink-0' }, ''),
         React.createElement('input', { value:convo, onChange:e=>setConvo(e.target.value),
           onKeyDown:e=>{ if(e.key==='Enter') applyPrompt(); },
           placeholder:'Describe what you want \u2014 e.g. "critical tickets breaching SLA from angry customers over $150k"',
@@ -7335,20 +7337,20 @@ function EmailSequence() {
             React.createElement('p', { className:'text-xs text-slate-400 truncate' }, e.desc)
           ),
           React.createElement('span', { className:'text-xs text-slate-400 flex-shrink-0 hidden sm:inline' }, e.timing),
-          React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium flex-shrink-0 ${e.type==='auto'?'bg-indigo-100 text-indigo-700':'bg-slate-200 text-slate-600'}` }, e.type==='auto'?'✦ Auto':'👆 CSM'),
+          React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium flex-shrink-0 ${e.type==='auto'?'bg-indigo-100 text-indigo-700':'bg-slate-200 text-slate-600'}` }, e.type==='auto'?'Auto':'CSM'),
           React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium flex-shrink-0 ${statusClasses[e.statusColor]}` }, e.status),
-          React.createElement('span', { className:'text-slate-400 flex-shrink-0' }, isOpen ? '▾' : '▸')
+          React.createElement('span', { className:'text-slate-400 flex-shrink-0' }, isOpen ? '' : '')
         ),
         isOpen && React.createElement('div', { className:'p-3 border-t border-slate-200 bg-white space-y-2' },
           React.createElement('p', { className:'text-xs font-medium text-slate-400 uppercase tracking-wide' }, 'Recipients'),
           React.createElement('div', { className:'flex flex-wrap gap-1.5' }, EBR_CONTACTS.map(c => React.createElement('span', { key:c.name, className:`px-2 py-0.5 text-xs rounded-full ${c.badgeClass}` }, c.name))),
           React.createElement('div', { className:'bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600 leading-relaxed' },
-            React.createElement('p', { className:'font-medium text-slate-900 mb-1' }, '✉ Subject: ' + e.subject),
+            React.createElement('p', { className:'font-medium text-slate-900 mb-1' }, 'Subject:' + e.subject),
             e.body
           ),
           React.createElement('div', { className:'flex items-center gap-2 pt-1' },
-            React.createElement(Btn, { variant:'secondary', size:'xs' }, '✎ Edit email'),
-            e.n === 5 && e.status === 'Pending' && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>markSent(5) }, '➤ Send to all')
+            React.createElement(Btn, { variant:'secondary', size:'xs' }, 'Edit email'),
+            e.n === 5 && e.status === 'Pending' && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>markSent(5) }, 'Send to all')
           )
         )
       );
@@ -7358,19 +7360,19 @@ function EmailSequence() {
 
 function EBRStep1({ onNext }) {
   return React.createElement('div', { className:'space-y-4' },
-    React.createElement('div', { className:'flex items-center gap-1.5 text-xs text-indigo-600 font-medium' }, '✦ Auto-generated by AI — pulled from account data'),
+    React.createElement('div', { className:'flex items-center gap-1.5 text-xs text-indigo-600 font-medium' }, 'Auto-generated by AI — pulled from account data'),
     React.createElement(Card, { className:'p-4' },
       React.createElement('div', { className:'flex items-center justify-between mb-2 flex-wrap gap-1' },
-        React.createElement('h4', { className:'font-semibold text-slate-900' }, '🤖 Pre-EBR brief'),
+        React.createElement('h4', { className:'font-semibold text-slate-900' }, 'Pre-EBR brief'),
         React.createElement('span', { className:'text-xs text-slate-400' }, 'Pulled from health score, emails, calls and NPS · Updated now')
       ),
       React.createElement('div', { className:'bg-indigo-50 border border-indigo-100 rounded-lg p-4' },
-        React.createElement('p', { className:'text-xs font-medium text-indigo-700 mb-2' }, '🤖 What to know before the call'),
+        React.createElement('p', { className:'text-xs font-medium text-indigo-700 mb-2' }, 'What to know before the call'),
         React.createElement('p', { className:'text-sm text-slate-700 leading-relaxed' }, "Lead with adoption — feature usage is up 12% to 71% and 3 new users were onboarded this quarter. Address the API issue after the good news, not before. Tony Stark hasn't replied to emails in 12 days — open with the relationship. James Rhodes (CFO) is joining for the first time — be ready for a pricing conversation. Renewal is in 18 days — this EBR needs a commitment before it ends."),
         React.createElement('div', { className:'flex flex-wrap gap-2 mt-3' },
-          React.createElement(Btn, { variant:'secondary', size:'xs' }, '💬 Suggest talk tracks'),
-          React.createElement(Btn, { variant:'secondary', size:'xs' }, '🛡 Draft objection responses'),
-          React.createElement(Btn, { variant:'secondary', size:'xs' }, '📊 Summarise value delivered')
+          React.createElement(Btn, { variant:'secondary', size:'xs' }, 'Suggest talk tracks'),
+          React.createElement(Btn, { variant:'secondary', size:'xs' }, 'Draft objection responses'),
+          React.createElement(Btn, { variant:'secondary', size:'xs' }, 'Summarise value delivered')
         )
       )
     ),
@@ -7383,7 +7385,7 @@ function EBRStep1({ onNext }) {
     ),
     React.createElement(Card, { className:'p-4' },
       React.createElement('div', { className:'flex items-center justify-between mb-3 flex-wrap gap-1' },
-        React.createElement('h4', { className:'font-semibold text-slate-900' }, '✉ EBR email sequence'),
+        React.createElement('h4', { className:'font-semibold text-slate-900' }, 'EBR email sequence'),
         React.createElement('span', { className:'text-xs text-slate-400' }, 'Stark Industries · Q2 2026 · Jun 27')
       ),
       React.createElement('div', { className:'bg-slate-50 rounded-lg p-3 mb-3' },
@@ -7398,13 +7400,13 @@ function EBRStep1({ onNext }) {
     ),
     React.createElement('div', { className:'bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between flex-wrap gap-3' },
       React.createElement('div', { className:'flex items-center gap-3' },
-        React.createElement('span', { className:'text-indigo-600 text-lg' }, '→'),
+        React.createElement('span', { className:'text-indigo-600 text-lg' }, ''),
         React.createElement('div', null,
           React.createElement('p', { className:'text-sm font-medium text-indigo-700' }, 'AI has auto-generated your slide deck'),
           React.createElement('p', { className:'text-xs text-slate-500 mt-0.5' }, '6 slides built from live account data — review, customise, and add your own topics in the next step')
         )
       ),
-      React.createElement(Btn, { variant:'primary', onClick:onNext }, '🗂 Build deck')
+      React.createElement(Btn, { variant:'primary', onClick:onNext }, 'Build deck')
     )
   );
 }
@@ -7431,13 +7433,13 @@ function EBRStep2({ slides, setSlides, activeSlide, setActiveSlide, onBack, onNe
 
   return React.createElement('div', { className:'space-y-4' },
     React.createElement(Card, { className:'p-4' },
-      React.createElement('h4', { className:'font-semibold text-slate-900' }, '💡 AI-suggested topics from account timeline'),
+      React.createElement('h4', { className:'font-semibold text-slate-900' }, 'AI-suggested topics from account timeline'),
       React.createElement('p', { className:'text-xs text-slate-400 mb-3' }, 'Detected in past calls, emails and notes'),
       React.createElement('div', { className:'space-y-2 mb-3' },
         EBR_SUGGESTIONS.map(s => {
           const added = addedIds.includes(s.id);
           return React.createElement('div', { key:s.id, onClick:()=>addSuggestion(s), className:`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${added?'bg-green-50 border-green-200':'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50'}` },
-            React.createElement('span', { className:'text-sm flex-shrink-0' }, added ? '✓' : '+'),
+            React.createElement('span', { className:'text-sm flex-shrink-0' }, added ? '' : '+'),
             React.createElement('div', { className:'flex-1' },
               React.createElement('p', { className:'text-sm font-medium text-slate-900' }, s.reason),
               React.createElement('p', { className:'text-xs text-slate-400 mt-0.5' }, s.detail)
@@ -7463,7 +7465,7 @@ function EBRStep2({ slides, setSlides, activeSlide, setActiveSlide, onBack, onNe
           ))
         ),
         React.createElement('div', { className:'flex-1 p-6 min-h-[380px]' },
-          slide.ai && React.createElement('span', { className:'text-xs text-indigo-600 font-medium' }, '✦ AI generated'),
+          slide.ai && React.createElement('span', { className:'text-xs text-indigo-600 font-medium' }, 'AI generated'),
           React.createElement('h3', { className:'text-lg font-semibold text-slate-900 mt-1 mb-4' }, slide.title),
           slide.metrics && React.createElement('div', { className:'grid grid-cols-3 gap-3 mb-4' },
             slide.metrics.map(m => React.createElement('div', { key:m.label, className:'bg-slate-50 rounded-lg p-3 text-center' },
@@ -7490,18 +7492,18 @@ function EBRStep2({ slides, setSlides, activeSlide, setActiveSlide, onBack, onNe
       React.createElement('div', { className:'flex items-center justify-between px-4 py-2.5 border-t border-slate-200 bg-slate-50 flex-wrap gap-2' },
         React.createElement('span', { className:'text-xs text-slate-400' }, 'Click any text to edit · AI slides auto-populated from account data'),
         React.createElement('div', { className:'flex items-center gap-2' },
-          React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.max(0,i-1)) }, '←'),
+          React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.max(0,i-1)) }, ''),
           React.createElement('span', { className:'text-xs text-slate-500' }, `Slide ${activeSlide+1} of ${slides.length}`),
-          React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.min(slides.length-1,i+1)) }, '→')
+          React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.min(slides.length-1,i+1)) }, '')
         )
       )
     ),
-    exported && React.createElement('div', { className:'bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 text-sm text-green-700' }, '✓ Deck exported to Google Slides successfully'),
+    exported && React.createElement('div', { className:'bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 text-sm text-green-700' }, 'Deck exported to Google Slides successfully'),
     React.createElement('div', { className:'flex justify-between flex-wrap gap-2' },
-      React.createElement(Btn, { variant:'secondary', onClick:onBack }, '← Back'),
+      React.createElement(Btn, { variant:'secondary', onClick:onBack }, 'Back'),
       React.createElement('div', { className:'flex gap-2' },
-        React.createElement(Btn, { variant:'success', onClick:handleExport }, '📤 Export to Google Slides'),
-        React.createElement(Btn, { variant:'primary', onClick:onNext }, '🖥 Start EBR')
+        React.createElement(Btn, { variant:'success', onClick:handleExport }, 'Export to Google Slides'),
+        React.createElement(Btn, { variant:'primary', onClick:onNext }, 'Start EBR')
       )
     )
   );
@@ -7545,43 +7547,43 @@ function EBRStep3({ onBack, onEnd, slides, activeSlide, setActiveSlide }) {
       ),
       React.createElement('div', { className:'flex items-center gap-2' },
         React.createElement('span', { className:'px-3 py-1.5 bg-slate-700 text-white text-xs rounded-lg' }, '⏱ ' + mm + ':' + ss),
-        React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>setShowPresent(true) }, '🖥 Present to customer'),
-        React.createElement(Btn, { variant:'danger', size:'sm', onClick:onEnd }, '✓ End EBR')
+        React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>setShowPresent(true) }, 'Present to customer'),
+        React.createElement(Btn, { variant:'danger', size:'sm', onClick:onEnd }, 'End EBR')
       )
     ),
     React.createElement(Card, { className:'p-4' },
       React.createElement('div', { className:'flex items-center justify-between flex-wrap gap-2' },
-        React.createElement('p', { className:'text-sm font-medium text-slate-900' }, '🔵 Use your own Google Slides deck instead'),
+        React.createElement('p', { className:'text-sm font-medium text-slate-900' }, 'Use your own Google Slides deck instead'),
         React.createElement('div', { className:'flex gap-2' },
-          React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setShowImport(true) }, '⬇ Import from Google Slides'),
-          React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>setShowExportConfirm(true) }, '⬆ Export to Google Slides')
+          React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setShowImport(true) }, 'Import from Google Slides'),
+          React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>setShowExportConfirm(true) }, 'Export to Google Slides')
         )
       )
     ),
     showImport && React.createElement(Card, { className:'p-4 border-indigo-200' },
       React.createElement('div', { className:'flex items-center justify-between mb-3' },
-        React.createElement('p', { className:'text-sm font-medium text-slate-900' }, '⬇ Import from Google Slides'),
-        React.createElement('button', { onClick:()=>{ setShowImport(false); setImportDone(false); }, className:'text-slate-400' }, '✕')
+        React.createElement('p', { className:'text-sm font-medium text-slate-900' }, 'Import from Google Slides'),
+        React.createElement('button', { onClick:()=>{ setShowImport(false); setImportDone(false); }, className:'text-slate-400' }, '')
       ),
       React.createElement('div', { className:'flex gap-2 mb-2' },
         React.createElement('input', { value:importUrl, onChange:e=>setImportUrl(e.target.value), placeholder:'Paste Google Slides URL...', className:'flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500' }),
         React.createElement(Btn, { variant:'primary', size:'sm', onClick:()=>setImportDone(true) }, 'Import')
       ),
       React.createElement('p', { className:'text-xs text-slate-400' }, 'ℹ The imported deck replaces the AI-generated slides. Your notes and action items are unaffected.'),
-      importDone && React.createElement('p', { className:'text-xs text-green-600 mt-2' }, '✓ 8 slides imported from Google Slides — deck updated')
+      importDone && React.createElement('p', { className:'text-xs text-green-600 mt-2' }, '8 slides imported from Google Slides — deck updated')
     ),
     showExportConfirm && React.createElement('div', { className:'bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 text-sm text-green-700 flex items-center justify-between' },
-      React.createElement('span', null, '✓ Deck exported to Google Slides'),
-      React.createElement('button', { onClick:()=>setShowExportConfirm(false), className:'text-green-600' }, '✕')
+      React.createElement('span', null, 'Deck exported to Google Slides'),
+      React.createElement('button', { onClick:()=>setShowExportConfirm(false), className:'text-green-600' }, '')
     ),
-    showPresent && React.createElement(Modal, { open:true, onClose:()=>setShowPresent(false), title:'🖥 Present to customer', size:'lg' },
+    showPresent && React.createElement(Modal, { open:true, onClose:()=>setShowPresent(false), title:'Present to customer', size:'lg' },
       React.createElement('div', { className:'space-y-3' },
         React.createElement('p', { className:'text-sm text-slate-600 bg-indigo-50 border border-indigo-100 rounded-lg p-3' }, 'CX42 opens a clean slide-only window in a new tab. Share that tab with your customer via Zoom or any screen sharing tool. Your notes and action items stay private.'),
-        React.createElement(Btn, { variant:'primary', className:'w-full justify-center', onClick:()=>{ setPresentLaunched(true); setShowPresent(false); } }, '↗ Open presentation in new tab')
+        React.createElement(Btn, { variant:'primary', className:'w-full justify-center', onClick:()=>{ setPresentLaunched(true); setShowPresent(false); } }, 'Open presentation in new tab')
       )
     ),
     presentLaunched && React.createElement('div', { className:'bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-3' },
-      React.createElement('span', null, '🖥'),
+      React.createElement('span', null, ''),
       React.createElement('div', { className:'flex-1' },
         React.createElement('p', { className:'text-sm font-medium text-green-700' }, 'Presentation is live in a separate tab'),
         React.createElement('p', { className:'text-xs text-green-600 mt-0.5' }, 'Share that tab with your customer — your notes below are private')
@@ -7591,7 +7593,7 @@ function EBRStep3({ onBack, onEnd, slides, activeSlide, setActiveSlide }) {
     React.createElement('div', { className:'grid grid-cols-1 lg:grid-cols-2 gap-4' },
       React.createElement('div', { className:'space-y-4' },
         React.createElement(Card, { className:'p-4' },
-          React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, '☑ Agenda'),
+          React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, 'Agenda'),
           EBR_AGENDA.map((a,i) => React.createElement('div', { key:i, className:`flex items-center gap-2.5 py-2 ${i<EBR_AGENDA.length-1?'border-b border-slate-100':''} text-sm` },
             React.createElement('span', { className:`w-6 h-6 rounded-full border flex items-center justify-center text-xs flex-shrink-0 ${a.active?'bg-indigo-600 border-indigo-600 text-white':'border-slate-300 text-slate-500'}` }, i+1),
             React.createElement('span', { className:`flex-1 ${a.active?'font-medium text-indigo-600':'text-slate-700'}` }, a.title),
@@ -7600,15 +7602,15 @@ function EBRStep3({ onBack, onEnd, slides, activeSlide, setActiveSlide }) {
         ),
         React.createElement(Card, { className:'p-4' },
           React.createElement('div', { className:'flex items-center justify-between mb-3' },
-            React.createElement('h4', { className:'font-semibold text-slate-900' }, '🖥 Current slide'),
+            React.createElement('h4', { className:'font-semibold text-slate-900' }, 'Current slide'),
             React.createElement('div', { className:'flex gap-1' },
-              React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.max(0,i-1)) }, '←'),
+              React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.max(0,i-1)) }, ''),
               React.createElement('span', { className:'text-xs text-slate-500 self-center px-1' }, `${activeSlide+1} / ${slides.length}`),
-              React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.min(slides.length-1,i+1)) }, '→')
+              React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setActiveSlide(i=>Math.min(slides.length-1,i+1)) }, '')
             )
           ),
           React.createElement('div', { className:'bg-slate-50 border border-slate-200 rounded-lg aspect-video flex flex-col items-center justify-center gap-2 p-4' },
-            React.createElement('span', { className:'text-2xl' }, '📊'),
+            React.createElement('span', { className:'text-2xl' }, ''),
             React.createElement('p', { className:'text-sm font-medium text-slate-700' }, slide.title)
           )
         )
@@ -7616,16 +7618,16 @@ function EBRStep3({ onBack, onEnd, slides, activeSlide, setActiveSlide }) {
       React.createElement('div', { className:'space-y-4' },
         React.createElement(Card, { className:'p-4' },
           React.createElement('div', { className:'flex items-center justify-between mb-2' },
-            React.createElement('h4', { className:'font-semibold text-slate-900' }, '🔒 Private — notes'),
+            React.createElement('h4', { className:'font-semibold text-slate-900' }, 'Private — notes'),
             React.createElement('span', { className:'text-xs text-slate-400' }, 'Not visible to customer')
           ),
           React.createElement('textarea', { value:notes, onChange:e=>setNotes(e.target.value), rows:6, placeholder:'Type quick bullet points as the call happens...', className:'w-full text-sm border border-slate-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500' })
         ),
         React.createElement(Card, { className:'p-4' },
-          React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, '🔒 Private — action items'),
+          React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, 'Private — action items'),
           React.createElement('div', { className:'bg-slate-50 rounded-lg p-2.5 text-xs text-slate-500 mb-3' }, 'ℹ Log action items as they come up. AI will merge these with items found in the transcript after upload.'),
           actionItems.map((it,i) => React.createElement('div', { key:i, className:'flex items-start gap-2.5 py-2 border-b last:border-0 border-slate-100' },
-            React.createElement('button', { onClick:()=>toggleItem(i), className:`w-4 h-4 rounded border mt-0.5 flex-shrink-0 flex items-center justify-center text-xs ${it.done?'bg-green-500 border-green-500 text-white':'border-slate-300'}` }, it.done?'✓':''),
+            React.createElement('button', { onClick:()=>toggleItem(i), className:`w-4 h-4 rounded border mt-0.5 flex-shrink-0 flex items-center justify-center text-xs ${it.done?'bg-green-500 border-green-500 text-white':'border-slate-300'}` }, it.done?'':''),
             React.createElement('div', { className:'flex-1' },
               React.createElement('p', { className:`text-sm ${it.done?'line-through text-slate-400':'text-slate-800'}` }, it.text),
               React.createElement('p', { className:'text-xs text-slate-400 mt-0.5' }, it.meta)
@@ -7635,7 +7637,7 @@ function EBRStep3({ onBack, onEnd, slides, activeSlide, setActiveSlide }) {
             React.createElement('input', { value:newItem, onChange:e=>setNewItem(e.target.value), onKeyDown:e=>e.key==='Enter'&&addItem(), placeholder:'Add action item...', className:'flex-1 text-xs border border-slate-200 rounded-lg px-2 py-1.5' }),
             React.createElement(Btn, { variant:'secondary', size:'xs', onClick:addItem }, '+')
           ),
-          React.createElement(Btn, { variant:'primary', className:'w-full justify-center mt-3', onClick:onEnd }, '⬆ End EBR — upload transcript')
+          React.createElement(Btn, { variant:'primary', className:'w-full justify-center mt-3', onClick:onEnd }, 'End EBR — upload transcript')
         )
       )
     )
@@ -7668,41 +7670,41 @@ function EBRStep4({ onBack, onClose }) {
     { color:'bg-indigo-500', title:'Next EBR scheduled — Sep 26', detail:'Calendar invite sent to all attendees' },
   ];
   const portalPush = [
-    { icon:'📄', title:'EBR summary + transcript', detail:'Visible to all attendees' },
-    { icon:'☑', title:'Action items with owners + due dates', detail:'Customer can tick off their own tasks' },
-    { icon:'📅', title:'Next EBR — Sep 26, 2026', detail:'Calendar invite sent' },
+    { icon:'', title:'EBR summary + transcript', detail:'Visible to all attendees' },
+    { icon:'', title:'Action items with owners + due dates', detail:'Customer can tick off their own tasks' },
+    { icon:'', title:'Next EBR — Sep 26, 2026', detail:'Calendar invite sent' },
   ];
 
   if(!done) {
     return React.createElement('div', { className:'space-y-4' },
       !processing && React.createElement(Card, { className:'p-4' },
-        React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, '⬆ Step 1 — upload or paste transcript'),
+        React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, 'Step 1 — upload or paste transcript'),
         React.createElement('div', { onClick:()=>setUploaded(true), className:`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${uploaded?'border-green-300 bg-green-50':'border-slate-300 hover:border-indigo-300 hover:bg-indigo-50'}` },
           uploaded
             ? React.createElement(React.Fragment, null,
-                React.createElement('p', { className:'text-2xl mb-2' }, '✅'),
+                React.createElement('p', { className:'text-2xl mb-2' }, ''),
                 React.createElement('p', { className:'text-sm font-medium text-green-700' }, 'stark_industries_ebr_jun27.txt uploaded'),
                 React.createElement('p', { className:'text-xs text-green-600 mt-1' }, '1,842 words · Ready to process')
               )
             : React.createElement(React.Fragment, null,
-                React.createElement('p', { className:'text-2xl mb-2' }, '📄'),
+                React.createElement('p', { className:'text-2xl mb-2' }, ''),
                 React.createElement('p', { className:'text-sm font-medium text-slate-700' }, 'Drop transcript file here or click to upload'),
                 React.createElement('p', { className:'text-xs text-slate-400 mt-1' }, 'Supports .txt, .docx, .pdf · Or paste text below')
               )
         ),
         React.createElement('div', { className:'flex flex-wrap gap-1.5 mt-3' },
           React.createElement('span', { className:'text-xs text-slate-400 self-center' }, 'Common sources:'),
-          ['🎙 Granola','🎙 Otter.ai','🎙 Fireflies','📹 Zoom AI','📅 Google Meet'].map(s => React.createElement('span', { key:s, className:'text-xs px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-500' }, s))
+          ['Granola','Otter.ai','Fireflies','Zoom AI','Google Meet'].map(s => React.createElement('span', { key:s, className:'text-xs px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-500' }, s))
         ),
-        React.createElement(Btn, { variant:'primary', className:'w-full justify-center mt-4', disabled:!uploaded, onClick:handleProcess }, '✦ Process transcript — generate EBR summary')
+        React.createElement(Btn, { variant:'primary', className:'w-full justify-center mt-4', disabled:!uploaded, onClick:handleProcess }, 'Process transcript — generate EBR summary')
       ),
       processing && React.createElement(Card, { className:'p-4' },
         React.createElement('div', { className:'flex items-center justify-between mb-3' },
-          React.createElement('h4', { className:'font-semibold text-slate-900' }, '✦ AI processing transcript'),
+          React.createElement('h4', { className:'font-semibold text-slate-900' }, 'AI processing transcript'),
           React.createElement('span', { className:'text-xs text-slate-400' }, '~15 seconds')
         ),
         processSteps.map((s,i) => React.createElement('div', { key:i, className:'flex items-center gap-3 py-2 border-b last:border-0 border-slate-100' },
-          React.createElement('span', { className:'w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0' }, '✓'),
+          React.createElement('span', { className:'w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0' }, ''),
           React.createElement('div', { className:'flex-1' },
             React.createElement('p', { className:'text-sm font-medium text-slate-800' }, s.title),
             React.createElement('p', { className:'text-xs text-slate-400 mt-0.5' }, s.detail)
@@ -7710,28 +7712,28 @@ function EBRStep4({ onBack, onClose }) {
           React.createElement('span', { className:'text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full flex-shrink-0' }, 'Done')
         ))
       ),
-      React.createElement(Btn, { variant:'secondary', onClick:onBack }, '← Back')
+      React.createElement(Btn, { variant:'secondary', onClick:onBack }, 'Back')
     );
   }
 
   return React.createElement('div', { className:'space-y-4' },
     React.createElement(Card, { className:'p-4' },
-      React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, '✉ Follow-up email — AI drafted'),
+      React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, 'Follow-up email — AI drafted'),
       React.createElement('div', { className:'bg-indigo-50 border border-indigo-100 rounded-lg p-4' },
-        React.createElement('p', { className:'text-xs font-medium text-indigo-700 mb-2' }, '🤖 Draft — ready to edit and send'),
+        React.createElement('p', { className:'text-xs font-medium text-indigo-700 mb-2' }, 'Draft — ready to edit and send'),
         React.createElement('p', { className:'text-sm text-slate-700 leading-relaxed' },
           "Hi Tony — thank you for the time today. Here's a summary of what we covered. Value this quarter: feature adoption up 12% to 71%, 3 new users onboarded, NPS steady at +38. On the API issue — engineering has committed to a fix by June 30. James, I'm preparing the analytics tier pricing and will send across by July 1. Action for Stark Industries: Pepper to onboard 3 remaining users by July 15. Next EBR: September 26, 2026."
         ),
         React.createElement('div', { className:'flex gap-2 mt-3' },
-          React.createElement(Btn, { variant:'secondary', size:'xs' }, '✎ Edit draft'),
-          !emailSent && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>setEmailSent(true) }, '➤ Send to all attendees')
+          React.createElement(Btn, { variant:'secondary', size:'xs' }, 'Edit draft'),
+          !emailSent && React.createElement(Btn, { variant:'success', size:'xs', onClick:()=>setEmailSent(true) }, 'Send to all attendees')
         )
       ),
-      emailSent && React.createElement('p', { className:'text-sm text-green-600 mt-2' }, '✓ Email sent to Tony Stark, Pepper Potts, James Rhodes')
+      emailSent && React.createElement('p', { className:'text-sm text-green-600 mt-2' }, 'Email sent to Tony Stark, Pepper Potts, James Rhodes')
     ),
     React.createElement('div', { className:'grid grid-cols-1 sm:grid-cols-2 gap-4' },
       React.createElement(Card, { className:'p-4' },
-        React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, '▶ Actions auto-triggered'),
+        React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, 'Actions auto-triggered'),
         actionsTriggered.map((p,i) => React.createElement('div', { key:i, className:'flex items-start gap-2.5 py-2 border-b last:border-0 border-slate-100' },
           React.createElement('span', { className:`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${p.color}` }),
           React.createElement('div', null,
@@ -7741,9 +7743,9 @@ function EBRStep4({ onBack, onClose }) {
         ))
       ),
       React.createElement(Card, { className:'p-4' },
-        React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, '📋 Pushed to customer portal'),
+        React.createElement('h4', { className:'font-semibold text-slate-900 mb-3' }, 'Pushed to customer portal'),
         portalPush.map((p,i) => React.createElement('div', { key:i, className:'flex items-center gap-2.5 py-2 border-b last:border-0 border-slate-100' },
-          React.createElement('span', { className:'text-base flex-shrink-0' }, p.icon),
+          React.createElement('span', { className:'text-base flex-shrink-0' }, renderIcon(p.icon)),
           React.createElement('div', { className:'flex-1' },
             React.createElement('p', { className:'text-sm font-medium text-slate-800' }, p.title),
             React.createElement('p', { className:'text-xs text-slate-400 mt-0.5' }, p.detail)
@@ -7760,7 +7762,7 @@ function EBRStep4({ onBack, onClose }) {
       )
     ),
     React.createElement('div', { className:'flex justify-end' },
-      React.createElement(Btn, { variant:'primary', onClick:onClose }, '✓ Finish')
+      React.createElement(Btn, { variant:'primary', onClick:onClose }, 'Finish')
     )
   );
 }
@@ -7779,20 +7781,20 @@ function EBRWizard({ onClose }) {
 
   return React.createElement(Card, { className:'overflow-hidden' },
     React.createElement('div', { className:'flex items-center gap-1 px-6 py-3 border-b border-slate-200 bg-white overflow-x-auto' },
-      React.createElement('button', { onClick:onClose, className:'text-slate-400 hover:text-slate-600 mr-3 flex-shrink-0 flex items-center gap-1 text-xs font-medium' }, '← Exit to QBRs'),
+      React.createElement('button', { onClick:onClose, className:'text-slate-400 hover:text-slate-600 mr-3 flex-shrink-0 flex items-center gap-1 text-xs font-medium' }, 'Exit to QBRs'),
       React.createElement('span', { className:'text-xs text-slate-300 mr-3 flex-shrink-0' }, '|'),
       React.createElement('span', { className:'text-xs text-slate-400 font-medium mr-4 whitespace-nowrap' }, 'Stark Industries — Q2 EBR (demo)'),
       steps.map((s,i) => React.createElement(React.Fragment, { key:s.n },
         React.createElement('div', { className:'flex items-center gap-2 flex-shrink-0' },
-          React.createElement('span', { className:`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${step===s.n?'bg-indigo-600 text-white':step>s.n?'bg-green-500 text-white':'bg-slate-200 text-slate-500'}` }, step>s.n?'✓':s.n),
+          React.createElement('span', { className:`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${step===s.n?'bg-indigo-600 text-white':step>s.n?'bg-green-500 text-white':'bg-slate-200 text-slate-500'}` }, step>s.n?'':s.n),
           React.createElement('span', { className:`text-xs font-medium whitespace-nowrap ${step===s.n?'text-slate-900':'text-slate-400'}` }, s.label)
         ),
         i < steps.length-1 && React.createElement('span', { className:'text-slate-300 mx-2' }, '›')
       )),
       React.createElement('div', { className:'ml-auto flex items-center gap-2 flex-shrink-0' },
         React.createElement('span', { className:'text-xs text-slate-400' }, `Step ${step} of 4`),
-        step > 1 && step < 4 && React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>setStep(s=>s-1) }, '← Back'),
-        step < 4 && React.createElement(Btn, { variant:'primary', size:'sm', onClick:()=>setStep(s=>s+1) }, 'Next →')
+        step > 1 && step < 4 && React.createElement(Btn, { variant:'secondary', size:'sm', onClick:()=>setStep(s=>s-1) }, 'Back'),
+        step < 4 && React.createElement(Btn, { variant:'primary', size:'sm', onClick:()=>setStep(s=>s+1) }, 'Next')
       )
     ),
     React.createElement('div', { className:'p-6 bg-slate-50' },
@@ -7845,16 +7847,16 @@ function DriveSopDetail({ pb, onBack, dispatch }){
   const total = driveSopTasks(pb);
   return React.createElement('div', { className:'space-y-4' },
     React.createElement('div', { className:'flex items-center justify-between gap-3 flex-wrap' },
-      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, '\u2190 Back to SOPs'),
+      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, 'Back to SOPs'),
       React.createElement('div', { className:'flex gap-2' },
-        React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>dispatch({type:'ADD_TOAST',msg:'Downloading '+pb.title,toastType:'info'}) }, '\u2b07 Download'),
+        React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>dispatch({type:'ADD_TOAST',msg:'Downloading '+pb.title,toastType:'info'}) }, 'Download'),
         React.createElement(Btn, { variant:'primary', size:'xs', onClick:()=>dispatch({type:'ADD_TOAST',msg:total+' tasks created from this SOP',toastType:'success'}) }, '+ Create ' + total + ' tasks from SOP')
       )
     ),
 
     React.createElement(Card, { className:'p-5' },
       React.createElement('div', { className:'flex items-start gap-4' },
-        React.createElement('div', { className:`w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${ADMIN_TONES[pb.tone]}` }, pb.icon),
+        React.createElement('div', { className:`w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${ADMIN_TONES[pb.tone]}` }, renderIcon(pb.icon)),
         React.createElement('div', { className:'flex-1 min-w-0' },
           React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
             React.createElement('h3', { className:'text-base font-bold text-slate-900' }, pb.title),
@@ -7949,14 +7951,14 @@ function DrivePage() {
       onDrop:e=>{ e.preventDefault(); setDragOver(false); upload(); },
       className:`border-2 border-dashed rounded-xl px-4 py-4 flex items-center gap-4 flex-wrap transition-colors ${dragOver?'border-indigo-400 bg-indigo-50':'border-slate-200 bg-white'}`
     },
-      React.createElement('div', { className:'w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-base flex-shrink-0' }, '\u2191'),
+      React.createElement('div', { className:'w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-base flex-shrink-0' }, ''),
       React.createElement('div', { className:'flex-1 min-w-[200px]' },
         React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, 'Upload ' + km.label.toLowerCase()),
         React.createElement('p', { className:'text-[11px] text-slate-500' }, 'PPTX, PDF or DOCX \u00b7 up to 25 MB')
       ),
       React.createElement('input', { value:q, onChange:e=>setQ(e.target.value), placeholder:'Search ' + km.label.toLowerCase() + '\u2026',
         className:'text-xs border border-slate-200 rounded-lg px-3 py-1.5 w-48 outline-none focus:border-indigo-400' }),
-      React.createElement(Btn, { variant:'primary', size:'xs', onClick:upload }, '\u2191 Upload ' + km.singular)
+      React.createElement(Btn, { variant:'primary', size:'xs', onClick:upload }, 'Upload ' + km.singular)
     ),
 
     // ── QBR: templates + past reviews + guided EBR ──
@@ -7964,10 +7966,10 @@ function DrivePage() {
       React.createElement(Card, { className:'p-4 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white' },
         React.createElement('div', { className:'flex items-center justify-between flex-wrap gap-3' },
           React.createElement('div', null,
-            React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, '\u2726 Guided EBR workflow'),
+            React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, 'Guided EBR workflow'),
             React.createElement('p', { className:'text-xs text-slate-500 mt-0.5 max-w-lg' }, 'AI-prepped brief, auto-built slide deck, live presenter mode and post-call automation.')
           ),
-          React.createElement(Btn, { variant:'primary', onClick:()=>setShowEBR(true) }, '\u{1F680} Launch guided EBR')
+          React.createElement(Btn, { variant:'primary', onClick:()=>setShowEBR(true) }, 'Launch guided EBR')
         )
       ),
       React.createElement(Card, { className:'overflow-hidden' },
@@ -7999,7 +8001,7 @@ function DrivePage() {
             const c = state.customers.find(x=>x.id===qb.customerId);
             return React.createElement('div', { key:qb.id, onClick:()=>setSelectedQBR(qb.id),
               className:'px-4 py-3 border-b border-slate-50 last:border-0 flex items-center gap-3 hover:bg-slate-50 cursor-pointer' },
-              React.createElement('span', { className:'w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm flex-shrink-0' }, '\u{1F4CA}'),
+              React.createElement('span', { className:'w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm flex-shrink-0' }, ''),
               React.createElement('div', { className:'flex-1 min-w-0' },
                 React.createElement('p', { className:'text-sm font-medium text-slate-900 truncate' }, qb.title),
                 React.createElement('p', { className:'text-[11px] text-slate-400' }, (c?c.name:'') + ' \u00b7 ' + qb.date)),
@@ -8042,10 +8044,10 @@ function QBRsPage() {
     React.createElement(Card, { className:'p-4 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white' },
       React.createElement('div', { className:'flex items-center justify-between flex-wrap gap-3' },
         React.createElement('div', null,
-          React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, '✦ Guided EBR workflow'),
+          React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, 'Guided EBR workflow'),
           React.createElement('p', { className:'text-xs text-slate-500 mt-0.5 max-w-lg' }, 'AI-prepped brief, auto-built slide deck, live presenter mode, and post-call automation — walk through the full flow with a live demo account (Stark Industries).')
         ),
-        React.createElement(Btn, { variant:'primary', onClick:()=>setShowEBR(true) }, '🚀 Launch guided EBR')
+        React.createElement(Btn, { variant:'primary', onClick:()=>setShowEBR(true) }, 'Launch guided EBR')
       )
     ),
     React.createElement('div', { className:'grid grid-cols-3 gap-4' },
@@ -8060,7 +8062,7 @@ function QBRsPage() {
             )
           ),
           React.createElement('div', { className:'flex items-center gap-2 mt-3 text-xs text-slate-400' },
-            React.createElement('span', null, q.shareStatus === 'shared' ? '👁 Shared' : '🔒 Draft'),
+            React.createElement('span', null, q.shareStatus === 'shared' ? 'Shared' : 'Draft'),
             React.createElement('span', null, '·'),
             React.createElement('span', null, q.approvalStatus)
           )
@@ -8095,7 +8097,7 @@ function QBRsPage() {
         ),
         qbr.recommendations.length > 0 && React.createElement('div', { className:'p-4 bg-slate-50 rounded-xl' },
           React.createElement('h4', { className:'font-semibold text-slate-900 mb-2' }, 'Recommendations'),
-          qbr.recommendations.map((r,i) => React.createElement('p', { key:i, className:'text-sm text-slate-700' }, '→ ' + r))
+          qbr.recommendations.map((r,i) => React.createElement('p', { key:i, className:'text-sm text-slate-700' }, '' + r))
         )
       ) : React.createElement('div', { className:'text-center py-8 text-slate-400' }, 'QBR is being prepared. Preview will be available once content is added.')
     )
@@ -8195,10 +8197,10 @@ function ConnectorsAdmin() {
       CONNECTORS.map(conn => React.createElement(Card, { key:conn.id, className:'p-4' },
         React.createElement('div', { className:'flex items-start justify-between mb-3' },
           React.createElement('div', { className:'flex items-center gap-2' },
-            React.createElement('div', { className:'w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-sm font-bold text-slate-600' }, conn.icon),
+            React.createElement('div', { className:'w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-sm font-bold text-slate-600' }, renderIcon(conn.icon)),
             React.createElement('div', null,
               React.createElement('p', { className:'font-semibold text-slate-900' }, conn.name),
-              React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium ${conn.status==='connected'?'bg-green-100 text-green-700':conn.status==='needs_attention'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-600'}` }, conn.status === 'connected' ? '● Connected' : conn.status === 'needs_attention' ? '⚠ Needs attention' : '○ Not connected')
+              React.createElement('span', { className:`px-2 py-0.5 text-xs rounded-full font-medium ${conn.status==='connected'?'bg-green-100 text-green-700':conn.status==='needs_attention'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-600'}` }, conn.status === 'connected' ? 'Connected' : conn.status === 'needs_attention' ? 'Needs attention' : 'Not connected')
             )
           )
         ),
@@ -8206,7 +8208,7 @@ function ConnectorsAdmin() {
           React.createElement('div', { className:'flex justify-between' }, React.createElement('span',null,'Last sync'), React.createElement('span',{className:'font-medium'},conn.lastSync)),
           conn.recordsSynced > 0 && React.createElement('div', { className:'flex justify-between' }, React.createElement('span',null,'Records'), React.createElement('span',{className:'font-medium'},conn.recordsSynced.toLocaleString())),
           conn.errorCount > 0 && React.createElement('div', { className:'flex justify-between' }, React.createElement('span',null,'Errors'), React.createElement('span',{className:'font-medium text-red-600'},conn.errorCount)),
-          conn.issue && React.createElement('p', { className:'text-amber-600 mt-1' }, '⚠ ' + conn.issue),
+          conn.issue && React.createElement('p', { className:'text-amber-600 mt-1' }, '' + conn.issue),
           conn.authOwner && React.createElement('div', { className:'flex justify-between' }, React.createElement('span',null,'Auth owner'), React.createElement('span',{className:'font-medium'},conn.authOwner))
         ),
         React.createElement('div', { className:'flex gap-1 mt-3' },
@@ -8246,10 +8248,10 @@ function ConnectorsAdmin() {
 
 // ── Field Manager ──
 const ADMIN_ENTITIES = [
-  { id:'company', label:'Company fields', icon:'\u{1F3E2}', tone:'blue',   desc:'Account-level attributes used across health, renewal and segmentation.' },
-  { id:'contact', label:'Contact fields', icon:'\u{1F4C7}', tone:'purple', desc:'Individual stakeholder attributes for relationship mapping.' },
-  { id:'task',    label:'Task fields',    icon:'\u2705',    desc:'Task attributes used in SOPs and goal execution.', tone:'teal' },
-  { id:'plan',    label:'Plan / Goal fields', icon:'\u{1F3AF}', tone:'green', desc:'Success plan and goal attributes used in QBRs and reporting.' },
+  { id:'company', label:'Company fields', icon:Building2, tone:'blue',   desc:'Account-level attributes used across health, renewal and segmentation.' },
+  { id:'contact', label:'Contact fields', icon:Contact, tone:'purple', desc:'Individual stakeholder attributes for relationship mapping.' },
+  { id:'task',    label:'Task fields',    icon:CheckSquare,    desc:'Task attributes used in SOPs and goal execution.', tone:'teal' },
+  { id:'plan',    label:'Plan / Goal fields', icon:Target, tone:'green', desc:'Success plan and goal attributes used in QBRs and reporting.' },
 ];
 
 const ADMIN_FIELDS = {
@@ -8314,11 +8316,11 @@ const ADMIN_FIELDS = {
 
 // ── Signals ──
 const SIGNAL_SOURCES = [
-  { id:'usage',      label:'Product usage',    icon:'\u{1F4CA}', tone:'blue',   status:'active',  freq:'Every 15 min',  coverage:92, source:'Vantage Analytics',
+  { id:'usage',      label:'Product usage',    icon:BarChart3, tone:'blue',   status:'active',  freq:'Every 15 min',  coverage:92, source:'Vantage Analytics',
     desc:'Feature clicks, session depth, drop-offs and rage clicks streamed from the product.',
     metrics:[['Events / day','1.4M'],['Accounts covered','22 / 24'],['Signal lag','12 min']],
     settings:[['Track feature-level clicks',true],['Capture rage clicks',true],['Session replay retention',true],['Anonymous sessions',false]] },
-  { id:'sentiment',  label:'Sentiment',        icon:'\u{1F4AC}', tone:'purple', status:'active',  freq:'On message',    coverage:88, source:'Email + Ticket NLP',
+  { id:'sentiment',  label:'Sentiment',        icon:MessageSquare, tone:'purple', status:'active',  freq:'On message',    coverage:88, source:'Email + Ticket NLP',
     desc:'Language-model scoring of email threads, ticket replies and meeting notes.',
     metrics:[['Messages scored','8,412'],['Avg confidence','0.86'],['Negative flags (30d)','37']],
     settings:[['Score inbound email',true],['Score ticket replies',true],['Score meeting transcripts',true],['Alert on sharp drops',true]] },
@@ -8351,40 +8353,47 @@ const DRIVE_TEMPLATES = [
 // ADMIN — SHARED UI
 // ============================================================
 const ADMIN_TONES = {
-  blue:   'bg-blue-50 text-blue-600',
-  red:    'bg-red-50 text-red-600',
-  amber:  'bg-amber-50 text-amber-600',
-  purple: 'bg-purple-50 text-purple-600',
-  teal:   'bg-teal-50 text-teal-600',
-  green:  'bg-green-50 text-green-600',
-  slate:  'bg-slate-100 text-slate-600',
+  blue:   'bg-info-subtle text-info-fg',
+  red:    'bg-danger-subtle text-danger-fg',
+  amber:  'bg-warning-subtle text-warning-fg',
+  purple: 'bg-subtle text-on-surface-muted',
+  teal:   'bg-accent-subtle text-accent-on-subtle',
+  green:  'bg-success-subtle text-success-fg',
+  slate:  'bg-subtle text-on-surface-muted',
 };
 
 function AdminTile({ icon, title, desc, meta, tone='slate', onClick }){
+  // `icon` is a lucide component now, not a glyph. Older call sites that still
+  // pass a string render nothing rather than leaking an emoji into the UI.
+  const Icon = typeof icon === 'function' ? icon : null;
   return React.createElement('button', {
     onClick,
-    className:'text-left bg-white border border-slate-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all group w-full'
+    className:'group w-full text-left rounded-xl border border-border-default bg-surface p-4 transition-colors duration-[120ms] hover:border-border-strong hover:bg-hover'
   },
     React.createElement('div', { className:'flex items-start gap-3' },
-      React.createElement('div', { className:`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[tone]||ADMIN_TONES.slate}` }, icon),
-      React.createElement('div', { className:'flex-1 min-w-0' },
-        React.createElement('p', { className:'font-semibold text-slate-900 text-sm group-hover:text-indigo-700 transition-colors' }, title),
-        desc && React.createElement('p', { className:'text-xs text-slate-500 mt-1 leading-relaxed' }, desc)
+      React.createElement('span', { className:`flex size-9 shrink-0 items-center justify-center rounded-lg ${ADMIN_TONES[tone]||ADMIN_TONES.slate}` },
+        Icon && React.createElement(Icon, { className:'size-4', strokeWidth:1.75 })),
+      React.createElement('div', { className:'min-w-0 flex-1' },
+        React.createElement('p', { className:'text-body-sm font-medium text-on-surface' }, title),
+        desc && React.createElement('p', { className:'mt-1 text-caption leading-relaxed text-on-surface-subtle' }, desc)
       ),
-      React.createElement('span', { className:'text-slate-300 group-hover:text-indigo-500 transition-colors flex-shrink-0' }, '\u2192')
+      React.createElement(ChevronRight, { className:'size-4 shrink-0 text-on-surface-faint transition-colors duration-[120ms] group-hover:text-on-surface-muted', strokeWidth:1.75 })
     ),
-    meta && React.createElement('div', { className:'mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 flex-wrap' }, meta)
+    meta && React.createElement('div', { className:'mt-3 flex flex-wrap items-center gap-1.5 border-t border-border-default pt-3' }, meta)
   );
 }
 
 function AdminCrumb({ trail, onNavigate, actions }){
+  if (trail.length <= 2 && !actions) return null;
   return React.createElement('div', { className:'flex items-center justify-between gap-3 flex-wrap' },
-    React.createElement('div', { className:'flex items-center gap-1.5 text-sm flex-wrap' },
-      trail.map((t,i) => React.createElement(React.Fragment, { key:i },
-        i > 0 && React.createElement('span', { className:'text-slate-300' }, '/'),
-        i < trail.length - 1
-          ? React.createElement('button', { onClick:()=>onNavigate(i), className:'text-slate-500 hover:text-indigo-600 font-medium' }, t)
-          : React.createElement('span', { className:'text-slate-900 font-semibold' }, t)
+    // AdminPage already prints Settings > <section> in its header, so the first
+    // two rungs would read twice. Only a drill-down inside a section is shown.
+    React.createElement('div', { className:'flex flex-wrap items-center gap-1.5 text-body-sm' },
+      (trail.length > 2 ? trail.slice(1) : []).map((t,i,arr) => React.createElement(React.Fragment, { key:i },
+        i > 0 && React.createElement(ChevronRight, { className:'size-3.5 text-on-surface-faint', strokeWidth:1.75 }),
+        i < arr.length - 1
+          ? React.createElement('button', { onClick:()=>onNavigate(i + 1), className:'font-medium text-on-surface-muted transition-colors duration-[120ms] hover:text-on-surface' }, t)
+          : React.createElement('span', { className:'font-semibold text-on-surface' }, t)
       ))
     ),
     actions || null
@@ -8392,13 +8401,9 @@ function AdminCrumb({ trail, onNavigate, actions }){
 }
 
 function AdminToggle({ on, onChange, label }){
-  return React.createElement('button', {
-    onClick:()=>onChange(!on),
-    className:'inline-flex items-center gap-2 cursor-pointer'
-  },
-    React.createElement('span', { className:`w-9 h-5 rounded-full inline-flex items-center px-0.5 transition-colors flex-shrink-0 ${on?'bg-green-500 justify-end':'bg-slate-300 justify-start'}` },
-      React.createElement('span', { className:'w-4 h-4 bg-white rounded-full shadow' })),
-    label && React.createElement('span', { className:`text-xs font-medium ${on?'text-green-700':'text-slate-400'}` }, label)
+  return React.createElement('span', { className:'inline-flex items-center gap-2' },
+    React.createElement(DsSwitch, { checked: !!on, onCheckedChange: onChange, 'aria-label': label || 'Toggle' }),
+    label && React.createElement('span', { className:`text-caption font-medium ${on?'text-on-surface':'text-on-surface-subtle'}` }, label)
   );
 }
 
@@ -8555,12 +8560,12 @@ const COMMUNITY_SPACES = [
 
 // ── CSAT survey builder ──
 const SURVEY_QUESTION_TYPES = [
-  { id:'rating5',  label:'1\u20135 rating',      icon:'\u2605' },
-  { id:'thumbs',   label:'Thumbs up / down',     icon:'\u{1F44D}' },
-  { id:'scale10',  label:'0\u201310 scale',      icon:'\u{1F522}' },
-  { id:'choice',   label:'Multiple choice',      icon:'\u25C9' },
-  { id:'text',     label:'Open text',            icon:'\u270E' },
-  { id:'nps',      label:'NPS question',         icon:'\u{1F4CA}' },
+  { id:'rating5',  label:'1\u20135 rating',      icon:Star },
+  { id:'thumbs',   label:'Thumbs up / down',     icon:ThumbsUp },
+  { id:'scale10',  label:'0\u201310 scale',      icon:Hash },
+  { id:'choice',   label:'Multiple choice',      icon:CircleDot },
+  { id:'text',     label:'Open text',            icon:PenLine },
+  { id:'nps',      label:'NPS question',         icon:Gauge },
 ];
 const DEFAULT_CSAT_SURVEY = [
   { id:'q1', type:'rating5', title:'How satisfied were you with this resolution?', required:true,  options:[] },
@@ -8744,7 +8749,7 @@ function CsatBuilder({ dispatch }){
   const preview = (q) => {
     if (q.type==='rating5')  return React.createElement('div',{className:'flex gap-1'}, [1,2,3,4,5].map(n=>React.createElement('span',{key:n,className:'w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-xs text-slate-500'},n)));
     if (q.type==='scale10')  return React.createElement('div',{className:'flex gap-0.5 flex-wrap'}, Array.from({length:11},(_,n)=>React.createElement('span',{key:n,className:'w-6 h-6 rounded border border-slate-200 flex items-center justify-center text-[10px] text-slate-500'},n)));
-    if (q.type==='thumbs')   return React.createElement('div',{className:'flex gap-2'}, ['\u{1F44D}','\u{1F44E}'].map(x=>React.createElement('span',{key:x,className:'w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center'},x)));
+    if (q.type==='thumbs')   return React.createElement('div',{className:'flex gap-2'}, ['',''].map(x=>React.createElement('span',{key:x,className:'w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center'},x)));
     if (q.type==='nps')      return React.createElement('div',{className:'flex gap-0.5 flex-wrap'}, Array.from({length:11},(_,n)=>React.createElement('span',{key:n,className:`w-6 h-6 rounded border flex items-center justify-center text-[10px] ${n<7?'border-red-200 text-red-500':n<9?'border-amber-200 text-amber-600':'border-green-200 text-green-600'}`},n)));
     if (q.type==='choice')   return React.createElement('div',{className:'space-y-1'}, q.options.map((o,i)=>React.createElement('div',{key:i,className:'flex items-center gap-2 text-xs text-slate-600'},React.createElement('span',{className:'w-3 h-3 rounded-full border border-slate-300'}),o)));
     return React.createElement('div',{className:'border border-slate-200 rounded-lg h-14 bg-slate-50'});
@@ -8775,14 +8780,14 @@ function CsatBuilder({ dispatch }){
               const open = sel === q.id;
               return React.createElement('div', { key:q.id, className:`border rounded-xl ${open?'border-indigo-300':'border-slate-200'}` },
                 React.createElement('div', { className:'flex items-center gap-2 px-3 py-2' },
-                  React.createElement('span', { className:'w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-xs flex-shrink-0' }, meta.icon),
+                  React.createElement('span', { className:'w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-xs flex-shrink-0' }, renderIcon(meta.icon)),
                   React.createElement('div', { className:'flex-1 min-w-0' },
                     React.createElement('p', { className:'text-sm font-medium text-slate-800 truncate' }, q.title),
                     React.createElement('p', { className:'text-[10px] text-slate-400' }, meta.label + (q.required?' \u00b7 required':''))),
-                  React.createElement('button', { onClick:()=>move(i,-1), disabled:i===0, className:'text-slate-300 hover:text-slate-600 text-xs px-0.5 disabled:opacity-30' }, '\u2191'),
-                  React.createElement('button', { onClick:()=>move(i,1), disabled:i===qs.length-1, className:'text-slate-300 hover:text-slate-600 text-xs px-0.5 disabled:opacity-30' }, '\u2193'),
+                  React.createElement('button', { onClick:()=>move(i,-1), disabled:i===0, className:'text-slate-300 hover:text-slate-600 text-xs px-0.5 disabled:opacity-30' }, ''),
+                  React.createElement('button', { onClick:()=>move(i,1), disabled:i===qs.length-1, className:'text-slate-300 hover:text-slate-600 text-xs px-0.5 disabled:opacity-30' }, ''),
                   React.createElement('button', { onClick:()=>setSel(open?null:q.id), className:'text-[11px] text-indigo-600 hover:underline px-1' }, open?'Close':'Edit'),
-                  React.createElement('button', { onClick:()=>setQs(l=>l.filter(x=>x.id!==q.id)), className:'text-slate-300 hover:text-red-500 text-xs px-0.5' }, '\u2715')),
+                  React.createElement('button', { onClick:()=>setQs(l=>l.filter(x=>x.id!==q.id)), className:'text-slate-300 hover:text-red-500 text-xs px-0.5' }, '')),
                 open && React.createElement('div', { className:'px-3 pb-3 border-t border-slate-100 pt-2.5 space-y-2' },
                   React.createElement('input', { value:q.title, onChange:e=>upd(q.id,{title:e.target.value}),
                     className:'w-full text-sm border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:border-indigo-400' }),
@@ -8796,7 +8801,7 @@ function CsatBuilder({ dispatch }){
                     q.options.map((o,oi)=>React.createElement('div', { key:oi, className:'flex gap-2' },
                       React.createElement('input', { value:o, className:SG_INP + ' flex-1',
                         onChange:e=>upd(q.id,{options:q.options.map((x,j)=>j===oi?e.target.value:x)}) }),
-                      React.createElement('button', { onClick:()=>upd(q.id,{options:q.options.filter((_,j)=>j!==oi)}), className:'text-slate-300 hover:text-red-500 text-xs' }, '\u2715'))),
+                      React.createElement('button', { onClick:()=>upd(q.id,{options:q.options.filter((_,j)=>j!==oi)}), className:'text-slate-300 hover:text-red-500 text-xs' }, ''))),
                     React.createElement('button', { onClick:()=>upd(q.id,{options:q.options.concat('New option')}),
                       className:'text-[11px] text-indigo-600 hover:underline' }, '+ Add option'))));
             })),
@@ -8805,7 +8810,7 @@ function CsatBuilder({ dispatch }){
             React.createElement('div', { className:'flex gap-1.5 flex-wrap' },
               SURVEY_QUESTION_TYPES.map(x=>React.createElement('button', { key:x.id, onClick:()=>add(x.id),
                 className:'px-2 py-1 rounded-lg border border-slate-200 text-[11px] font-semibold text-slate-600 hover:border-indigo-300 hover:text-indigo-600' },
-                x.icon + ' ' + x.label)))))),
+                x.label)))))),
 
       React.createElement(Card, { className:'p-4' },
         React.createElement(CxLabel, null, 'Live preview'),
@@ -8839,7 +8844,7 @@ function NpsBuilder({ dispatch }){
 
   return React.createElement('div', { className:'space-y-4' },
     React.createElement('div', { className:'flex gap-0.5 bg-slate-100 rounded-lg p-0.5 w-fit' },
-      [['widget','\u{1F5A5} In-app widget'],['form','\u2709 Canned form']].map(m =>
+      [['widget','In-app widget'],['form','Canned form']].map(m =>
         React.createElement('button', { key:m[0], onClick:()=>setMode(m[0]),
           className:`px-3 py-1.5 text-xs rounded-md transition-colors ${mode===m[0]?'bg-white text-slate-900 shadow-sm font-semibold':'text-slate-500'}` }, m[1]))),
 
@@ -8930,7 +8935,7 @@ function ConversationsBuilder({ dispatch }){
           onDragOver:e=>{ e.preventDefault(); setDragOver(true); }, onDragLeave:()=>setDragOver(false),
           onDrop:e=>{ e.preventDefault(); setDragOver(false); drop(); }, onClick:drop,
           className:`border-2 border-dashed rounded-xl p-7 text-center cursor-pointer transition-colors ${dragOver?'border-indigo-400 bg-indigo-50':'border-slate-200 hover:border-indigo-300'}` },
-        React.createElement('div', { className:'w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mx-auto mb-2' }, '\u{1F4C4}'),
+        React.createElement('div', { className:'w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mx-auto mb-2' }, ''),
         React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, 'Drop transcript files here'),
         React.createElement('p', { className:'text-[11px] text-slate-500 mt-1' }, 'Bulk upload supported \u00b7 accounts matched on attendee email domain'))),
 
@@ -8939,7 +8944,7 @@ function ConversationsBuilder({ dispatch }){
       React.createElement('div', { className:'space-y-1.5' },
         CONVO_MAPPING.map(m => React.createElement('div', { key:m.field, className:'flex items-center gap-3' },
           React.createElement('span', { className:'text-xs font-semibold text-slate-700 w-24 flex-shrink-0' }, m.field),
-          React.createElement('span', { className:'text-slate-300 text-xs' }, '\u2190'),
+          React.createElement('span', { className:'text-slate-300 text-xs' }, ''),
           React.createElement('span', { className:'text-[11px] font-mono text-slate-500 flex-1' }, m.from))))),
 
     React.createElement(Card, { className:'overflow-hidden' },
@@ -9022,7 +9027,7 @@ function CommunityBuilder({ dispatch }){
     tab === 'connect' && React.createElement('div', { className:'grid grid-cols-2 gap-3' },
       platforms.map(p => React.createElement(Card, { key:p.id, className:'p-4' },
         React.createElement('div', { className:'flex items-start gap-3' },
-          React.createElement('span', { className:'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-sm flex-shrink-0' }, '\u{1F465}'),
+          React.createElement('span', { className:'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-sm flex-shrink-0' }, ''),
           React.createElement('div', { className:'flex-1 min-w-0' },
             React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
               React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, p.name),
@@ -9065,7 +9070,7 @@ function SentimentBuilder({ dispatch }){
       React.createElement('p', { className:'text-xs text-slate-500 mb-2' }, 'Any message containing these terms is scored negative regardless of the model output.'),
       React.createElement('div', { className:'flex gap-1.5 flex-wrap mb-2' },
         lexicon.map(w=>React.createElement('span', { key:w, className:'inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-50 text-red-700 text-[11px] font-semibold' },
-          w, React.createElement('button', { onClick:()=>setLexicon(l=>l.filter(x=>x!==w)), className:'text-red-300 hover:text-red-600' }, '\u2715')))),
+          w, React.createElement('button', { onClick:()=>setLexicon(l=>l.filter(x=>x!==w)), className:'text-red-300 hover:text-red-600' }, '')))),
       React.createElement('div', { className:'flex gap-2' },
         React.createElement('input', { value:word, onChange:e=>setWord(e.target.value), placeholder:'Add a term\u2026',
           onKeyDown:e=>{ if(e.key==='Enter' && word.trim()){ setLexicon(l=>l.concat(word.trim())); setWord(''); } }, className:SG_INP + ' flex-1' }),
@@ -9167,9 +9172,9 @@ function SignalsAdmin({ onBack, dispatch }){
   const s = SIGNAL_SOURCES.find(x=>x.id===sig);
   const [settings, setSettings] = useState({});
 
-  const statusPill = st => st==='active' ? React.createElement(CxPill,{tone:'green'},'\u25CF Active')
-                        : st==='attention' ? React.createElement(CxPill,{tone:'amber'},'\u26A0 Needs attention')
-                        : React.createElement(CxPill,{tone:'slate'},'\u25CB Inactive');
+  const statusPill = st => st==='active' ? React.createElement(CxPill,{tone:'green'},'Active')
+                        : st==='attention' ? React.createElement(CxPill,{tone:'amber'},'Needs attention')
+                        : React.createElement(CxPill,{tone:'slate'},'Inactive');
 
   if (!sig) {
     return React.createElement('div', { className:'space-y-4' },
@@ -9266,7 +9271,7 @@ function DriveAdmin({ onBack, dispatch }){
   return React.createElement('div', { className:'space-y-4' },
     React.createElement(AdminCrumb, {
       trail:['Admin','CX42 Drive'], onNavigate:()=>onBack(),
-      actions: React.createElement(Btn, { variant:'primary', size:'xs', onClick:simulateUpload }, '\u2191 Upload template')
+      actions: React.createElement(Btn, { variant:'primary', size:'xs', onClick:simulateUpload }, 'Upload template')
     }),
 
     // Upload dropzone
@@ -9277,7 +9282,7 @@ function DriveAdmin({ onBack, dispatch }){
       onClick:simulateUpload,
       className:`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${dragOver ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-white hover:border-indigo-300'}`
     },
-      React.createElement('div', { className:'w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mx-auto mb-3' }, '\u2191'),
+      React.createElement('div', { className:'w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mx-auto mb-3' }, ''),
       React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, 'Drop QBR, Goal or SOP files here'),
       React.createElement('p', { className:'text-xs text-slate-500 mt-1' }, 'PPTX, DOCX, XLSX or PDF \u00b7 up to 25 MB \u00b7 versioned automatically'),
       React.createElement('div', { className:'flex justify-center gap-2 mt-3' },
@@ -9429,7 +9434,7 @@ function SlaAdmin({ onBack, dispatch }){
               React.createElement('td', { className:'px-4 py-2.5 font-medium text-slate-800' }, x.respond),
               React.createElement('td', { className:'px-4 py-2.5 font-medium text-slate-800' }, x.resolve),
               React.createElement('td', { className:'px-4 py-2.5 text-xs text-slate-500' }, x.clock),
-              React.createElement('td', { className:'px-4 py-2.5 text-right text-slate-300' }, '\u2192')
+              React.createElement('td', { className:'px-4 py-2.5 text-right text-slate-300' }, '')
             )))
         )
       )
@@ -9491,24 +9496,24 @@ const ASSIGNMENT_STRATEGIES = ['Skill based','Load balanced','Round robin'];
 
 const ASSIGNMENT_RULES = {
   ticket: [
-    { id:'at1', name:'Critical tickets \u2192 Tier 1 pod',   match:'Priority is P1 \u2014 Critical',        strategy:'Skill based',   target:'Tier 1 support', order:1, enabled:true,  handled:412 },
-    { id:'at2', name:'Enterprise tickets \u2192 named agent', match:'Segment is Enterprise',              strategy:'Skill based', target:'Named support agent', order:2, enabled:true,  handled:288 },
-    { id:'at3', name:'APAC hours \u2192 APAC pod',            match:'Created 00:00\u201308:00 UTC',        strategy:'Load balanced', target:'APAC pod', order:3, enabled:true,  handled:196 },
-    { id:'at4', name:'Everything else \u2192 round robin',    match:'No other rule matched',              strategy:'Round robin',   target:'General support queue', order:4, enabled:true, handled:1104 },
-    { id:'at5', name:'Billing keywords \u2192 Finance',       match:'Subject contains "invoice, billing"', strategy:'Skill based',  target:'Finance ops', order:5, enabled:false, handled:0 },
+    { id:'at1', name:'Critical tickets  Tier 1 pod',   match:'Priority is P1 \u2014 Critical',        strategy:'Skill based',   target:'Tier 1 support', order:1, enabled:true,  handled:412 },
+    { id:'at2', name:'Enterprise tickets  named agent', match:'Segment is Enterprise',              strategy:'Skill based', target:'Named support agent', order:2, enabled:true,  handled:288 },
+    { id:'at3', name:'APAC hours  APAC pod',            match:'Created 00:00\u201308:00 UTC',        strategy:'Load balanced', target:'APAC pod', order:3, enabled:true,  handled:196 },
+    { id:'at4', name:'Everything else  round robin',    match:'No other rule matched',              strategy:'Round robin',   target:'General support queue', order:4, enabled:true, handled:1104 },
+    { id:'at5', name:'Billing keywords  Finance',       match:'Subject contains "invoice, billing"', strategy:'Skill based',  target:'Finance ops', order:5, enabled:false, handled:0 },
   ],
   company: [
-    { id:'ac1', name:'Strategic accounts \u2192 senior CSM',  match:'Strategic account is true',          strategy:'Manual',        target:'Maya Chen, Amara Osei', order:1, enabled:true,  handled:6 },
-    { id:'ac2', name:'Enterprise \u2192 enterprise pod',      match:'Segment is Enterprise',              strategy:'Load balanced', target:'Enterprise CSM pod', order:2, enabled:true,  handled:9 },
-    { id:'ac3', name:'ARR above $150K \u2192 named CSM',      match:'ARR is above $150,000',              strategy:'Load balanced', target:'Senior CSM bench', order:3, enabled:true,  handled:11 },
-    { id:'ac4', name:'India-based \u2192 APAC pod',           match:'Region is APAC',                      strategy:'Load balanced', target:'APAC CSM pod', order:4, enabled:true,  handled:4 },
-    { id:'ac5', name:'New logos \u2192 onboarding pod',       match:'Account age is under 90 days',        strategy:'Round robin',   target:'Onboarding team', order:5, enabled:false, handled:0 },
+    { id:'ac1', name:'Strategic accounts  senior CSM',  match:'Strategic account is true',          strategy:'Manual',        target:'Maya Chen, Amara Osei', order:1, enabled:true,  handled:6 },
+    { id:'ac2', name:'Enterprise  enterprise pod',      match:'Segment is Enterprise',              strategy:'Load balanced', target:'Enterprise CSM pod', order:2, enabled:true,  handled:9 },
+    { id:'ac3', name:'ARR above $150K  named CSM',      match:'ARR is above $150,000',              strategy:'Load balanced', target:'Senior CSM bench', order:3, enabled:true,  handled:11 },
+    { id:'ac4', name:'India-based  APAC pod',           match:'Region is APAC',                      strategy:'Load balanced', target:'APAC CSM pod', order:4, enabled:true,  handled:4 },
+    { id:'ac5', name:'New logos  onboarding pod',       match:'Account age is under 90 days',        strategy:'Round robin',   target:'Onboarding team', order:5, enabled:false, handled:0 },
   ],
 };
 
 const ASSIGNMENT_OBJECTS = [
-  { id:'ticket',  label:'Ticket assignment',  icon:'\u{1F3AB}', tone:'red',  desc:'Route incoming support tickets to the right agent, pod or queue.' },
-  { id:'company', label:'Company assignment', icon:'\u{1F3E2}', tone:'blue', desc:'Assign accounts to CSMs by segment, ARR, territory or workload.' },
+  { id:'ticket',  label:'Ticket assignment',  icon:Ticket, tone:'red',  desc:'Route incoming support tickets to the right agent, pod or queue.' },
+  { id:'company', label:'Company assignment', icon:Building2, tone:'blue', desc:'Assign accounts to CSMs by segment, ARR, territory or workload.' },
 ];
 
 function AssignmentAdmin({ onBack, dispatch }){
@@ -9554,7 +9559,7 @@ function AssignmentAdmin({ onBack, dispatch }){
       React.createElement('div', { className:'space-y-3' },
         React.createElement('div', null,
           React.createElement('label', { className:'text-xs font-medium text-slate-500' }, 'Rule name'),
-          React.createElement('input', { className:'w-full mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400', placeholder:'e.g. EMEA enterprise \u2192 senior pod' })),
+          React.createElement('input', { className:'w-full mt-1 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400', placeholder:'e.g. EMEA enterprise  senior pod' })),
         React.createElement('div', { className:'grid grid-cols-2 gap-3' },
           React.createElement('div', null,
             React.createElement('label', { className:'text-xs font-medium text-slate-500' }, 'Strategy'),
@@ -9575,15 +9580,15 @@ function AssignmentAdmin({ onBack, dispatch }){
 // ADMIN — NOTIFICATIONS
 // ============================================================
 const NOTIFY_CHANNELS = [
-  { id:'email', label:'Email',    icon:'\u2709',    tone:'blue',   status:'connected', detail:'notifications@cx42.io \u00b7 SendGrid',
+  { id:'email', label:'Email',    icon:Mail,    tone:'blue',   status:'connected', detail:'notifications@cx42.io \u00b7 SendGrid',
     desc:'Transactional and digest email delivered to agents, CSMs and managers.',
     settings:[['Daily digest at 08:00',true],['Immediate for P1 breaches',true],['Include ticket body in email',false],['Weekly portfolio summary',true]],
     stats:[['Sent (30d)','12,480'],['Open rate','54%'],['Bounces','18']] },
-  { id:'slack', label:'Slack',    icon:'\u{1F4AC}', tone:'purple', status:'connected', detail:'cx42-workspace \u00b7 6 channels mapped',
+  { id:'slack', label:'Slack',    icon:Slack, tone:'purple', status:'connected', detail:'cx42-workspace \u00b7 6 channels mapped',
     desc:'Real-time alerts pushed into team channels and direct messages.',
     settings:[['Post to #cs-alerts',true],['DM the account owner',true],['Thread follow-up updates',true],['Mention @here on P1',false]],
     stats:[['Messages (30d)','3,204'],['Channels','6'],['Click-through','41%']] },
-  { id:'teams', label:'MS Teams', icon:'\u{1F465}', tone:'teal',   status:'not_connected', detail:'Not connected',
+  { id:'teams', label:'MS Teams', icon:Users, tone:'teal',   status:'not_connected', detail:'Not connected',
     desc:'Adaptive-card notifications delivered to Teams channels and chats.',
     settings:[['Post to CS Alerts channel',false],['Chat the account owner',false],['Use adaptive cards',false],['Mention on breach',false]],
     stats:[['Messages (30d)','\u2014'],['Channels','0'],['Click-through','\u2014']] },
@@ -9607,8 +9612,8 @@ function NotificationsAdmin({ onBack, dispatch }){
 
   const c = NOTIFY_CHANNELS.find(x=>x.id===chan);
   const statusPill = st => st==='connected'
-    ? React.createElement(CxPill,{tone:'green'},'\u25CF Connected')
-    : React.createElement(CxPill,{tone:'slate'},'\u25CB Not connected');
+    ? React.createElement(CxPill,{tone:'green'},'Connected')
+    : React.createElement(CxPill,{tone:'slate'},'Not connected');
 
   const toggleCell = (evId, ch) =>
     setMatrix(m => m.map(e => e.id===evId ? {...e, [ch]: !e[ch]} : e));
@@ -9667,7 +9672,7 @@ function NotificationsAdmin({ onBack, dispatch }){
         React.createElement('thead', null, React.createElement('tr', { className:'bg-slate-50 border-b' },
           React.createElement('th', { className:'px-4 py-3 text-left text-xs font-medium text-slate-500' }, 'Event'),
           React.createElement('th', { className:'px-4 py-3 text-left text-xs font-medium text-slate-500' }, 'Audience'),
-          ...NOTIFY_CHANNELS.map(ch => React.createElement('th', { key:ch.id, className:'px-4 py-3 text-center text-xs font-medium text-slate-500' }, ch.icon + ' ' + ch.label))
+          ...NOTIFY_CHANNELS.map(ch => React.createElement('th', { key:ch.id, className:'px-4 py-3 text-center text-xs font-medium text-slate-500' }, ch.label))
         )),
         React.createElement('tbody', null,
           matrix.map(e => React.createElement('tr', { key:e.id, className:'border-b last:border-0 hover:bg-slate-50' },
@@ -9678,7 +9683,7 @@ function NotificationsAdmin({ onBack, dispatch }){
                 onClick:()=>toggleCell(e.id, ch.id),
                 title: e[ch.id] ? 'Delivering via ' + ch.label : 'Not delivering via ' + ch.label,
                 className:`w-6 h-6 rounded-md text-xs font-bold transition-colors ${e[ch.id] ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-300 hover:bg-slate-200'}`
-              }, e[ch.id] ? '\u2713' : '\u2013')
+              }, e[ch.id] ? '' : '\u2013')
             ))
           )))
       )
@@ -9715,7 +9720,7 @@ function automationSentence(a){
   const f  = fieldMeta(a.pillar, a.event.field);
   const ev = `When ${pm.singular} ${f ? f.label.toLowerCase() : a.event.field} ${modeLabel(a.event.mode)}${a.event.to ? ' ' + a.event.to : ''}`;
   const cond = a.conditions.length ? `, and ${a.conditions.length} condition${a.conditions.length===1?'':'s'} match` : '';
-  return `${ev}${cond} \u2192 run ${a.actions.length} action${a.actions.length===1?'':'s'}.`;
+  return `${ev}${cond}  run ${a.actions.length} action${a.actions.length===1?'':'s'}.`;
 }
 
 // ── Small shared bits for the automation builder ──
@@ -9884,7 +9889,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
 
   // ── Palette tray ──
   const tray = React.createElement(Card, { className:'p-4' },
-    React.createElement(CxLabel, { right:React.createElement(CxPill,{tone:pm.tone}, pm.icon + ' ' + pm.label) }, 'Attribute palette'),
+    React.createElement(CxLabel, { right:React.createElement(CxPill,{tone:pm.tone}, pm.label) }, 'Attribute palette'),
     React.createElement('p', { className:'text-[10px] text-slate-400 mb-2' }, 'Drag a ' + pm.singular + ' attribute into Event or Conditions \u2014 or click to add.'),
     React.createElement('div', { className:'flex flex-wrap gap-1.5 mb-4' },
       AUTO_FIELDS[pillar].map(f => React.createElement(AutoChip, {
@@ -9901,7 +9906,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
           g.items.map(a => React.createElement('button', {
             key:a.id, draggable:true, onDragStart:startDragAction(a.id), onClick:()=>addAction(a.id),
             className:'px-2 py-1 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-600 cursor-grab active:cursor-grabbing hover:ring-2 hover:ring-indigo-200 text-left'
-          }, a.icon + ' ' + a.label))
+          }, a.label))
         )
       ))
     )
@@ -9915,7 +9920,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
       onNavigate:(i)=>{ if (i <= 2) onBack(); },
       actions: React.createElement('div', { className:'flex items-center gap-2' },
         React.createElement('div', { className:'flex gap-0.5 bg-slate-100 rounded-lg p-0.5' },
-          [['build','\u2317 Drag & drop'],['prompt','\u2726 Prompt']].map(m=>React.createElement('button', {
+          [['build','\u2317 Drag & drop'],['prompt','Prompt']].map(m=>React.createElement('button', {
             key:m[0], onClick:()=>setMode(m[0]),
             className:`px-2.5 py-1 text-xs rounded-md transition-colors ${mode===m[0]?'bg-white text-slate-900 shadow-sm font-semibold':'text-slate-500'}`
           }, m[1]))
@@ -9948,7 +9953,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
                 React.createElement('button', { key:ex, onClick:()=>setPrompt(ex),
                   className:'text-[11px] px-2 py-1 rounded-lg border border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-600 text-left' }, ex))
             ),
-            React.createElement(Btn, { variant:'primary', size:'xs', onClick:generate, disabled:!prompt.trim() }, '\u2726 Generate')
+            React.createElement(Btn, { variant:'primary', size:'xs', onClick:generate, disabled:!prompt.trim() }, 'Generate')
           ),
           draft && React.createElement('div', { className:'mt-4 border border-indigo-200 bg-indigo-50/50 rounded-xl p-4' },
             React.createElement('p', { className:'text-[10px] font-bold text-indigo-700 uppercase tracking-wider mb-2' }, 'Generated automation'),
@@ -10032,7 +10037,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
                               opsFor(m?m.type:'text').map(o=>React.createElement('option',{key:o},o))),
                             !/is empty|is not empty|is set|is not set|is true|is false|changes to true|changes to false/.test(c.op) &&
                               React.createElement(AutoValue, { meta:m, value:c.val, onChange:v=>setCond(i,{val:v}) }),
-                            React.createElement('button', { onClick:()=>delCond(i), className:'text-slate-300 hover:text-red-500 text-sm px-1' }, '\u2715')
+                            React.createElement('button', { onClick:()=>delCond(i), className:'text-slate-300 hover:text-red-500 text-sm px-1' }, '')
                           )
                         );
                       })
@@ -10051,7 +10056,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
                         const m = actionMeta(a.id);
                         if (!m) return null;
                         return React.createElement('div', { key:i, className:'flex gap-2 items-center bg-white border border-slate-200 rounded-lg p-2' },
-                          React.createElement('span', { className:'w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-xs flex-shrink-0' }, m.icon),
+                          React.createElement('span', { className:'w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-xs flex-shrink-0' }, renderIcon(m.icon)),
                           React.createElement('span', { className:'text-xs font-semibold text-slate-700 flex-shrink-0' }, m.label),
                           m.arg === 'enum'
                             ? React.createElement('select', { value:a.arg, onChange:e=>setActArg(i,e.target.value), className:AUTO_INP + ' flex-1' },
@@ -10060,7 +10065,7 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
                             : m.arg === 'text'
                               ? React.createElement('input', { value:a.arg, onChange:e=>setActArg(i,e.target.value), placeholder:'target / template', className:AUTO_INP + ' flex-1' })
                               : React.createElement('span', { className:'flex-1 text-[11px] text-slate-400 italic' }, 'No configuration needed'),
-                          React.createElement('button', { onClick:()=>delAct(i), className:'text-slate-300 hover:text-red-500 text-sm px-1' }, '\u2715')
+                          React.createElement('button', { onClick:()=>delAct(i), className:'text-slate-300 hover:text-red-500 text-sm px-1' }, '')
                         );
                       })
                     )
@@ -10072,10 +10077,10 @@ function AutomationBuilder({ pillar, automation, onBack, onSave, dispatch }){
               React.createElement(CxLabel, null, 'Summary'),
               React.createElement('p', { className:'text-sm text-slate-700 leading-relaxed' }, automationSentence(current)),
               React.createElement('div', { className:'flex items-center gap-2 mt-3 flex-wrap' },
-                React.createElement(Btn, { variant:'secondary', size:'xs', onClick:runTest }, '\u25B6 Test run'),
+                React.createElement(Btn, { variant:'secondary', size:'xs', onClick:runTest }, 'Test run'),
                 React.createElement(Btn, { variant:'primary', size:'xs', onClick:()=>onSave(current) }, 'Save automation'),
                 testOut && React.createElement('span', { className:`text-xs font-semibold ${testOut.matched?'text-green-600':'text-slate-500'}` },
-                  (testOut.matched ? '\u2713 Would fire' : '\u2014 Would not fire') + ' \u00b7 ' + testOut.checked + ' condition(s) at ' + testOut.at)
+                  (testOut.matched ? 'Would fire' : '\u2014 Would not fire') + ' \u00b7 ' + testOut.checked + ' condition(s) at ' + testOut.at)
               )
             )
           )
@@ -10132,7 +10137,7 @@ function AutomationAdmin({ onBack, dispatch }){
       React.createElement('div', { className:'col-span-3 space-y-3' },
         mine.length === 0
           ? React.createElement(Card, { className:'p-10 text-center' },
-              React.createElement('p', { className:'text-2xl mb-2' }, pm.icon),
+              React.createElement('p', { className:'text-2xl mb-2' }, renderIcon(pm.icon)),
               React.createElement('p', { className:'text-sm text-slate-500' }, q ? 'No automations match that search' : 'No ' + pm.singular + ' automations yet'),
               React.createElement('div', { className:'mt-3' },
                 React.createElement(Btn, { variant:'primary', size:'xs', onClick:()=>setEditing('new') }, 'Create the first one'))
@@ -10141,7 +10146,7 @@ function AutomationAdmin({ onBack, dispatch }){
               const f = fieldMeta(a.pillar, a.event.field);
               return React.createElement(Card, { key:a.id, className:'p-4 hover:border-indigo-300 transition-colors' },
                 React.createElement('div', { className:'flex items-start gap-3' },
-                  React.createElement('span', { className:`w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0 ${ADMIN_TONES[pm.tone]}` }, pm.icon),
+                  React.createElement('span', { className:`w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0 ${ADMIN_TONES[pm.tone]}` }, renderIcon(pm.icon)),
                   React.createElement('div', { className:'flex-1 min-w-0' },
                     React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
                       React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, a.name),
@@ -10149,7 +10154,7 @@ function AutomationAdmin({ onBack, dispatch }){
                     ),
                     React.createElement('p', { className:'text-xs text-slate-500 mt-1 leading-relaxed' }, automationSentence(a)),
                     React.createElement('div', { className:'flex gap-1.5 flex-wrap mt-2' },
-                      React.createElement(CxPill, { tone:pm.tone }, '\u26A1 ' + (f?f.label:a.event.field)),
+                      React.createElement(CxPill, { tone:pm.tone }, ' ' + (f?f.label:a.event.field)),
                       Array.from(new Set(a.conditions.map(c=>c.pillar))).map(p =>
                         React.createElement(CxPill, { key:p, tone:AUTO_PILLAR_META[p].tone }, 'if ' + AUTO_PILLAR_META[p].label)),
                       a.actions.slice(0,3).map((ac,i)=>{ const m=actionMeta(ac.id); return m && React.createElement(CxPill,{key:i,tone:'slate'}, m.icon+' '+m.label); }),
@@ -10190,7 +10195,7 @@ function actionSentenceFor(a){
   const ev = 'When ' + pm.singular + ' ' + (f ? f.label.toLowerCase() : a.event.field) + ' ' +
              modeLabel(a.event.mode) + (a.event.to ? ' ' + a.event.to : '');
   const cond = (a.conditions || []).length ? ', and ' + a.conditions.length + ' condition' + (a.conditions.length===1?'':'s') + ' match' : '';
-  return ev + cond + ' \u2192 run ' + (a.steps || []).length + ' action' + ((a.steps||[]).length===1?'':'s') + '.';
+  return ev + cond + '  run ' + (a.steps || []).length + ' action' + ((a.steps||[]).length===1?'':'s') + '.';
 }
 
 // Actions authored by other CSMs, so the admin overview has something to show
@@ -10218,13 +10223,13 @@ const ACTION_MERGE_FIELDS = [
 function ActionRuleView({ action }){
   const pm = AUTO_PILLAR_META[action.pillar];
   const f  = fieldMeta(action.pillar, action.event.field);
-  const lock = React.createElement('span', { className:'inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400' }, '\u{1F512} Locked by admin');
+  const lock = React.createElement('span', { className:'inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400' }, 'Locked by admin');
 
   return React.createElement('div', { className:'space-y-3' },
     React.createElement(Card, { className:'p-4 bg-slate-50/60' },
       React.createElement(CxLabel, { right:lock }, 'When \u2014 event trigger'),
       React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
-        React.createElement(CxPill, { tone:pm.tone }, pm.icon + ' ' + pm.label),
+        React.createElement(CxPill, { tone:pm.tone }, pm.label),
         React.createElement('span', { className:'text-sm font-semibold text-slate-800' }, f ? f.label : action.event.field),
         React.createElement('span', { className:'text-sm text-slate-500' }, modeLabel(action.event.mode)),
         action.event.to && React.createElement('span', { className:'text-sm font-semibold text-slate-800' }, action.event.to)
@@ -10275,10 +10280,10 @@ function ActionDetail({ action, onBack, dispatch, onEdit }){
 
   return React.createElement('div', { className:'space-y-4' },
     React.createElement('div', { className:'flex items-center justify-between gap-3 flex-wrap' },
-      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, '\u2190 Back to Actions'),
+      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, 'Back to Actions'),
       React.createElement('div', { className:'flex items-center gap-2' },
         React.createElement(CxPill, { tone:action.enabled?'green':'slate' }, action.enabled?'Active':'Paused'),
-        onEdit && React.createElement(Btn, { variant:'secondary', size:'xs', onClick:onEdit }, '\u270E Edit action'),
+        onEdit && React.createElement(Btn, { variant:'secondary', size:'xs', onClick:onEdit }, 'Edit action'),
         React.createElement(Btn, { variant:'secondary', size:'xs',
           onClick:()=>dispatch({ type:'TOGGLE_ACTION', actionId:action.id }) }, action.enabled?'Pause':'Resume')
       )
@@ -10286,7 +10291,7 @@ function ActionDetail({ action, onBack, dispatch, onEdit }){
 
     React.createElement(Card, { className:'p-5' },
       React.createElement('div', { className:'flex items-start gap-4' },
-        React.createElement('span', { className:`w-11 h-11 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[pm.tone]}` }, pm.icon),
+        React.createElement('span', { className:`w-11 h-11 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[pm.tone]}` }, renderIcon(pm.icon)),
         React.createElement('div', { className:'flex-1 min-w-0' },
           React.createElement('h3', { className:'text-base font-bold text-slate-900' }, action.name),
           React.createElement('p', { className:'text-sm text-slate-600 mt-1' }, automationSentence(Object.assign({}, action, { actions:action.steps }))),
@@ -10299,7 +10304,7 @@ function ActionDetail({ action, onBack, dispatch, onEdit }){
       ),
       React.createElement('div', { className:'mt-3 pt-3 border-t border-slate-100 bg-amber-50/60 -mx-5 -mb-5 px-5 py-3' },
         React.createElement('p', { className:'text-xs text-amber-800 leading-relaxed' },
-          React.createElement('span', { className:'font-bold' }, '\u{1F3E2} '),
+          React.createElement('span', { className:'font-bold' }, ' '),
           'This action runs only on the accounts assigned to you. ',
           editableCount > 0
             ? `You can personalise the ${editableCount} message${editableCount===1?'':'s'} this action sends.`
@@ -10317,15 +10322,15 @@ function ActionDetail({ action, onBack, dispatch, onEdit }){
           const d = draftFor(st);
           return React.createElement('div', { key:st.key, className:`border rounded-xl overflow-hidden ${st.editable?'border-indigo-200':'border-slate-200'}` },
             React.createElement('div', { className:`flex items-center gap-3 px-3 py-2.5 ${st.editable?'bg-indigo-50/50':'bg-slate-50/60'}` },
-              React.createElement('span', { className:'w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm flex-shrink-0' }, st.icon),
+              React.createElement('span', { className:'w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-sm flex-shrink-0' }, renderIcon(st.icon)),
               React.createElement('div', { className:'flex-1 min-w-0' },
                 React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, st.label),
                 React.createElement('p', { className:'text-[11px] text-slate-500 truncate' },
                   st.editable ? (st.channel + (st.arg ? ' \u00b7 ' + st.arg : '')) : (st.arg || 'No configuration'))
               ),
               st.editable
-                ? React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setOpenStep(open?null:st.key) }, open?'Close':'\u270E Edit message')
-                : React.createElement(CxPill, { tone:'slate' }, '\u{1F512} Locked')
+                ? React.createElement(Btn, { variant:'secondary', size:'xs', onClick:()=>setOpenStep(open?null:st.key) }, open?'Close':'Edit message')
+                : React.createElement(CxPill, { tone:'slate' }, 'Locked')
             ),
             open && st.editable && React.createElement('div', { className:'p-3 border-t border-indigo-100 space-y-2' },
               st.id !== 'n_slack' && st.id !== 'n_teams' && React.createElement('div', null,
@@ -10370,10 +10375,10 @@ function TicketActionLibrary({ state, dispatch, q, setQ, openId, setOpenId }){
   if (open) {
     const matching = TICKETS.filter(t => { try { return open.appliesWhen(t); } catch(e){ return false; } });
     return React.createElement('div', { className:'space-y-4' },
-      React.createElement('button', { onClick:()=>setOpenId(null), className:'text-sm text-indigo-600 hover:underline' }, '\u2190 Back to actions'),
+      React.createElement('button', { onClick:()=>setOpenId(null), className:'text-sm text-indigo-600 hover:underline' }, 'Back to actions'),
       React.createElement(Card, { className:'p-5' },
         React.createElement('div', { className:'flex items-start gap-4' },
-          React.createElement('span', { className:`w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${ADMIN_TONES[open.tone]}` }, open.icon),
+          React.createElement('span', { className:`w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${ADMIN_TONES[open.tone]}` }, renderIcon(open.icon)),
           React.createElement('div', { className:'flex-1 min-w-0' },
             React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
               React.createElement('h3', { className:'text-base font-bold text-slate-900' }, open.name),
@@ -10421,7 +10426,7 @@ function TicketActionLibrary({ state, dispatch, q, setQ, openId, setOpenId }){
             const matching = TICKETS.filter(t => { try { return a.appliesWhen(t); } catch(e){ return false; } });
             return React.createElement(Card, { key:a.id, className:'p-4 hover:border-indigo-300 transition-colors cursor-pointer', onClick:()=>setOpenId(a.id) },
               React.createElement('div', { className:'flex items-start gap-3.5' },
-                React.createElement('span', { className:`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[a.tone]}` }, a.icon),
+                React.createElement('span', { className:`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[a.tone]}` }, renderIcon(a.icon)),
                 React.createElement('div', { className:'flex-1 min-w-0' },
                   React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
                     React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, a.name),
@@ -10431,7 +10436,7 @@ function TicketActionLibrary({ state, dispatch, q, setQ, openId, setOpenId }){
                   React.createElement('div', { className:'flex gap-3 mt-2 text-[11px] text-slate-400' },
                     React.createElement('span', null, a.steps.length + ' tasks'),
                     React.createElement('span', null, matching.length + ' matching ticket' + (matching.length===1?'':'s')))),
-                React.createElement('span', { className:'text-slate-300 flex-shrink-0' }, '\u2192'))
+                React.createElement('span', { className:'text-slate-300 flex-shrink-0' }, ''))
             );
           })
         )
@@ -10455,7 +10460,7 @@ function makeConditionNode(pillar, field){
 }
 function makeActionNode(actionId){
   const m = actionMeta(actionId);
-  return { id:flowId(), kind:'action', actionId, label:m?m.label:actionId, icon:m?m.icon:'\u2699',
+  return { id:flowId(), kind:'action', actionId, label:m?m.label:actionId, icon:m?m.icon:'',
            arg:'', body: isCommsAction(actionId) ? '' : null, channel: isCommsAction(actionId) ? ACTION_COMMS[actionId] : null };
 }
 
@@ -10492,8 +10497,8 @@ function flowPaths(list, acc){
   list.forEach(n => {
     if (n.kind === 'action') { out.push(acc.concat(n.label)); }
     else {
-      out = out.concat(flowPaths(n.yes, acc.concat('if ' + (fieldMeta(n.pillar,n.field)||{}).label + ' ' + n.op + ' ' + n.val + ' \u2192 yes')));
-      out = out.concat(flowPaths(n.no,  acc.concat('if ' + (fieldMeta(n.pillar,n.field)||{}).label + ' ' + n.op + ' ' + n.val + ' \u2192 no')));
+      out = out.concat(flowPaths(n.yes, acc.concat('if ' + (fieldMeta(n.pillar,n.field)||{}).label + ' ' + n.op + ' ' + n.val + '  yes')));
+      out = out.concat(flowPaths(n.no,  acc.concat('if ' + (fieldMeta(n.pillar,n.field)||{}).label + ' ' + n.op + ' ' + n.val + '  no')));
     }
   });
   return out;
@@ -10552,9 +10557,9 @@ function FlowNode({ node, ctx, depth, last }){
   if (node.kind === 'action') {
     return React.createElement('div', { className:'bg-white border border-slate-200 rounded-lg p-2 shadow-sm' },
       React.createElement('div', { className:'flex items-center gap-2' },
-        React.createElement('span', { className:'w-6 h-6 rounded-md bg-teal-50 text-teal-700 flex items-center justify-center text-xs flex-shrink-0' }, node.icon),
+        React.createElement('span', { className:'w-6 h-6 rounded-md bg-teal-50 text-teal-700 flex items-center justify-center text-xs flex-shrink-0' }, renderIcon(node.icon)),
         React.createElement('span', { className:'text-xs font-semibold text-slate-700 flex-1 min-w-0 truncate' }, node.label),
-        React.createElement('button', { onClick:()=>ctx.remove(node.id), className:'text-slate-300 hover:text-red-500 text-xs' }, '\u2715')),
+        React.createElement('button', { onClick:()=>ctx.remove(node.id), className:'text-slate-300 hover:text-red-500 text-xs' }, '')),
       React.createElement('input', { value:node.arg, onChange:e=>ctx.update(node.id,{arg:e.target.value}),
         placeholder:'target / template', className:'w-full mt-1.5 ' + inp }),
       node.channel && React.createElement('textarea', { value:node.body || '', rows:2,
@@ -10570,10 +10575,10 @@ function FlowNode({ node, ctx, depth, last }){
 
   return React.createElement('div', { className:'bg-white border border-amber-200 rounded-xl p-2.5 shadow-sm' },
     React.createElement('div', { className:'flex items-center gap-2 mb-2' },
-      React.createElement('span', { className:'w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center text-xs flex-shrink-0' }, '\u25C6'),
+      React.createElement('span', { className:'w-6 h-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center text-xs flex-shrink-0' }, ''),
       React.createElement('span', { className:'text-[10px] font-bold text-amber-700 uppercase tracking-wider' }, 'Condition'),
       React.createElement(CxPill, { tone:pm.tone }, pm.label),
-      React.createElement('button', { onClick:()=>ctx.remove(node.id), className:'ml-auto text-slate-300 hover:text-red-500 text-xs' }, '\u2715')),
+      React.createElement('button', { onClick:()=>ctx.remove(node.id), className:'ml-auto text-slate-300 hover:text-red-500 text-xs' }, '')),
 
     React.createElement('div', { className:'flex gap-1.5 flex-wrap mb-2.5' },
       React.createElement('select', { value:node.pillar, className:inp + ' w-20',
@@ -10679,7 +10684,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
 
   return React.createElement('div', { className:'space-y-4' },
     React.createElement('div', { className:'flex items-center justify-between gap-3 flex-wrap' },
-      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, '\u2190 Back to actions'),
+      React.createElement('button', { onClick:onBack, className:'text-sm text-indigo-600 hover:underline' }, 'Back to actions'),
       React.createElement('div', { className:'flex items-center gap-2' },
         React.createElement(AdminToggle, { on:enabled, onChange:setEnabled, label:enabled?'Enabled':'Disabled' }),
         React.createElement(Btn, { variant:'primary', size:'xs', disabled:!name.trim() || counts.actions===0,
@@ -10693,11 +10698,11 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
         React.createElement('div', { className:'flex gap-1 mb-3' },
           ACTION_PILLARS.map(p => React.createElement('button', { key:p.id, onClick:()=>setPillar(p.id),
             className:`flex-1 px-2 py-1 text-[11px] font-semibold rounded-lg border transition-colors ${pillar===p.id?'bg-slate-900 text-white border-slate-900':'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}` },
-            p.icon + ' ' + p.label))),
+            p.label))),
 
         React.createElement('div', { className:'rounded-xl border border-indigo-200 bg-indigo-50/40 p-2.5 mb-2.5' },
           React.createElement('div', { className:'flex items-center gap-1.5 mb-1' },
-            React.createElement('span', { className:'w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center text-[10px]' }, '\u25B6'),
+            React.createElement('span', { className:'w-5 h-5 rounded-md bg-indigo-600 text-white flex items-center justify-center text-[10px]' }, ''),
             React.createElement('span', { className:'text-[10px] font-bold text-indigo-700 uppercase tracking-wider' }, 'Event')),
           React.createElement('p', { className:'text-[10px] text-slate-500 mb-1.5' }, 'The attribute change that starts the workflow. One per action.'),
           React.createElement('div', { className:'flex flex-wrap gap-1 max-h-32 overflow-y-auto' },
@@ -10709,7 +10714,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
 
         React.createElement('div', { className:'rounded-xl border border-amber-200 bg-amber-50/40 p-2.5 mb-2.5' },
           React.createElement('div', { className:'flex items-center gap-1.5 mb-1' },
-            React.createElement('span', { className:'w-5 h-5 rounded-md bg-amber-500 text-white flex items-center justify-center text-[10px]' }, '\u25C6'),
+            React.createElement('span', { className:'w-5 h-5 rounded-md bg-amber-500 text-white flex items-center justify-center text-[10px]' }, ''),
             React.createElement('span', { className:'text-[10px] font-bold text-amber-700 uppercase tracking-wider' }, 'Condition')),
           React.createElement('p', { className:'text-[10px] text-slate-500 mb-1.5' }, 'Splits the flow into a yes and a no branch.'),
           React.createElement('div', { className:'flex flex-wrap gap-1 max-h-32 overflow-y-auto' },
@@ -10721,7 +10726,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
 
         React.createElement('div', { className:'rounded-xl border border-teal-200 bg-teal-50/40 p-2.5' },
           React.createElement('div', { className:'flex items-center gap-1.5 mb-1' },
-            React.createElement('span', { className:'w-5 h-5 rounded-md bg-teal-600 text-white flex items-center justify-center text-[10px]' }, '\u25A0'),
+            React.createElement('span', { className:'w-5 h-5 rounded-md bg-teal-600 text-white flex items-center justify-center text-[10px]' }, ''),
             React.createElement('span', { className:'text-[10px] font-bold text-teal-700 uppercase tracking-wider' }, 'Action')),
           React.createElement('p', { className:'text-[10px] text-slate-500 mb-1.5' }, 'What the workflow does when it reaches this point.'),
           React.createElement('div', { className:'space-y-1.5 max-h-56 overflow-y-auto pr-1' },
@@ -10732,7 +10737,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
                   onDragStart:startDragAction(a.id),
                   onClick:()=>setFlow(fl=>flowInsert(fl, null, null, makeActionNode(a.id))),
                   className:'px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-white border border-teal-200 text-teal-800 cursor-grab active:cursor-grabbing hover:ring-2 hover:ring-indigo-200 text-left' },
-                  a.icon + ' ' + a.label)))))))
+                  a.label)))))))
       ),
 
       React.createElement('div', { className:'col-span-3 space-y-4' },
@@ -10755,7 +10760,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
               className:`rounded-xl border-2 p-3 transition-colors ${overZone==='trigger'?'border-indigo-400 bg-indigo-50/70 border-dashed':'border-indigo-200 bg-indigo-50/40'}`
             },
             React.createElement('div', { className:'flex items-center gap-2 mb-2 flex-wrap' },
-              React.createElement('span', { className:'w-6 h-6 rounded-md bg-indigo-600 text-white flex items-center justify-center text-[10px]' }, '\u25B6'),
+              React.createElement('span', { className:'w-6 h-6 rounded-md bg-indigo-600 text-white flex items-center justify-center text-[10px]' }, ''),
               React.createElement('span', { className:'text-[10px] font-bold text-indigo-700 uppercase tracking-wider' }, 'Event'),
               React.createElement(CxPill, { tone:pm.tone }, pm.label),
               React.createElement('span', { className:'text-[10px] text-slate-400 ml-auto' }, 'Drop an event block to change this')),
@@ -10769,7 +10774,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
 
           React.createElement('div', { className:'flex flex-col items-center py-1' },
             React.createElement('span', { className:'w-px h-4 bg-slate-300' }),
-            React.createElement('span', { className:'text-[10px] text-slate-400' }, '\u25BC')),
+            React.createElement('span', { className:'text-[10px] text-slate-400' }, '')),
 
           React.createElement('div', { className:'overflow-x-auto pb-2' },
             React.createElement(FlowBranch, { list:flow, parentId:null, branch:null, ctx, depth:0 }))),
@@ -10798,7 +10803,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
             ? React.createElement('p', { className:'text-xs text-slate-400 italic' }, 'Add at least one action so the workflow does something')
             : React.createElement('div', { className:'space-y-1' },
                 flowPaths(flow).slice(0,8).map((p,i)=>React.createElement('p', { key:i, className:'text-[11px] text-slate-600' },
-                  React.createElement('span',{className:'text-slate-400'},(i+1)+'. '), p.join('  \u2192  ')))),
+                  React.createElement('span',{className:'text-slate-400'},(i+1)+'. '), p.join('    ')))),
           React.createElement('p', { className:'text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-100' },
             'Runs on ' + (scope==='selected' ? accountIds.length + ' selected account(s)' : myAccounts.length + ' account(s) you own') + '.'))
       )
@@ -10818,7 +10823,7 @@ function ActionBuilder({ action, ownerId, customers, onBack, onSave, dispatch })
           React.createElement('div', { className:'flex flex-wrap gap-1.5 max-h-48 overflow-y-auto' },
             AUTO_ACTIONS.flatMap(g=>g.items).map(a=>React.createElement('button', { key:a.id,
               onClick:()=>{ setFlow(fl=>flowInsert(fl, picker.parentId, picker.branch, makeActionNode(a.id))); setPicker(null); },
-              className:'px-2 py-1 rounded-md text-[11px] font-semibold bg-teal-50 text-teal-700' }, a.icon + ' ' + a.label)))))
+              className:'px-2 py-1 rounded-md text-[11px] font-semibold bg-teal-50 text-teal-700' }, a.label)))))
     )
   );
 }
@@ -10846,7 +10851,7 @@ function ActionsOverviewAdmin({ onBack, dispatch, state }){
       React.createElement(CxLabel, null, 'Actions performed'),
       React.createElement('div', { className:'space-y-1.5' },
         open.steps.map(st=>React.createElement('div', { key:st.key, className:'flex items-center gap-2.5' },
-          React.createElement('span', { className:'w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-xs flex-shrink-0' }, st.icon),
+          React.createElement('span', { className:'w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center text-xs flex-shrink-0' }, renderIcon(st.icon)),
           React.createElement('span', { className:'text-sm text-slate-700 flex-1' }, st.label),
           st.arg && React.createElement('span', { className:'text-xs text-slate-400' }, st.arg))))),
     React.createElement(Card, { className:'p-4' },
@@ -10899,7 +10904,7 @@ function ActionsOverviewAdmin({ onBack, dispatch, state }){
                       a.scope === 'selected' ? (a.accountIds||[]).length + ' selected' : actionAccountCount(a, state.customers) + ' own accounts'),
                     React.createElement('td', { className:'px-4 py-3 text-xs text-slate-600' }, a.runs || 0),
                     React.createElement('td', { className:'px-4 py-3' }, React.createElement(CxPill, { tone:a.enabled?'green':'slate' }, a.enabled?'Yes':'No')),
-                    React.createElement('td', { className:'px-4 py-3 text-right text-slate-300' }, '\u2192'));
+                    React.createElement('td', { className:'px-4 py-3 text-right text-slate-300' }, ''));
                 })
           ))))
   );
@@ -10947,7 +10952,7 @@ function ActionsPage(){
 
     shown.length === 0
       ? React.createElement(Card, { className:'p-12 text-center' },
-          React.createElement('p', { className:'text-3xl mb-2' }, '\u26A1'),
+          React.createElement('p', { className:'text-3xl mb-2' }, ''),
           React.createElement('p', { className:'text-sm text-slate-500' }, actions.length === 0
             ? 'No actions published yet \u2014 your admin clones customer automations here'
             : 'No actions match that filter')
@@ -10959,25 +10964,25 @@ function ActionsPage(){
             const comms = a.steps.filter(s=>s.editable).length;
             return React.createElement(Card, { key:a.id, className:'p-4 hover:border-indigo-300 transition-colors cursor-pointer', onClick:()=>setOpenId(a.id) },
               React.createElement('div', { className:'flex items-start gap-3.5' },
-                React.createElement('span', { className:`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[pm.tone]}` }, pm.icon),
+                React.createElement('span', { className:`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${ADMIN_TONES[pm.tone]}` }, renderIcon(pm.icon)),
                 React.createElement('div', { className:'flex-1 min-w-0' },
                   React.createElement('div', { className:'flex items-center gap-2 flex-wrap' },
                     React.createElement('p', { className:'text-sm font-semibold text-slate-900' }, a.name),
                     React.createElement(CxPill, { tone:a.enabled?'green':'slate' }, a.enabled?'Active':'Paused'),
-                    comms > 0 && React.createElement(CxPill, { tone:'blue' }, '\u270E ' + comms + ' editable message' + (comms===1?'':'s'))
+                    comms > 0 && React.createElement(CxPill, { tone:'blue' }, ' ' + comms + ' editable message' + (comms===1?'':'s'))
                   ),
                   React.createElement('p', { className:'text-xs text-slate-500 mt-1' },
                     React.createElement('span', { className:'font-semibold text-slate-600' }, 'When: '),
                     (f?f.label:a.event.field) + ' ' + modeLabel(a.event.mode) + (a.event.to ? ' ' + a.event.to : '') +
                     (a.conditions.length ? ' \u00b7 ' + a.conditions.length + ' condition' + (a.conditions.length===1?'':'s') : '')),
                   React.createElement('div', { className:'flex gap-1.5 flex-wrap mt-2' },
-                    a.steps.slice(0,4).map(st => React.createElement(CxPill, { key:st.key, tone: st.editable?'blue':'slate' }, st.icon + ' ' + st.label)),
+                    a.steps.slice(0,4).map(st => React.createElement(CxPill, { key:st.key, tone: st.editable?'blue':'slate' }, st.label)),
                     a.steps.length > 4 && React.createElement(CxPill, { tone:'slate' }, '+' + (a.steps.length-4) + ' more'))
                 ),
                 React.createElement('div', { className:'flex flex-col items-end gap-1 flex-shrink-0' },
                   React.createElement('span', { className:'text-[10px] text-slate-400' }, a.runs + ' runs'),
                   React.createElement('span', { className:'text-[10px] text-slate-400' }, a.lastRun),
-                  React.createElement('span', { className:'text-slate-300 mt-1' }, '\u2192'))
+                  React.createElement('span', { className:'text-slate-300 mt-1' }, ''))
               )
             );
           })
@@ -11046,7 +11051,7 @@ function RolesAdmin({ onBack, dispatch }){
               ? React.createElement('p', { className:'text-xs text-slate-400 italic' }, 'None')
               : React.createElement('div', { className:'space-y-1.5 max-h-[420px] overflow-y-auto pr-1' },
                   list.map(p => React.createElement('div', { key:p.key, className:'flex items-start gap-2' },
-                    React.createElement('span', { className:`text-xs flex-shrink-0 mt-0.5 ${tone==='green'?'text-green-500':'text-slate-300'}` }, tone==='green'?'\u2713':'\u2715'),
+                    React.createElement('span', { className:`text-xs flex-shrink-0 mt-0.5 ${tone==='green'?'text-green-500':'text-slate-300'}` }, tone==='green'?'':''),
                     React.createElement('div', { className:'min-w-0' },
                       React.createElement('p', { className:'text-xs font-semibold text-slate-700' }, p.label),
                       React.createElement('p', { className:'text-[10px] text-slate-400' }, p.group + ' \u00b7 ' + p.key))
@@ -11121,7 +11126,7 @@ function RolesAdmin({ onBack, dispatch }){
                         className:`w-6 h-6 rounded-md border transition-colors ${granted(p,i)
                           ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
                           : 'bg-white border-slate-200 text-transparent hover:border-slate-400'}`
-                      }, '\u2713')
+                      }, '')
                     ))
                   ))
                 ))
@@ -11132,7 +11137,7 @@ function RolesAdmin({ onBack, dispatch }){
 
     React.createElement('p', { className:'text-[11px] text-slate-400' },
       shownCount + ' of ' + ALL_PRIVILEGES.length + ' privileges shown across ' + APP_ROLES.length + ' roles.' +
-      (Object.keys(grants).length ? '  \u00b7  ' + Object.keys(grants).length + ' privilege(s) modified \u2014 unsaved.' : ''))
+      (Object.keys(grants).length ? '  \u00b7' + Object.keys(grants).length + ' privilege(s) modified \u2014 unsaved.' : ''))
   );
 }
 
@@ -11152,13 +11157,13 @@ const AGENT_MAILBOXES = {
 };
 
 const EMAIL_AUTH_METHODS = [
-  { id:'oauth_google', label:'Google OAuth 2.0',  icon:'\u2709',    status:'enabled',
+  { id:'oauth_google', label:'Google OAuth 2.0',  icon:Mail,    status:'enabled',
     note:'Agents authorise Gmail and Calendar from Profile settings. Tokens refresh automatically.',
     detail:['Scopes: gmail.readonly, gmail.send, calendar.events','Token lifetime: 60 minutes, auto-refreshed','Consent screen: verified'] },
-  { id:'graph_ms',     label:'Microsoft Graph',   icon:'\u{1F4E7}', status:'enabled',
+  { id:'graph_ms',     label:'Microsoft Graph',   icon:Mail, status:'enabled',
     note:'Delegated Graph permissions for Outlook mail and calendar.',
     detail:['Scopes: Mail.Read, Mail.Send, Calendars.ReadWrite','Tenant: cx42.onmicrosoft.com','Admin consent: granted'] },
-  { id:'imap',         label:'IMAP / SMTP',       icon:'\u{1F5A5}', status:'disabled',
+  { id:'imap',         label:'IMAP / SMTP',       icon:Server, status:'disabled',
     note:'Manual server configuration. Less secure \u2014 only enable where OAuth is unavailable.',
     detail:['Requires per-agent app passwords','No calendar sync','Not recommended for new setups'] },
 ];
@@ -11292,7 +11297,7 @@ function EmailConfigAdmin({ onBack, dispatch, state }){
               React.createElement('td', { className:'px-4 py-2.5' }, React.createElement(CxPill, { tone:'slate' }, m.creates)),
               React.createElement('td', { className:'px-4 py-2.5 text-xs font-semibold text-slate-700' }, (m.received30d||0).toLocaleString()),
               React.createElement('td', { className:'px-4 py-2.5' },
-                React.createElement(CxPill, { tone:m.connected?'green':'amber' }, m.connected ? '\u25CF Connected' : '\u25CB Not connected')),
+                React.createElement(CxPill, { tone:m.connected?'green':'amber' }, m.connected ? 'Connected' : 'Not connected')),
               React.createElement('td', { className:'px-4 py-2.5 text-right whitespace-nowrap' },
                 React.createElement('button', { onClick:()=>setEditId(m.id), className:'text-xs text-indigo-600 hover:underline mr-3' }, 'Edit'),
                 !m.isDefault && React.createElement('button', { onClick:()=>dispatch({type:'UPDATE_SUPPORT_MAILBOX', id:m.id, patch:{ isDefault:true }, msg:m.address + ' is now the default'}),
@@ -11413,10 +11418,10 @@ function EmailConfigAdmin({ onBack, dispatch, state }){
         React.createElement(CxLabel, { right:React.createElement(CxPill,{tone:'slate'},'Worked example') }, 'How this plays out'),
         React.createElement('div', { className:'space-y-2' },
           [
-            ['1', 'Mon 09:00', 'Agent resolves SUP1842.', 'Ticket status \u2192 Resolved. Our outbound carries Message-ID <sup1842.a7f@acme.com>.', 'slate'],
-            ['2', 'Tue 11:20', 'Customer replies to that same email.', 'In-Reply-To matches, and 1 day is inside the ' + thr.reopenWindowDays + '-day window \u2192 SUP1842 reopens. No duplicate.', 'green'],
-            ['3', 'Day ' + (thr.reopenWindowDays + 12), 'Customer replies again to the same thread.', 'Header still matches but the reply is outside the ' + thr.reopenWindowDays + '-day window \u2192 a new ticket is created and linked to SUP1842.', 'amber'],
-            ['4', 'Wed 14:05', 'Customer writes a fresh email with no In-Reply-To header.', 'Nothing to match \u2192 new ticket, whatever the subject line says.', 'amber'],
+            ['1', 'Mon 09:00', 'Agent resolves SUP1842.', 'Ticket status  Resolved. Our outbound carries Message-ID <sup1842.a7f@acme.com>.', 'slate'],
+            ['2', 'Tue 11:20', 'Customer replies to that same email.', 'In-Reply-To matches, and 1 day is inside the ' + thr.reopenWindowDays + '-day window  SUP1842 reopens. No duplicate.', 'green'],
+            ['3', 'Day ' + (thr.reopenWindowDays + 12), 'Customer replies again to the same thread.', 'Header still matches but the reply is outside the ' + thr.reopenWindowDays + '-day window  a new ticket is created and linked to SUP1842.', 'amber'],
+            ['4', 'Wed 14:05', 'Customer writes a fresh email with no In-Reply-To header.', 'Nothing to match  new ticket, whatever the subject line says.', 'amber'],
             ['5', 'Wed 15:40', 'Agent forwards the thread to billing@partner.com.', 'Forward is recorded on the ticket and the partner gets the quoted thread.', 'slate'],
             ['6', 'Thu 08:15', 'billing@partner.com replies.', thr.forwardRepliesAsNote
                 ? 'Attaches to SUP1842 as a private note. The customer never sees it and no new ticket is opened.'
@@ -11442,7 +11447,7 @@ function EmailConfigAdmin({ onBack, dispatch, state }){
     tab === 'loop' && React.createElement('div', { className:'space-y-4' },
       React.createElement(Card, { className:'p-4 bg-red-50/50 border-red-100' },
         React.createElement('div', { className:'flex items-start gap-3' },
-          React.createElement('span', { className:'text-lg' }, '\u26A0'),
+          React.createElement('span', { className:'text-lg' }, ''),
           React.createElement('div', null,
             React.createElement('p', { className:'text-sm font-semibold text-red-800' }, 'Safety critical \u2014 not a nice-to-have'),
             React.createElement('p', { className:'text-xs text-red-700 mt-0.5 leading-relaxed' },
@@ -11557,8 +11562,8 @@ function DomainTester({ cfg, customers }){
 // DKIM: generate a selector and TXT value, publish, verify, regenerate.
 function DkimPanel({ cfg, dispatch, domain, setDomain }){
   const d = cfg.dkim;
-  const statusPill = d.status === 'verified' ? React.createElement(CxPill,{tone:'green'},'\u2713 Published & verified')
-    : d.status === 'generated' ? React.createElement(CxPill,{tone:'amber'},'\u26A0 Generated, not published')
+  const statusPill = d.status === 'verified' ? React.createElement(CxPill,{tone:'green'},'Published & verified')
+    : d.status === 'generated' ? React.createElement(CxPill,{tone:'amber'},'Generated, not published')
     : React.createElement(CxPill,{tone:'slate'},'Not generated');
 
   const generate = () => {
@@ -11613,9 +11618,9 @@ function MailboxWizard({ open, onClose, dispatch, cfg }){
   const inp = 'w-full mt-1 text-sm border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-indigo-400';
   const lbl = 'text-[10px] font-bold text-slate-400 uppercase tracking-wider';
   const providers = [
-    { id:'o365',  label:'Microsoft 365', method:'Microsoft Graph', icon:'\u{1F4E7}', scopes:['Mail.Read','Mail.Send'] },
-    { id:'gmail', label:'Google Workspace', method:'OAuth 2.0',    icon:'\u2709',    scopes:['gmail.readonly','gmail.send'] },
-    { id:'imap',  label:'Other (IMAP/SMTP)', method:'IMAP / SMTP', icon:'\u{1F5A5}', scopes:['imap','smtp'] },
+    { id:'o365',  label:'Microsoft 365', method:'Microsoft Graph', icon:'', scopes:['Mail.Read','Mail.Send'] },
+    { id:'gmail', label:'Google Workspace', method:'OAuth 2.0',    icon:'',    scopes:['gmail.readonly','gmail.send'] },
+    { id:'imap',  label:'Other (IMAP/SMTP)', method:'IMAP / SMTP', icon:Server, scopes:['imap','smtp'] },
   ];
   const prov = providers.find(p=>p.id===d.provider) || providers[0];
   const domainOk = !d.address || (cfg.companyDomains||[]).some(x => emailDomainOf(d.address) === x.toLowerCase());
@@ -11648,7 +11653,7 @@ function MailboxWizard({ open, onClose, dispatch, cfg }){
         React.createElement('div', { className:'grid grid-cols-3 gap-3' },
           providers.map(p => React.createElement('button', { key:p.id, onClick:()=>setD(v=>({...v, provider:p.id})),
             className:`text-left border rounded-xl p-3 transition-all ${d.provider===p.id?'border-indigo-400 bg-indigo-50/50':'border-slate-200 hover:border-indigo-200'}` },
-            React.createElement('div', { className:'text-base mb-1' }, p.icon),
+            React.createElement('div', { className:'text-base mb-1' }, renderIcon(p.icon)),
             React.createElement('p', { className:'text-sm font-semibold text-slate-800' }, p.label),
             React.createElement('p', { className:'text-[11px] text-slate-500 mt-0.5' }, p.method)))),
         React.createElement('div', { className:'border border-slate-200 rounded-xl p-3' },
@@ -11852,7 +11857,7 @@ function UserManagementAdmin({ onBack, dispatch }){
             React.createElement('p', { className:'text-sm font-bold text-slate-900' }, u.name),
             React.createElement('p', { className:'text-xs text-slate-500' }, trail.length + ' session events recorded')),
           React.createElement(Btn, { variant:'secondary', size:'xs',
-            onClick:()=>dispatch && dispatch({type:'ADD_TOAST',msg:'Audit log exported',toastType:'success'}) }, '\u2b07 Export'))),
+            onClick:()=>dispatch && dispatch({type:'ADD_TOAST',msg:'Audit log exported',toastType:'success'}) }, 'Export'))),
       React.createElement(Card, { className:'overflow-hidden' },
         React.createElement('table', { className:'w-full text-sm' },
           React.createElement('thead', null, React.createElement('tr', { className:'bg-slate-50 border-b' },
@@ -11867,7 +11872,7 @@ function UserManagementAdmin({ onBack, dispatch }){
                   React.createElement('td', { className:'px-4 py-2.5 text-xs font-mono text-slate-600' }, e.ip),
                   React.createElement('td', { className:'px-4 py-2.5 text-xs text-slate-600' }, e.device),
                   React.createElement('td', { className:'px-4 py-2.5' },
-                    React.createElement('span', { className:`text-xs font-semibold ${e.ok?'text-green-600':'text-red-600'}` }, e.ok?'\u2713 Success':'\u2715 Failed'))
+                    React.createElement('span', { className:`text-xs font-semibold ${e.ok?'text-green-600':'text-red-600'}` }, e.ok?'Success':'Failed'))
                 ))
           )
         )
@@ -11904,7 +11909,7 @@ function UserManagementAdmin({ onBack, dispatch }){
             React.createElement('div', { className:'flex items-center gap-2' },
               React.createElement('label', { className:'text-[10px] font-bold text-slate-400 uppercase tracking-wider' }, f.label),
               f.req && React.createElement(CxPill, { tone:'amber' }, 'Required'),
-              f.system && React.createElement(CxPill, { tone:'slate' }, '\u{1F512} System')),
+              f.system && React.createElement(CxPill, { tone:'slate' }, 'System')),
             React.createElement('input', { defaultValue:fieldValue(openAgent, f.key), readOnly:f.system,
               className:'w-full mt-1 text-sm border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-indigo-400' + (f.system?' bg-slate-50 text-slate-500':'') }),
             React.createElement('p', { className:'text-[10px] text-slate-400 mt-1' }, f.type + ' \u00b7 used in ' + f.usage)
@@ -11952,8 +11957,8 @@ function UserManagementAdmin({ onBack, dispatch }){
                     React.createElement('td', { className:'px-4 py-3 text-xs text-slate-500 whitespace-nowrap' }, m.lastActive),
                     React.createElement('td', { className:'px-4 py-3 text-right whitespace-nowrap' },
                       React.createElement('button', { onClick:e=>{ e.stopPropagation(); setAuditFor(id); },
-                        className:'text-xs text-indigo-600 hover:underline mr-3' }, '\u{1F5D2} Audit log'),
-                      React.createElement('span', { className:'text-slate-300' }, '\u2192'))
+                        className:'text-xs text-indigo-600 hover:underline mr-3' }, 'Audit log'),
+                      React.createElement('span', { className:'text-slate-300' }, ''))
                   );
                 })
           )
@@ -11964,12 +11969,12 @@ function UserManagementAdmin({ onBack, dispatch }){
 }
 
 const ADMIN_SECTIONS = [
-  { id:'fields',      icon:'\u{1F5C3}', title:'Field Manager',       tone:'blue',   desc:'Define company, contact, task and goal attributes.' },
-  { id:'emailcfg',    icon:'\u2709',    title:'Email configuration', tone:'blue',   desc:'OAuth and Graph mailbox auth, forwarding addresses, and who has connected.' },
-  { id:'users',       icon:'\u{1F465}', title:'User management',     tone:'teal',   desc:'Invite CSMs individually and assign their role.' },
-  { id:'roles',       icon:'\u{1F511}', title:'Roles',               tone:'purple', desc:'Default roles and the individual privileges granted to each one.' },
-  { id:'connectors',  icon:'\u{1F50C}', title:'Connectors',          tone:'teal',   desc:'CRM, ticketing and product analytics integrations that sync account data.' },
-  { id:'signals',     icon:'\u{1F4E1}', title:'Signals',             tone:'amber',  desc:'Tune the signal sources that feed health scores \u2014 product usage and sentiment.' },
+  { id:'fields',      icon:'', title:'Field Manager',       tone:'blue',   desc:'Define company, contact, task and goal attributes.' },
+  { id:'emailcfg',    icon:'',    title:'Email configuration', tone:'blue',   desc:'OAuth and Graph mailbox auth, forwarding addresses, and who has connected.' },
+  { id:'users',       icon:'', title:'User management',     tone:'teal',   desc:'Invite CSMs individually and assign their role.' },
+  { id:'roles',       icon:'', title:'Roles',               tone:'purple', desc:'Default roles and the individual privileges granted to each one.' },
+  { id:'connectors',  icon:'', title:'Connectors',          tone:'teal',   desc:'CRM, ticketing and product analytics integrations that sync account data.' },
+  { id:'signals',     icon:'', title:'Signals',             tone:'amber',  desc:'Tune the signal sources that feed health scores \u2014 product usage and sentiment.' },
 ];
 
 function AdminPage() {
@@ -11998,7 +12003,7 @@ function AdminPage() {
   const counts = {
     fields:     Object.values(ADMIN_FIELDS).reduce((n,a)=>n+a.length,0) + ' fields \u00b7 6 objects',
     reqfields:  (gateFields(state.gateConfig||TICKET_GATE_DEFAULTS,'firstResponse').filter(f=>f.required).length) + ' on reply · ' + (gateFields(state.gateConfig||TICKET_GATE_DEFAULTS,'resolution').filter(f=>f.required).length) + ' on resolve',
-    emailcfg:   ((state.supportMailboxes||SUPPORT_MAILBOXES).length) + ' support · ' + Object.values(AGENT_MAILBOXES).filter(m=>m.connected).length + ' CSM mailboxes',
+    emailcfg:   ((state.supportMailboxes||SUPPORT_MAILBOXES).length) + ' support · ' + Object.values(AGENT_MAILBOXES).filter(m=>m.connected).length + 'CSM mailboxes',
     users:      Object.keys(USERS).length + ' agents \u00b7 ' + new Set(Object.values(AGENT_META).map(m=>m.roleLabel)).size + ' roles',
     roles:      APP_ROLES.length + ' roles \u00b7 ' + ALL_PRIVILEGES.length + ' privileges',
     automation: AUTOMATIONS.filter(a=>a.pillar==='ticket').length + ' ticket automations',
@@ -12028,7 +12033,7 @@ function AdminPage() {
 
 function ComingSoon({ feature }) {
   return React.createElement(Card, { className:'p-12 text-center' },
-    React.createElement('div', { className:'w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4' }, '🚧'),
+    React.createElement('div', { className:'w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4' }, ''),
     React.createElement('h3', { className:'text-lg font-semibold text-slate-900' }, feature),
     React.createElement('p', { className:'text-slate-500 text-sm mt-2' }, 'This feature is available in the full product.')
   );

@@ -104,7 +104,7 @@ export function AppShell({
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
 
       {state.assistantOpen && (
-        <div className="cx-legacy w-96 shrink-0 overflow-y-auto border-l border-border-default bg-panel">
+        <div className="w-96 shrink-0 border-l border-border-default">
           {assistant}
         </div>
       )}

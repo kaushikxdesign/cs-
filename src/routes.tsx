@@ -5,9 +5,8 @@ import { AppShell } from '@/layout/AppShell';
 import { pageTitle } from '@/layout/nav';
 import { EmptyState } from '@/design-system';
 import { FileQuestion } from 'lucide-react';
-import {
-  AssistantPanel, PortalPreview,
-} from '@/legacy/app';
+import { AssistantPanel } from '@/features/assistant/AssistantPanel';
+import { PortalPreview } from '@/features/portal/PortalPreview';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { AdminPage } from '@/features/admin/AdminPage';
 import { MyWorkPage } from '@/features/work/MyWorkPage';
@@ -84,11 +83,9 @@ export function AppRoutes() {
   // Portal preview is customer-facing: it renders without any of the shell.
   if (pathname.startsWith('/portal-preview')) {
     return (
-      <div className="cx-legacy">
-        <Routes>
-          <Route path="/portal-preview/:customerId" element={<PortalPreview />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/portal-preview/:customerId" element={<PortalPreview />} />
+      </Routes>
     );
   }
 
