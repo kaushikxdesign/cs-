@@ -6,13 +6,17 @@ import { pageTitle } from '@/layout/nav';
 import { EmptyState } from '@/design-system';
 import { FileQuestion } from 'lucide-react';
 import {
-  ActionsPage, AssistantPanel, ConnectorsAdmin, Customer360,
-  DrivePage, ExecutiveDashboard, GoalDetail, HealthPortfolio,
+  AssistantPanel, ConnectorsAdmin,
+  ExecutiveDashboard, HealthPortfolio,
   ManagerDashboard, PortalPreview, ProfileSettings,
 } from '@/legacy/app';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { AdminPage } from '@/features/admin/AdminPage';
 import { MyWorkPage } from '@/features/work/MyWorkPage';
+import { Customer360Page } from '@/features/customer/Customer360Page';
+import { GoalDetailPage } from '@/features/goals/GoalDetailPage';
+import { DrivePage as DriveScreen } from '@/features/drive/DrivePage';
+import { ActionsPage as ActionsScreen } from '@/features/actions/ActionsPage';
 import { InboxPage } from '@/features/inbox/InboxPage';
 import { CustomersPage } from '@/features/customers/CustomersPage';
 import { RisksPage } from '@/features/pipeline/RisksPage';
@@ -65,16 +69,16 @@ function ShellRoutes() {
                 route, so every ticket row landed on the 404. */}
             <Route path="/tickets" element={<InboxPage />} />
             <Route path="/customers" element={<CustomersPage />} />
-            <Route path="/customers/:customerId" element={<Legacy><Customer360 /></Legacy>} />
+            <Route path="/customers/:customerId" element={<Customer360Page />} />
             <Route path="/health" element={<Legacy><HealthPortfolio /></Legacy>} />
             <Route path="/renewals" element={<RenewalsPage />} />
             <Route path="/risks" element={<RisksPage />} />
             <Route path="/expansion" element={<ExpansionPage />} />
             <Route path="/profile" element={<Legacy><ProfileSettings /></Legacy>} />
-            <Route path="/actions" element={<Legacy><ActionsPage /></Legacy>} />
-            <Route path="/drive" element={<Legacy><DrivePage /></Legacy>} />
-            <Route path="/qbrs" element={<Legacy><DrivePage /></Legacy>} />
-            <Route path="/goals/:goalId" element={<Legacy><GoalDetail /></Legacy>} />
+            <Route path="/actions" element={<ActionsScreen />} />
+            <Route path="/drive" element={<DriveScreen />} />
+            <Route path="/qbrs" element={<DriveScreen />} />
+            <Route path="/goals/:goalId" element={<GoalDetailPage />} />
             <Route path="/manager" element={<Legacy><ManagerDashboard /></Legacy>} />
             <Route path="/executive" element={<Legacy><ExecutiveDashboard /></Legacy>} />
             <Route path="/admin" element={<AdminPage />} />
