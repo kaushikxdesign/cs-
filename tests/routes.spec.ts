@@ -126,3 +126,36 @@ test('the theme switcher stamps the root and survives a reload', async ({ page }
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
+
+/**
+ * No emoji may reach the rendered interface. The MVP used 220+ glyphs as
+ * icons and the seed data still carries them on action steps and admin
+ * entities, so this asserts against the DOM rather than the source — the
+ * only place that actually proves it.
+ */
+const EMOJI = /[\u{1F300}-\u{1FAFF}\u{2190}-\u{21FF}\u{2460}-\u{27BF}\u{2B00}-\u{2BFF}\u{25A0}-\u{25FF}\u{FE0F}]/u;
+
+const EMOJI_ROUTES = [
+  '/dashboard', '/work', '/tickets', '/customers', '/customers/acme',
+  '/goals/g1', '/risks', '/expansion', '/renewals', '/health',
+  '/manager', '/executive', '/actions', '/drive', '/profile',
+  '/admin', '/admin/connectors',
+];
+
+for (const route of EMOJI_ROUTES) {
+  test(`no emoji on ${route}`, async ({ page }) => {
+    await page.goto(`/#${route}`, { waitUntil: 'networkidle' });
+    const text = await page.locator('#root').innerText();
+    const found = [...text].filter((ch) => EMOJI.test(ch));
+    expect(found, `emoji rendered: ${[...new Set(found)].join(' ')}`).toEqual([]);
+  });
+}
+
+test('the assistant panel is reachable from the rail', async ({ page }) => {
+  await page.goto('/#/dashboard', { waitUntil: 'networkidle' });
+  await page.locator('button[aria-label="CX42 Assistant"]').click();
+  await expect(page.locator('button[aria-label="CX42 Assistant"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+});

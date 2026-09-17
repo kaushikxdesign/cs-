@@ -75,6 +75,10 @@ export function InboxPage() {
       <TicketConversation
         ticket={selected}
         customerName={customer?.name}
+        following={(state.followedTickets ?? []).includes(selected?.id ?? '')}
+        onToggleFollow={() =>
+          selected && dispatch({ type: 'TOGGLE_FOLLOW_TICKET', ticketId: selected.id })
+        }
         onClose={() =>
           dispatch({ type: 'ADD_TOAST', msg: 'Conversation closed.', toastType: 'success' })
         }

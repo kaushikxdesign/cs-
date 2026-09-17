@@ -3,7 +3,7 @@ import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
 import { PageHeader } from '@/design-system';
 import {
-  ActionsOverviewAdmin, AssignmentAdmin, AutomationAdmin, ConnectorsAdmin, DriveAdmin,
+  ActionsOverviewAdmin, AssignmentAdmin, AutomationAdmin, DriveAdmin,
   EmailConfigAdmin, FieldManagerAdmin, NotificationsAdmin, RequiredFieldsAdmin, RolesAdmin,
   SignalsAdmin, SlaAdmin, UserManagementAdmin,
 } from '@/legacy/app';
@@ -33,7 +33,6 @@ const SECTIONS: Section[] = [
   { id: 'automation', title: 'Automation', description: 'Triggers that run without a person starting them.', Component: AutomationAdmin },
   { id: 'actionsview', title: 'Actions overview', description: 'Every action in the library and who authored it.', Component: ActionsOverviewAdmin },
   { id: 'drive', title: 'Drive', description: 'Templates available to QBRs, goals and plans.', Component: DriveAdmin },
-  { id: 'connectors', title: 'Connectors', description: 'CRM, ticketing and product analytics integrations.', Component: ConnectorsAdmin },
 ];
 
 export function AdminPage() {

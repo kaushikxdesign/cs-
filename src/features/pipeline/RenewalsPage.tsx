@@ -2,9 +2,9 @@ import React from 'react';
 import { CalendarCheck } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
-import { Badge, DataTable, EmptyState, MetricCard, PageHeader, type Column, type Tone } from '@/design-system';
+import { Badge, DataTable, EmptyState, MetricCard, PageHeader, Select, type Column } from '@/design-system';
 import { RENEWALS, USERS } from '@/data/core';
-import { formatCurrency, formatDate, healthTone, titleCase } from '@/lib/format';
+import { formatCurrency, formatDate, healthTone } from '@/lib/format';
 
 interface RenewalRow {
   id: string;
@@ -21,15 +21,15 @@ interface RenewalRow {
   nextStep: string;
 }
 
-function forecastTone(f: string): Tone {
-  if (f === 'commit' || f === 'closed_won') return 'success';
-  if (f === 'at_risk') return 'danger';
-  if (f === 'best_case') return 'warning';
-  return 'neutral';
-}
+const FORECASTS = [
+  { value: 'commit', label: 'Commit' },
+  { value: 'best_case', label: 'Best case' },
+  { value: 'at_risk', label: 'At risk' },
+  { value: 'closed_won', label: 'Closed won' },
+];
 
 export function RenewalsPage() {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const navigate = useNavigate();
 
   const customersById = React.useMemo(
@@ -63,7 +63,18 @@ export function RenewalsPage() {
       key: 'forecast',
       header: 'Forecast',
       sortValue: (r) => r.forecast,
-      render: (r) => <Badge tone={forecastTone(r.forecast)}>{titleCase(r.forecast)}</Badge>,
+      render: (r) => (
+        <span onClick={(e) => e.stopPropagation()}>
+          <Select
+            value={r.forecast}
+            onValueChange={(forecast) =>
+              dispatch({ type: 'UPDATE_RENEWAL_FORECAST', renewalId: r.id, forecast })
+            }
+            options={FORECASTS}
+            className="h-7 w-32"
+          />
+        </span>
+      ),
     },
     {
       key: 'date',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Monitor, Moon, Sun } from 'lucide-react';
+import { Check, Monitor, Moon, Sparkles, Sun } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Avatar, CountBadge, DropdownMenu, Tooltip } from '@/design-system';
 import { useTheme } from '@/lib/theme';
@@ -54,12 +54,16 @@ export function NavRail({
   counts = {},
   onNavigate,
   onSwitchRole,
+  onToggleAssistant,
+  assistantOpen,
 }: {
   activeModuleId?: string;
   activeRole: string;
   counts?: Record<string, number>;
   onNavigate: (path: string) => void;
   onSwitchRole: (roleId: string, userId: string, path: string) => void;
+  onToggleAssistant: () => void;
+  assistantOpen?: boolean;
 }) {
   const { theme, setTheme } = useTheme();
   const userId = ROLES.find((r) => r.id === activeRole)?.userId ?? 'maya';
@@ -86,6 +90,22 @@ export function NavRail({
       ))}
 
       <div className="mt-auto flex flex-col items-center gap-1.5">
+        <Tooltip label="CX42 Assistant" side="right">
+          <button
+            aria-label="CX42 Assistant"
+            aria-pressed={assistantOpen}
+            onClick={onToggleAssistant}
+            className={cn(
+              'flex size-9 items-center justify-center rounded-lg transition-colors duration-[120ms]',
+              assistantOpen
+                ? 'bg-surface text-accent shadow-sm'
+                : 'text-on-surface-muted hover:bg-hover hover:text-on-surface',
+            )}
+          >
+            <Sparkles className="size-[1.125rem]" strokeWidth={1.75} />
+          </button>
+        </Tooltip>
+
         <Tooltip label={theme === 'dark' ? 'Switch to light' : 'Switch to dark'} side="right">
           <button
             aria-label="Toggle theme"

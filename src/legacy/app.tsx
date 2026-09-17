@@ -12141,10 +12141,6 @@ export {
   ErrorBoundary,
   // Screens, consumed by src/routes.tsx while they still live here.
   // Each name disappears from this list as its screen is rebuilt.
-  HealthPortfolio,
-  ProfileSettings,
-  ManagerDashboard,
-  ExecutiveDashboard,
   ConnectorsAdmin,
   // Admin sub-screens. Seven of these were unreachable in the MVP: they were
   // wired into AdminPage's if-chain but had no tile in ADMIN_SECTIONS.

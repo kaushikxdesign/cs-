@@ -6,9 +6,7 @@ import { pageTitle } from '@/layout/nav';
 import { EmptyState } from '@/design-system';
 import { FileQuestion } from 'lucide-react';
 import {
-  AssistantPanel, ConnectorsAdmin,
-  ExecutiveDashboard, HealthPortfolio,
-  ManagerDashboard, PortalPreview, ProfileSettings,
+  AssistantPanel, PortalPreview,
 } from '@/legacy/app';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { AdminPage } from '@/features/admin/AdminPage';
@@ -17,6 +15,10 @@ import { Customer360Page } from '@/features/customer/Customer360Page';
 import { GoalDetailPage } from '@/features/goals/GoalDetailPage';
 import { DrivePage as DriveScreen } from '@/features/drive/DrivePage';
 import { ActionsPage as ActionsScreen } from '@/features/actions/ActionsPage';
+import { HealthBoardPage } from '@/features/health/HealthBoardPage';
+import { ManagerDashboardPage, ExecutiveDashboardPage } from '@/features/dashboard/RollupDashboards';
+import { ProfileSettingsPage } from '@/features/profile/ProfileSettingsPage';
+import { ConnectorsPage } from '@/features/connectors/ConnectorsPage';
 import { InboxPage } from '@/features/inbox/InboxPage';
 import { CustomersPage } from '@/features/customers/CustomersPage';
 import { RisksPage } from '@/features/pipeline/RisksPage';
@@ -41,20 +43,6 @@ function NotFound() {
   );
 }
 
-/**
- * Screens not yet rebuilt still paint their own headers and rely on Tailwind
- * v3 border defaults, so each is wrapped in .cx-legacy with the page padding
- * the old shell used to provide. Rebuilt screens render bare and own their
- * full height — which is what the three-pane inbox needs.
- */
-function Legacy({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
-      <div className="cx-legacy p-6">{children}</div>
-    </div>
-  );
-}
-
 function ShellRoutes() {
   const { pathname } = useLocation();
   return (
@@ -70,20 +58,20 @@ function ShellRoutes() {
             <Route path="/tickets" element={<InboxPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/customers/:customerId" element={<Customer360Page />} />
-            <Route path="/health" element={<Legacy><HealthPortfolio /></Legacy>} />
+            <Route path="/health" element={<HealthBoardPage />} />
             <Route path="/renewals" element={<RenewalsPage />} />
             <Route path="/risks" element={<RisksPage />} />
             <Route path="/expansion" element={<ExpansionPage />} />
-            <Route path="/profile" element={<Legacy><ProfileSettings /></Legacy>} />
+            <Route path="/profile" element={<ProfileSettingsPage />} />
             <Route path="/actions" element={<ActionsScreen />} />
             <Route path="/drive" element={<DriveScreen />} />
             <Route path="/qbrs" element={<DriveScreen />} />
             <Route path="/goals/:goalId" element={<GoalDetailPage />} />
-            <Route path="/manager" element={<Legacy><ManagerDashboard /></Legacy>} />
-            <Route path="/executive" element={<Legacy><ExecutiveDashboard /></Legacy>} />
+            <Route path="/manager" element={<ManagerDashboardPage />} />
+            <Route path="/executive" element={<ExecutiveDashboardPage />} />
             <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/connectors" element={<Legacy><ConnectorsAdmin /></Legacy>} />
-            <Route path="*" element={<Legacy><NotFound /></Legacy>} />
+            <Route path="/admin/connectors" element={<ConnectorsPage />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
       </div>
     </AppShell>

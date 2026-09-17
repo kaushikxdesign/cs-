@@ -2,7 +2,7 @@ import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
-import { Badge, DataTable, EmptyState, FilterBar, PageHeader, type Column, type Tone } from '@/design-system';
+import { Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, type Column, type Tone } from '@/design-system';
 import { USERS } from '@/data/core';
 import { formatCurrency, titleCase } from '@/lib/format';
 
@@ -25,7 +25,7 @@ function confidenceTone(c: string): Tone {
 }
 
 export function ExpansionPage() {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const { query } = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = React.useState('');
@@ -130,6 +130,25 @@ export function ExpansionPage() {
             columns={columns}
             rowKey={(o) => o.id}
             onRowClick={(o) => navigate(`/customers/${o.customerId}`)}
+            rowActions={(o) =>
+              o.qualificationStatus === 'candidate' ? (
+                <Button
+                  size="xs"
+                  variant="secondary"
+                  onClick={() => dispatch({ type: 'QUALIFY_EXPANSION', oppId: o.id })}
+                >
+                  Qualify
+                </Button>
+              ) : o.crmOpportunityState === 'none' ? (
+                <Button
+                  size="xs"
+                  variant="secondary"
+                  onClick={() => dispatch({ type: 'CREATE_CRM_OPP', oppId: o.id })}
+                >
+                  Create opp
+                </Button>
+              ) : null
+            }
             empty={
               <EmptyState
                 icon={<TrendingUp className="size-6" strokeWidth={1.5} />}

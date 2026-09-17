@@ -1,9 +1,10 @@
 import React from 'react';
-import { CalendarDays, CheckCircle2, Crosshair, Zap } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Crosshair, Plus, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import {
-  Avatar, Badge, Checkbox, EmptyState, PageHeader, SearchInput, SegmentedControl, Tabs, Tooltip,
+  Avatar, Badge, Button, Checkbox, Dialog, EmptyState, Field, Input, PageHeader, SearchInput,
+  SegmentedControl, Tabs, Textarea, Tooltip,
 } from '@/design-system';
 import { GOALS, MEETINGS, USERS } from '@/data/core';
 import { relativeDue, daysFromToday } from '@/lib/demoDate';
@@ -125,6 +126,9 @@ export function MyWorkPage() {
   const [search, setSearch] = React.useState('');
   const [openId, setOpenId] = React.useState<string | null>(null);
   const [showDone, setShowDone] = React.useState(false);
+  const [composeOpen, setComposeOpen] = React.useState(false);
+  const [draftTitle, setDraftTitle] = React.useState('');
+  const [draftNote, setDraftNote] = React.useState('');
 
   const customersById = React.useMemo(
     () => Object.fromEntries((state.customers ?? []).map((c: any) => [c.id, c])),
@@ -193,6 +197,16 @@ export function MyWorkPage() {
             )}
           </>
         }
+        actions={
+          <Button
+            variant="solid"
+            size="sm"
+            icon={<Plus className="size-4" strokeWidth={2} />}
+            onClick={() => setComposeOpen(true)}
+          >
+            New task
+          </Button>
+        }
         tabs={
           <Tabs
             value={tab}
@@ -233,10 +247,11 @@ export function MyWorkPage() {
           ) : tab === 'email' ? (
             <ul className="space-y-1">
               {emails.map((e: any) => (
-                <li
-                  key={e.id}
-                  className="flex items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors duration-[120ms] hover:bg-hover"
-                >
+                <li key={e.id}>
+                  <button
+                    onClick={() => dispatch({ type: 'MARK_EMAIL_READ', emailId: e.id })}
+                    className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors duration-[120ms] hover:bg-hover"
+                  >
                   <Avatar name={e.from} size="lg" className="shrink-0" />
                   <div className="min-w-0 flex-1">
                     <p
@@ -250,9 +265,10 @@ export function MyWorkPage() {
                     <p className="mt-0.5 truncate text-caption text-on-surface-subtle">{e.subject}</p>
                   </div>
                   {e.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
-                  <span className="w-20 shrink-0 text-right text-caption tabular-nums text-on-surface-subtle">
-                    {e.ago}
-                  </span>
+                    <span className="w-20 shrink-0 text-right text-caption tabular-nums text-on-surface-subtle">
+                      {e.ago}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -321,6 +337,51 @@ export function MyWorkPage() {
           )}
         </div>
       </div>
+
+      <Dialog
+        open={composeOpen}
+        onOpenChange={setComposeOpen}
+        title="New task"
+        description="Tasks you create yourself appear without an Action marker."
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setComposeOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="solid"
+              disabled={!draftTitle.trim()}
+              onClick={() => {
+                dispatch({
+                  type: 'CREATE_TASK',
+                  title: draftTitle.trim(),
+                  description: draftNote.trim(),
+                  source: 'manual',
+                });
+                setDraftTitle('');
+                setDraftNote('');
+                setComposeOpen(false);
+              }}
+            >
+              Create task
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-3">
+          <Field label="Title">
+            <Input
+              value={draftTitle}
+              onChange={(e) => setDraftTitle(e.target.value)}
+              placeholder="What needs doing?"
+              autoFocus
+            />
+          </Field>
+          <Field label="Notes" hint="Optional context for whoever picks this up.">
+            <Textarea value={draftNote} onChange={(e) => setDraftNote(e.target.value)} />
+          </Field>
+        </div>
+      </Dialog>
 
       <TaskDrawer
         task={openTask}

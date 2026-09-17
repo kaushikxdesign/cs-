@@ -1,5 +1,5 @@
 import React from 'react';
-import { PanelLeftClose, Plus, Search } from 'lucide-react';
+import { Command, PanelLeftClose, Plus, Search } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { IconButton, Kbd, Tooltip } from '@/design-system';
 import type { NavModule } from './nav';
@@ -109,7 +109,9 @@ export function SecondaryNav({
         >
           <Plus className="size-3.5" strokeWidth={1.75} />
           Jump to…
-          <Kbd className="ml-auto">⌘K</Kbd>
+          <Kbd className="ml-auto gap-0.5 px-1">
+            <Command className="size-3" strokeWidth={2} />K
+          </Kbd>
         </button>
       </div>
     </div>

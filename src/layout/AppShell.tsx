@@ -81,6 +81,8 @@ export function AppShell({
         activeRole={state.activeRole}
         counts={railCounts}
         onNavigate={navigate}
+        assistantOpen={state.assistantOpen}
+        onToggleAssistant={() => dispatch({ type: 'TOGGLE_ASSISTANT' })}
         onSwitchRole={(roleId, userId, path) => {
           dispatch({ type: 'SWITCH_ROLE', role: roleId, userId });
           navigate(path);
@@ -101,7 +103,11 @@ export function AppShell({
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
 
-      {state.assistantOpen && assistant}
+      {state.assistantOpen && (
+        <div className="cx-legacy w-96 shrink-0 overflow-y-auto border-l border-border-default bg-panel">
+          {assistant}
+        </div>
+      )}
 
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} items={commands} />
       <ToastViewport

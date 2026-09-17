@@ -2,12 +2,13 @@ import React from 'react';
 import {
   Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { ArrowRight, ListTodo } from 'lucide-react';
+import { ArrowRight, Clock, ListTodo, X } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
 import {
   AXIS_PROPS, Avatar, Badge, Button, Card, CardHeader, ChartCard, EmptyState, GRID_PROPS,
-  MetricCard, PageHeader, STATUS_CHART_COLORS, TOOLTIP_PROPS, Tabs,
+  IconButton, MetricCard, PageHeader, STATUS_CHART_COLORS, TOOLTIP_PROPS, Tabs,
+  Tooltip as UITooltip,
 } from '@/design-system';
 import { HEALTH_SIGNALS, RENEWALS, USERS } from '@/data/core';
 import { formatCurrency, formatDate, severityTone } from '@/lib/format';
@@ -19,7 +20,7 @@ const BANDS = [
 ];
 
 export function DashboardPage() {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const navigate = useNavigate();
   const [taskTab, setTaskTab] = React.useState('todo');
 
@@ -59,13 +60,18 @@ export function DashboardPage() {
     return points;
   }, [customers]);
 
+  const hidden = React.useMemo(
+    () => new Set([...(state.dismissedPriority ?? []), ...(state.snoozedPriority ?? [])]),
+    [state.dismissedPriority, state.snoozedPriority],
+  );
+
   const priority = React.useMemo(
     () =>
       risks
-        .filter((r) => r.status !== 'resolved')
+        .filter((r) => r.status !== 'resolved' && !hidden.has(r.id))
         .sort((a, b) => (b.amountAtRisk ?? 0) - (a.amountAtRisk ?? 0))
         .slice(0, 4),
-    [risks],
+    [risks, hidden],
   );
 
   // The mock data uses two spellings for each end state.
@@ -149,9 +155,29 @@ export function DashboardPage() {
                         <span className="shrink-0 text-body-sm text-on-surface-muted tabular-nums">
                           {formatCurrency(r.amountAtRisk)}
                         </span>
-                        <Button size="sm" variant="secondary" onClick={() => navigate(`/customers/${r.customerId}`)}>
-                          Open
-                        </Button>
+                        <span className="flex shrink-0 items-center gap-1">
+                          <UITooltip label="Snooze" side="top">
+                            <IconButton
+                              label="Snooze"
+                              size="sm"
+                              onClick={() => dispatch({ type: 'SNOOZE_PRIORITY', itemId: r.id })}
+                            >
+                              <Clock className="size-4" strokeWidth={1.75} />
+                            </IconButton>
+                          </UITooltip>
+                          <UITooltip label="Dismiss" side="top">
+                            <IconButton
+                              label="Dismiss"
+                              size="sm"
+                              onClick={() => dispatch({ type: 'DISMISS_PRIORITY', itemId: r.id })}
+                            >
+                              <X className="size-4" strokeWidth={1.75} />
+                            </IconButton>
+                          </UITooltip>
+                          <Button size="sm" variant="secondary" onClick={() => navigate(`/customers/${r.customerId}`)}>
+                            Open
+                          </Button>
+                        </span>
                       </li>
                     ))}
                   </ul>

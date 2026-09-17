@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   AtSign, Bookmark, ChevronDown, Inbox, MessagesSquare, MoreHorizontal, Moon, Paperclip,
-  Phone, Smile, Star, Ticket, Zap,
+  Phone, Smile, Star, Ticket, Zap, CornerDownLeft, Command,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Avatar, Button, EmptyState, IconButton, Kbd, Tooltip } from '@/design-system';
@@ -56,11 +56,15 @@ export function TicketConversation({
   customerName,
   onReply,
   onClose,
+  onToggleFollow,
+  following,
 }: {
   ticket: TicketRow | null;
   customerName?: string;
   onReply: (body: string) => void;
   onClose: () => void;
+  onToggleFollow: () => void;
+  following?: boolean;
 }) {
   const [draft, setDraft] = React.useState('');
   const ref = React.useRef<HTMLDivElement>(null);
@@ -87,9 +91,17 @@ export function TicketConversation({
         </h2>
         <div className="flex shrink-0 items-center gap-1.5">
 
-        <Tooltip label="Star" side="bottom">
-          <IconButton label="Star" size="sm">
-            <Star className="size-4" strokeWidth={1.75} />
+        <Tooltip label={following ? 'Unfollow' : 'Follow'} side="bottom">
+          <IconButton
+            label={following ? 'Unfollow' : 'Follow'}
+            size="sm"
+            aria-pressed={following}
+            onClick={onToggleFollow}
+          >
+            <Star
+              className={cn('size-4', following && 'fill-warning-solid text-warning-solid')}
+              strokeWidth={1.75}
+            />
           </IconButton>
         </Tooltip>
         <Tooltip label="More actions" side="bottom">
@@ -182,7 +194,12 @@ export function TicketConversation({
               </Tooltip>
             ))}
             <div className="ml-auto flex items-center gap-2">
-              <Kbd>⌘↵</Kbd>
+              {/* Drawn as icons rather than the ⌘ and ↵ glyphs, so no
+                  codepoint stands in for an icon anywhere in the UI. */}
+              <Kbd className="gap-0.5 px-1">
+                <Command className="size-3" strokeWidth={2} />
+                <CornerDownLeft className="size-3" strokeWidth={2} />
+              </Kbd>
               <Button
                 size="sm"
                 variant={draft.trim() ? 'solid' : 'ghost'}

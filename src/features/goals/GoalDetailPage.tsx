@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import { useNavigate, useParams } from '@/router';
 import {
-  Avatar, Badge, Button, Checkbox, EmptyState, KeyValueList, PageHeader,
+  Avatar, Badge, Button, Checkbox, EmptyState, KeyValueList, PageHeader, Select,
 } from '@/design-system';
 import { USERS } from '@/data/core';
 import { formatDate } from '@/lib/format';
@@ -62,17 +62,28 @@ export function GoalDetailPage() {
           </>
         }
         actions={
-          goal.publicationStatus !== 'published' ? (
-            <Button
-              variant="solid"
-              size="sm"
-              onClick={() => dispatch({ type: 'PUBLISH_GOAL', goalId: goal.id })}
-            >
-              Publish to customer
-            </Button>
-          ) : (
-            <Badge tone="success">Published</Badge>
-          )
+          <>
+            {goal.status === 'not_started' && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => dispatch({ type: 'ACCEPT_GOAL', goalId: goal.id })}
+              >
+                Accept goal
+              </Button>
+            )}
+            {goal.publicationStatus !== 'published' ? (
+              <Button
+                variant="solid"
+                size="sm"
+                onClick={() => dispatch({ type: 'PUBLISH_GOAL', goalId: goal.id })}
+              >
+                Publish to customer
+              </Button>
+            ) : (
+              <Badge tone="success">Published</Badge>
+            )}
+          </>
         }
       />
 
@@ -148,7 +159,22 @@ export function GoalDetailPage() {
               items={[
                 { label: 'Type', value: goal.type ?? '—' },
                 { label: 'Priority', value: goal.priority ?? '—' },
-                { label: 'Visibility', value: goal.visibility ?? '—' },
+                {
+                  label: 'Visibility',
+                  value: (
+                    <Select
+                      value={goal.visibility ?? 'internal'}
+                      onValueChange={(visibility) =>
+                        dispatch({ type: 'CHANGE_GOAL_VISIBILITY', goalId: goal.id, visibility })
+                      }
+                      options={[
+                        { value: 'internal', label: 'Internal' },
+                        { value: 'shared', label: 'Shared with customer' },
+                      ]}
+                      className="h-7 w-44"
+                    />
+                  ),
+                },
                 { label: 'Started', value: formatDate(goal.startDate) },
                 { label: 'Due', value: formatDate(goal.dueDate) },
                 ...(goal.successMetric ? [{ label: 'Success metric', value: goal.successMetric }] : []),
