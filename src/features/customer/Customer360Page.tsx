@@ -7,6 +7,8 @@ import {
   Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis,
 } from 'recharts';
 import { cn } from '@/lib/cn';
+import { customerOverview } from '@/lib/copilot';
+import { NextBestActions } from '@/features/assistant/AiOverview';
 import { useApp } from '@/state/AppContext';
 import { useNavigate, useParams } from '@/router';
 import {
@@ -69,6 +71,11 @@ export function Customer360Page() {
   const [tab, setTab] = React.useState<TabId>('overview');
 
   const customer = (state.customers ?? []).find((c: any) => c.id === customerId);
+  // Above the not-found return, so the hook order never changes.
+  const copilot = React.useMemo(
+    () => (customerId ? customerOverview(state, customerId) : null),
+    [state, customerId],
+  );
 
   if (!customer) {
     return (
@@ -170,6 +177,10 @@ export function Customer360Page() {
               {/* One label per number. The first pass wrapped each of these in
                   a titled panel as well, so "Health / Composite / 30" spent
                   three lines saying one thing. */}
+              {copilot && copilot.actions.length > 0 && (
+                <NextBestActions actions={copilot.actions} onNavigate={navigate} />
+              )}
+
               <MetricRow>
                 <Stat
                   label="Health score"

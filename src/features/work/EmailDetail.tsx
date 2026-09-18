@@ -4,9 +4,11 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import {
-  Avatar, Badge, Button, Card, DropdownMenu, Field, Input, Select, Textarea,
+  Avatar, Badge, Button, Card, ComposerTools, DropdownMenu, Field, Input, Select,
+  SuggestedReplies, Textarea,
 } from '@/design-system';
 import { EMAIL_TEMPLATES } from '@/data/emails';
+import { suggestReplies } from '@/lib/composer';
 
 /**
  * A pulled message, its routing decision, and the reply.
@@ -36,6 +38,23 @@ export function EmailDetail({
     'Follow up: ' + String(email.subject ?? '').replace(/^Re:\s*/i, ''),
   );
   const [taskDue, setTaskDue] = React.useState('');
+
+  const composerContext = React.useMemo(
+    () => ({
+      recipient: email.from,
+      sender: 'Maya Chen',
+      account: customer?.name,
+      subject: email.subject,
+    }),
+    [email.from, email.subject, customer?.name],
+  );
+
+  // An email carries no SLA clock, so the openers key off the thread's own
+  // signals instead: how old it is, and how it reads.
+  const suggestions = React.useMemo(
+    () => suggestReplies({ sentiment: email.sentiment, ageDays: email.ageDays }),
+    [email.sentiment, email.ageDays],
+  );
 
   function applyTemplate(t: any) {
     setReply(
@@ -244,6 +263,15 @@ export function EmailDetail({
           />
         </div>
 
+        {!reply.trim() && (
+          <SuggestedReplies
+            className="mb-2"
+            suggestions={suggestions}
+            context={composerContext}
+            onPick={setReply}
+          />
+        )}
+
         <Textarea
           rows={9}
           value={reply}
@@ -251,6 +279,15 @@ export function EmailDetail({
           placeholder="Write your reply… or apply a template to start from a draft"
           aria-label={`Reply to ${email.from}`}
         />
+
+        {reply.trim() && (
+          <ComposerTools
+            className="mt-2"
+            draft={reply}
+            onChange={setReply}
+            context={composerContext}
+          />
+        )}
 
         {attachments.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2">

@@ -178,3 +178,53 @@ test('the breadcrumb names the module, and the page header does not repeat it', 
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Customers');
   await expect(page.getByRole('heading', { name: 'All accounts' })).toBeVisible();
 });
+
+// The copilot reads the application's own state, so these assert that what
+// it prints agrees with the page behind it rather than merely appearing.
+test('Ask CX42 opens on the account it was opened from', async ({ page }) => {
+  await page.goto('/#/customers/acme', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Ask CX42' }).click();
+  const panel = page.locator('aside').last();
+  await expect(panel.getByRole('heading', { name: 'Acme Analytics' })).toBeVisible();
+  await expect(panel.getByText('Next best actions')).toBeVisible();
+  // The health figure in the summary must match the one on the page.
+  const score = await page.locator('main').getByText('30', { exact: true }).first().isVisible();
+  expect(score).toBe(true);
+  await expect(panel.getByText(/is at risk at 30/)).toBeVisible();
+});
+
+test('the composer rewrites a draft and offers the undo', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  const box = page.locator('[role="textbox"]');
+  await box.click();
+  await box.type('We are just basically looking into it right now.');
+  await expect(page.getByText('Rewrite')).toBeVisible();
+  await page.getByRole('button', { name: 'Tighten' }).click();
+  await expect(box).not.toContainText('basically');
+  await page.getByRole('button', { name: /Undo tighten/ }).click();
+  await expect(box).toContainText('basically');
+});
+
+test('suggested replies fill the composer and then get out of the way', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  await expect(page.getByText('Suggested')).toBeVisible();
+  await page.locator('[role="textbox"]').click();
+  await page.locator('[role="textbox"]').type('x');
+  await expect(page.getByText('Suggested')).toHaveCount(0);
+});
+
+test('the inbox panes collapse and come back', async ({ page }) => {
+  await page.goto('/#/tickets', { waitUntil: 'networkidle' });
+  await page.locator('button[aria-label="Hide list"]').click();
+  await expect(page.locator('button[aria-label="Hide list"]')).toHaveCount(0);
+  await page.locator('button[aria-label="Show list"]').click();
+  await expect(page.locator('button[aria-label="Hide list"]')).toBeVisible();
+});
+
+test('a module with one view shows no view pane', async ({ page }) => {
+  await page.goto('/#/work', { waitUntil: 'networkidle' });
+  await expect(page.getByRole('button', { name: 'All work' })).toHaveCount(0);
+  // ...but a module with several still does.
+  await page.goto('/#/customers', { waitUntil: 'networkidle' });
+  await expect(page.getByRole('button', { name: 'My portfolio' })).toBeVisible();
+});

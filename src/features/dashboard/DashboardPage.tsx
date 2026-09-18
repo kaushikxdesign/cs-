@@ -76,22 +76,27 @@ export function DashboardPage() {
     return points;
   }, [customers]);
 
-  /* Sparkline series. The portfolio trend is the real one; the other three
-     are the same records bucketed over the trend's window, so a tile's
-     texture and its number always come from one source. */
+  /* Sparkline series, over the same window as the portfolio trend.
+     The first generator used a modulo, which wraps — and a wrap is a cliff,
+     which is where the hard drops in the first version came from. These are
+     two slow sine waves summed instead: continuous by construction, so the
+     curve through them has no discontinuity to smooth over. */
   const sparks = React.useMemo(() => {
-    const scores = trend.map((p) => p.score);
-    const shape = (seed: number, total: number) =>
-      scores.length
-        ? scores.map((v, i) => total * (0.82 + ((v + seed * 7 + i) % 17) / 90))
-        : [total];
+    const n = Math.max(2, trend.length);
+    const shape = (seed: number, total: number, drift: number) =>
+      Array.from({ length: n }, (_, i) => {
+        const t = i / (n - 1);
+        const wobble =
+          Math.sin(t * Math.PI * 1.7 + seed) * 0.05 + Math.sin(t * Math.PI * 3.1 + seed * 2) * 0.025;
+        return total * (1 + drift * (t - 0.5) + wobble);
+      });
     return {
-      arr: shape(1, managedArr),
-      risk: shape(2, atRisk),
-      renewal: shape(3, Math.max(1, upcoming.length)),
-      expansion: shape(4, expansion),
+      arr: shape(0.4, managedArr, 0.1),
+      risk: shape(1.9, atRisk, 0.16),
+      renewal: shape(3.3, Math.max(1, upcoming.length), -0.08),
+      expansion: shape(5.1, expansion, 0.22),
     };
-  }, [trend, managedArr, atRisk, upcoming.length, expansion]);
+  }, [trend.length, managedArr, atRisk, upcoming.length, expansion]);
 
   /* Pad the observed range by a couple of points and snap to fives, so the
      line sits in the middle of the panel and a real movement is visible. */

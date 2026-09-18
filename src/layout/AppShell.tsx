@@ -129,7 +129,7 @@ export function AppShell({
         />
 
         <div className="flex min-h-0 flex-1 overflow-hidden rounded-tl-2xl border-l border-t border-border-default bg-surface">
-          {!navCollapsed && (
+          {!navCollapsed && (activeModule?.views?.length ?? 0) > 1 && (
             <SecondaryNav
               module={activeModule}
               currentPath={pathname}

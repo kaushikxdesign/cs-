@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Send, Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
-import { useLocation } from '@/router';
+import { useLocation, useNavigate } from '@/router';
 import {
   Badge, Button, Dialog, Field, IconButton, Input, Switch, Textarea, Tooltip, type Tone,
 } from '@/design-system';
@@ -10,6 +10,8 @@ import {
   ASSISTANT_RESPONSES, ASSISTANT_SCOPES, scopeForPath,
   type AssistantChip, type AssistantResponse,
 } from '@/data/assistant';
+import { overviewForPath, type NextAction } from '@/lib/copilot';
+import { AiOverview } from './AiOverview';
 
 /**
  * Evidence chips carried six unrelated hues in the MVP, one per source, none
@@ -53,7 +55,8 @@ Customer Success Manager`;
  */
 export function AssistantPanel() {
   const { state, dispatch } = useApp();
-  const { pathname } = useLocation();
+  const { pathname, query } = useLocation();
+  const navigate = useNavigate();
   const [input, setInput] = React.useState('');
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [showDraft, setShowDraft] = React.useState(false);
@@ -83,6 +86,35 @@ export function AssistantPanel() {
   const scopeLabel =
     activeScopeId === 'customer' && scopeCustomer ? scopeCustomer.name : scope.label;
   const ScopeIcon = scope.icon;
+
+  // Opened on a page, the assistant should already know what the page is
+  // about. Landing on a prompt list makes the user do the work of telling it
+  // what it could have read off the route.
+  const overview = React.useMemo(
+    () => (scoped ? overviewForPath(state, pathname, query) : overviewForPath(state, '/', {})),
+    [state, pathname, query, scoped],
+  );
+
+  function runAction(a: NextAction) {
+    if (a.to) {
+      navigate(a.to);
+      return;
+    }
+    if (a.kind === 'compose') {
+      setShowDraft(true);
+      return;
+    }
+    dispatch({
+      type: 'CREATE_TASK',
+      taskId: `t_ai_${a.id}_${Date.now().toString(36)}`,
+      title: a.title,
+      description: a.why,
+      customerId,
+      ownerId: 'maya',
+      source: 'assistant',
+    });
+    dispatch({ type: 'ADD_TOAST', msg: `Task created — ${a.title}`, toastType: 'success' });
+  }
 
   React.useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -169,9 +201,13 @@ export function AssistantPanel() {
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 ? (
-          <div>
-            <p className="mb-2.5 text-caption text-on-surface-subtle">
-              Suggested prompts for {scopeLabel}
+          <div className="space-y-5">
+            {overview && (
+              <AiOverview overview={overview} onNavigate={navigate} onCompose={runAction} />
+            )}
+            <div>
+            <p className="mb-2.5 text-caption font-medium text-on-surface-muted">
+              Or ask about {scopeLabel}
             </p>
             <div className="space-y-1.5">
               {scope.prompts.map((s) => (
@@ -187,6 +223,7 @@ export function AssistantPanel() {
                   {s}
                 </button>
               ))}
+            </div>
             </div>
           </div>
         ) : (

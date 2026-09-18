@@ -73,7 +73,7 @@ export function TicketDetailsPanel({
   const doneCount = Object.values(done).filter(Boolean).length;
 
   return (
-    <aside className="flex w-[21rem] shrink-0 flex-col border-l border-border-default bg-panel">
+    <aside className="flex w-[21rem] shrink-0 flex-col overflow-hidden rounded-xl border border-border-default bg-surface">
       <div className="flex h-14 shrink-0 items-center gap-1 border-b border-border-default px-3">
         {(['details', 'assistant'] as const).map((t) => (
           <button

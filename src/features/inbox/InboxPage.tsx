@@ -36,6 +36,7 @@ export function InboxPage() {
   const [sort, setSort] = React.useState<SortId>('newest');
   const [selectedId, setSelectedId] = React.useState<string | null>(query.ticket ?? null);
   const [panelOpen, setPanelOpen] = React.useState(true);
+  const [listOpen, setListOpen] = React.useState(true);
 
   const customersById = React.useMemo(
     () => Object.fromEntries((state.customers ?? []).map((c: any) => [c.id, c])),
@@ -61,7 +62,11 @@ export function InboxPage() {
   const customer = selected ? customersById[selected.customerId] : undefined;
 
   return (
-    <div className="flex h-full min-h-0">
+    // Three cards on a ground, not three columns sharing rules. Each pane
+    // carries its own border, so collapsing one leaves no orphaned edge and
+    // the seams stop forming a grid across the screen.
+    <div className="flex h-full min-h-0 gap-2 bg-canvas p-2">
+      {listOpen && (
       <TicketList
         tickets={tickets}
         customersById={customersById}
@@ -70,10 +75,16 @@ export function InboxPage() {
         sort={sort}
         onSortChange={setSort}
         statusLabel={LABELS[filter]}
+        onCollapse={() => setListOpen(false)}
       />
+      )}
 
       <TicketConversation
         ticket={selected}
+        listCollapsed={!listOpen}
+        detailsCollapsed={!panelOpen}
+        onExpandList={() => setListOpen(true)}
+        onExpandDetails={() => setPanelOpen(true)}
         customerName={customer?.name}
         following={(state.followedTickets ?? []).includes(selected?.id ?? '')}
         onToggleFollow={() =>

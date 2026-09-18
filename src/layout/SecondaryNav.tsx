@@ -23,7 +23,9 @@ export function SecondaryNav({
   counts?: Record<string, number>;
   onNavigate: (path: string) => void;
 }) {
-  if (!module?.views?.length) return null;
+  // A pane holding one item is 224px spent telling you where you already
+  // are. The rail and the breadcrumb both say it already.
+  if (!module?.views?.length || module.views.length < 2) return null;
 
   function matchesQuery(qs?: string) {
     if (!qs) return false;

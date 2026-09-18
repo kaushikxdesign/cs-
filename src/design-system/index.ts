@@ -23,4 +23,5 @@ export { PageHeader, type Crumb } from './PageHeader';
 export { DetailsPanel, PanelSection } from './DetailsPanel';
 export { CommandPalette, useCommandPalette, type CommandItem } from './CommandPalette';
 export { RichTextEditor } from './RichTextEditor';
+export { ComposerTools, SuggestedReplies } from './ComposerTools';
 export * from './chartTheme';

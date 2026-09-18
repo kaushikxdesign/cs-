@@ -1,11 +1,14 @@
 import React from 'react';
 import {
   AtSign, Bookmark, ChevronDown, Inbox, MessagesSquare, MoreHorizontal, Moon, Paperclip,
-  Phone, Smile, Sparkles, Star, Ticket, Zap, CornerDownLeft, Command,
+  PanelLeftOpen, PanelRightOpen, Phone, Smile, Sparkles, Star, Ticket, Zap, CornerDownLeft, Command,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { Avatar, Button, EmptyState, IconButton, Kbd, Tooltip } from '@/design-system';
+import {
+  Avatar, Button, ComposerTools, EmptyState, IconButton, Kbd, SuggestedReplies, Tooltip,
+} from '@/design-system';
 import { parseConversation } from './ticketModel';
+import { suggestReplies } from '@/lib/composer';
 import type { TicketRow } from './TicketList';
 
 function Bubble({
@@ -55,6 +58,10 @@ export function TicketConversation({
   ticket,
   customerName,
   onReply,
+  listCollapsed,
+  detailsCollapsed,
+  onExpandList,
+  onExpandDetails,
   onClose,
   onToggleFollow,
   following,
@@ -62,11 +69,46 @@ export function TicketConversation({
   ticket: TicketRow | null;
   customerName?: string;
   onReply: (body: string) => void;
+  listCollapsed?: boolean;
+  detailsCollapsed?: boolean;
+  onExpandList?: () => void;
+  onExpandDetails?: () => void;
   onClose: () => void;
   onToggleFollow: () => void;
   following?: boolean;
 }) {
   const [draft, setDraft] = React.useState('');
+
+  const composerContext = React.useMemo(
+    () => ({
+      recipient: customerName,
+      sender: 'Maya Chen',
+      account: customerName,
+      subject: ticket?.subject,
+    }),
+    [customerName, ticket?.subject],
+  );
+
+  const suggestions = React.useMemo(
+    () =>
+      ticket
+        ? suggestReplies({
+            slaState: (ticket as any).slaState,
+            sentiment: (ticket as any).sentiment,
+            status: ticket.status,
+            ageDays: (ticket as any).age,
+          })
+        : [],
+    [ticket],
+  );
+
+  /* The composer is contenteditable, so a tool that rewrites the draft has
+     to put the text back into the node as well as into state — otherwise
+     the two disagree and the next keystroke reverts the rewrite. */
+  const setBody = React.useCallback((next: string) => {
+    if (ref.current) ref.current.innerText = next;
+    setDraft(next);
+  }, []);
   const ref = React.useRef<HTMLDivElement>(null);
 
   if (!ticket) {
@@ -84,8 +126,15 @@ export function TicketConversation({
   const messages = parseConversation((ticket as { conversation?: string }).conversation);
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col bg-surface">
+    <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border-default bg-surface">
       <header className="flex h-14 shrink-0 items-center gap-1.5 border-b border-border-default px-4">
+        {listCollapsed && onExpandList && (
+          <Tooltip label="Show list" side="bottom">
+            <IconButton label="Show list" size="sm" className="mr-1" onClick={onExpandList}>
+              <PanelLeftOpen className="size-4" strokeWidth={1.75} />
+            </IconButton>
+          </Tooltip>
+        )}
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-title-sm font-semibold text-on-surface">{customerName}</h2>
           <p className="truncate text-caption text-on-surface-subtle">
@@ -130,6 +179,13 @@ export function TicketConversation({
         {/* A rule separates the five secondary tools from the one action
             that ends the conversation — without it the Close button reads as
             the sixth item in an icon strip. */}
+        {detailsCollapsed && onExpandDetails && (
+          <Tooltip label="Show details" side="bottom">
+            <IconButton label="Show details" size="sm" onClick={onExpandDetails}>
+              <PanelRightOpen className="size-4" strokeWidth={1.75} />
+            </IconButton>
+          </Tooltip>
+        )}
         <span className="mx-1.5 h-5 w-px bg-border-default" aria-hidden />
         <Button
           size="sm"
@@ -171,6 +227,17 @@ export function TicketConversation({
       </div>
 
       <div className="shrink-0 border-t border-border-default bg-surface px-4 py-3">
+        {/* Suggestions sit above the box, not inside it: they are a way in
+            to a blank draft, and once there is one they get out of the way. */}
+        <div className="mx-auto mb-2 max-w-3xl">
+          {!draft.trim() && (
+            <SuggestedReplies
+              suggestions={suggestions}
+              context={composerContext}
+              onPick={setBody}
+            />
+          )}
+        </div>
         <div className="mx-auto max-w-3xl overflow-hidden rounded-lg border border-border-default bg-canvas focus-within:border-border-strong">
           <div className="flex items-center gap-1.5 px-3 pt-2.5">
             <MessagesSquare className="size-4 text-on-surface" strokeWidth={1.75} />
@@ -188,6 +255,12 @@ export function TicketConversation({
             onInput={() => setDraft(ref.current?.innerText ?? '')}
             className="cx-rte min-h-16 px-3 py-2 text-body text-on-surface outline-none"
           />
+
+          {draft.trim() && (
+            <div className="border-t border-border-default px-2.5 py-1.5">
+              <ComposerTools draft={draft} onChange={setBody} context={composerContext} />
+            </div>
+          )}
 
           <div className="flex items-center gap-0.5 px-2 pb-2">
             {[
