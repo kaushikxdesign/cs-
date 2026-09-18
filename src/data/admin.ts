@@ -117,7 +117,7 @@ export const USAGE_PAGE_RULES = [
   { id:'pr3', name:'Admin',      match:'starts with', value:'/admin',        events:2, exclude:true },
 ];
 
-export const USAGE_SNIPPET = "<script>\n  (function(w,d,k){w.cx42=w.cx42||function(){(w.cx42.q=w.cx42.q||[]).push(arguments)};\n   var s=d.createElement('script');s.async=1;\n   s.src='https://cdn.cx-42.com/listener.js?k='+k;\n   d.head.appendChild(s);})(window,document,'PK_live_8f2c41');\n  cx42('identify', { accountId: ACCOUNT_ID, userId: USER_ID });\n<' + '/script>";
+export const USAGE_SNIPPET = "<script>\n  (function(w,d,k){w.sia=w.sia||function(){(w.sia.q=w.sia.q||[]).push(arguments)};\n   var s=d.createElement('script');s.async=1;\n   s.src='https://cdn.sia.com/listener.js?k='+k;\n   d.head.appendChild(s);})(window,document,'PK_live_8f2c41');\n  sia('identify', { accountId: ACCOUNT_ID, userId: USER_ID });\n<' + '/script>";
 
 export const CONVO_PARSERS = [
   { id:'vtt',  label:'WebVTT (.vtt)',        note:'Zoom, Teams and Meet exports.' },
@@ -134,7 +134,7 @@ export const CONVO_MAPPING = [
 ];
 
 export const COMMUNITY_PLATFORMS = [
-  { id:'native',   name:'CX42 Communities', note:'Built in. Spaces, categories and moderation managed here.', connected:true },
+  { id:'native',   name:'Sia Communities', note:'Built in. Spaces, categories and moderation managed here.', connected:true },
   { id:'discourse',name:'Discourse',        note:'Read topics, replies and likes via API key.',              connected:false },
   { id:'khoros',   name:'Khoros',           note:'Enterprise community sync.',                                connected:false },
   { id:'circle',   name:'Circle',           note:'Spaces and member activity.',                               connected:false },
@@ -166,7 +166,7 @@ export const DEFAULT_CSAT_SURVEY = [
 
 export const SURVEY_TRIGGERS = ['On ticket resolution','On ticket close','7 days after onboarding','After a QBR','Manual send only'];
 
-export const NPS_SNIPPET = "<script>\n  window.cx42NPS = {\n    surveyId: 'nps_q3_2025',\n    accountId: ACCOUNT_ID,\n    userId: USER_ID,\n    position: 'bottom-right',\n    delay: 8000,          // ms after page load\n    frequency: 90         // days between prompts for the same user\n  };\n<' + '/script>\n<script async src=\"https://cdn.cx-42.com/nps.js?k=PK_live_8f2c41\"><' + '/script>";
+export const NPS_SNIPPET = "<script>\n  window.siaNPS = {\n    surveyId: 'nps_q3_2025',\n    accountId: ACCOUNT_ID,\n    userId: USER_ID,\n    position: 'bottom-right',\n    delay: 8000,          // ms after page load\n    frequency: 90         // days between prompts for the same user\n  };\n<' + '/script>\n<script async src=\"https://cdn.sia.com/nps.js?k=PK_live_8f2c41\"><' + '/script>";
 
 export const NPS_SEGMENTS = ['All users','Admins only','Users active in the last 30 days','Accounts renewing in 90 days','Enterprise accounts'];
 
@@ -233,11 +233,11 @@ export const ASSIGNMENT_OBJECTS = [
 ];
 
 export const NOTIFY_CHANNELS = [
-  { id:'email', label:'Email',    icon:Mail,    tone:'blue',   status:'connected', detail:'notifications@cx42.io \u00b7 SendGrid',
+  { id:'email', label:'Email',    icon:Mail,    tone:'blue',   status:'connected', detail:'notifications@sia.io \u00b7 SendGrid',
     desc:'Transactional and digest email delivered to agents, CSMs and managers.',
     settings:[['Daily digest at 08:00',true],['Immediate for P1 breaches',true],['Include ticket body in email',false],['Weekly portfolio summary',true]],
     stats:[['Sent (30d)','12,480'],['Open rate','54%'],['Bounces','18']] },
-  { id:'slack', label:'Slack',    icon:Slack, tone:'purple', status:'connected', detail:'cx42-workspace \u00b7 6 channels mapped',
+  { id:'slack', label:'Slack',    icon:Slack, tone:'purple', status:'connected', detail:'sia-workspace \u00b7 6 channels mapped',
     desc:'Real-time alerts pushed into team channels and direct messages.',
     settings:[['Post to #cs-alerts',true],['DM the account owner',true],['Thread follow-up updates',true],['Mention @here on P1',false]],
     stats:[['Messages (30d)','3,204'],['Channels','6'],['Click-through','41%']] },
@@ -259,11 +259,11 @@ export const NOTIFY_EVENTS = [
 ];
 
 export const AGENT_MAILBOXES = {
-  maya:   { connected:true,  provider:'gmail', method:'OAuth 2.0',      address:'maya.chen@cx42.io',    connectedOn:'Jun 14, 2025', synced:'12 minutes ago', scopes:['read','send','calendar'] },
-  james:  { connected:true,  provider:'o365',  method:'Microsoft Graph', address:'james.park@cx42.io',   connectedOn:'Jul 02, 2025', synced:'38 minutes ago', scopes:['read','send'] },
-  sarah:  { connected:true,  provider:'gmail', method:'OAuth 2.0',      address:'sarah.kim@cx42.io',    connectedOn:'May 28, 2025', synced:'4 hours ago',    scopes:['read','send','calendar'] },
-  daniel: { connected:false, provider:null,    method:null,             address:'daniel.ortiz@cx42.io', connectedOn:null,           synced:null,             scopes:[] },
-  priya:  { connected:false, provider:null,    method:null,             address:'priya.raman@cx42.io',  connectedOn:null,           synced:null,             scopes:[] },
+  maya:   { connected:true,  provider:'gmail', method:'OAuth 2.0',      address:'maya.chen@sia.io',    connectedOn:'Jun 14, 2025', synced:'12 minutes ago', scopes:['read','send','calendar'] },
+  james:  { connected:true,  provider:'o365',  method:'Microsoft Graph', address:'james.park@sia.io',   connectedOn:'Jul 02, 2025', synced:'38 minutes ago', scopes:['read','send'] },
+  sarah:  { connected:true,  provider:'gmail', method:'OAuth 2.0',      address:'sarah.kim@sia.io',    connectedOn:'May 28, 2025', synced:'4 hours ago',    scopes:['read','send','calendar'] },
+  daniel: { connected:false, provider:null,    method:null,             address:'daniel.ortiz@sia.io', connectedOn:null,           synced:null,             scopes:[] },
+  priya:  { connected:false, provider:null,    method:null,             address:'priya.raman@sia.io',  connectedOn:null,           synced:null,             scopes:[] },
 };
 
 export const EMAIL_AUTH_METHODS = [
@@ -272,17 +272,17 @@ export const EMAIL_AUTH_METHODS = [
     detail:['Scopes: gmail.readonly, gmail.send, calendar.events','Token lifetime: 60 minutes, auto-refreshed','Consent screen: verified'] },
   { id:'graph_ms',     label:'Microsoft Graph',   icon:Mail, status:'enabled',
     note:'Delegated Graph permissions for Outlook mail and calendar.',
-    detail:['Scopes: Mail.Read, Mail.Send, Calendars.ReadWrite','Tenant: cx42.onmicrosoft.com','Admin consent: granted'] },
+    detail:['Scopes: Mail.Read, Mail.Send, Calendars.ReadWrite','Tenant: sia.onmicrosoft.com','Admin consent: granted'] },
   { id:'imap',         label:'IMAP / SMTP',       icon:Server, status:'disabled',
     note:'Manual server configuration. Less secure \u2014 only enable where OAuth is unavailable.',
     detail:['Requires per-agent app passwords','No calendar sync','Not recommended for new setups'] },
 ];
 
 export const FORWARDING_RULES = [
-  { id:'fw1', address:'support@cx42.io',       target:'Support queue',        creates:'Ticket', verified:true,  received:1284, note:'Primary inbound support address.' },
-  { id:'fw2', address:'escalations@cx42.io',   target:'Escalation queue',     creates:'Ticket \u00b7 P1', verified:true, received:96, note:'Auto-sets priority to P1 on arrival.' },
-  { id:'fw3', address:'success@cx42.io',       target:'Assigned CSM',         creates:'Ticket', verified:true,  received:412, note:'Routed by account domain to the owning CSM.' },
-  { id:'fw4', address:'renewals@cx42.io',      target:'Renewals queue',       creates:'Ticket', verified:false, received:0,   note:'DNS verification pending \u2014 add the MX record.' },
+  { id:'fw1', address:'support@sia.io',       target:'Support queue',        creates:'Ticket', verified:true,  received:1284, note:'Primary inbound support address.' },
+  { id:'fw2', address:'escalations@sia.io',   target:'Escalation queue',     creates:'Ticket \u00b7 P1', verified:true, received:96, note:'Auto-sets priority to P1 on arrival.' },
+  { id:'fw3', address:'success@sia.io',       target:'Assigned CSM',         creates:'Ticket', verified:true,  received:412, note:'Routed by account domain to the owning CSM.' },
+  { id:'fw4', address:'renewals@sia.io',      target:'Renewals queue',       creates:'Ticket', verified:false, received:0,   note:'DNS verification pending \u2014 add the MX record.' },
 ];
 
 export const AGENT_AUDIT = {
@@ -365,7 +365,7 @@ export const PRIVILEGE_GROUPS = [
     { key:'auto.create',        label:'Create or edit automations',    desc:'Build triggers, conditions and actions.',                        roles:[0,0,0,1,0] },
     { key:'auto.delete',        label:'Delete automations',            desc:'Permanently remove an automation.',                              roles:[0,0,0,1,0] },
   ]},
-  { group:'CX42 Drive', icon:'', items:[
+  { group:'Sia Drive', icon:'', items:[
     { key:'drive.view',         label:'View Drive content',            desc:'Read SOPs, QBR decks and goal templates.',                  roles:[1,1,1,1,1] },
     { key:'drive.upload',       label:'Upload templates and SOPs',     desc:'Add new files to the Drive library.',                            roles:[0,1,1,1,0] },
     { key:'drive.publish',      label:'Publish or unpublish',          desc:'Move a Drive item between draft and published.',                 roles:[0,0,1,1,0] },

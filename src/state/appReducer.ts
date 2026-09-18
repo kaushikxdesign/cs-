@@ -203,7 +203,7 @@ function appReducer(state, action) {
         toasts: [...state.toasts, { id: Date.now(), msg: (ATTR_LABELS[action.field]||{label:action.field}).label + ' updated \u2014 reason recorded on the timeline', type:'success' }] };
     }
     case 'CONNECT_MAILBOX':
-      return { ...state, mailbox: { connected:true, provider:action.provider, address:action.address || 'maya.chen@cx42.io', synced:'just now',
+      return { ...state, mailbox: { connected:true, provider:action.provider, address:action.address || 'maya.chen@sia.io', synced:'just now',
           connectedOn: action.connectedOn || 'Today', scopes: action.scopes || ['Mail.Read','Mail.Send'], method: action.method || 'OAuth 2.0' },
         toasts: [...state.toasts, { id: Date.now(), msg: 'Mailbox connected', type: 'success' }] };
 

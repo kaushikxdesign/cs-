@@ -104,7 +104,7 @@ export const MODULES: NavModule[] = [
   },
   {
     id: 'drive',
-    label: 'CX42 Drive',
+    label: 'Sia Drive',
     icon: FolderOpen,
     path: '/drive',
     views: [
@@ -159,5 +159,5 @@ export function moduleForPath(path: string): NavModule | undefined {
 export function pageTitle(path: string): string {
   const exact = ALL_MODULES.flatMap((m) => m.views ?? []).find((v) => v.path === path);
   if (exact) return exact.label;
-  return moduleForPath(path)?.label ?? 'CX42';
+  return moduleForPath(path)?.label ?? 'Sia';
 }

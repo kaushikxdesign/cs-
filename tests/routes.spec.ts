@@ -31,7 +31,7 @@ for (const route of ROUTES) {
     const errors = await collectErrors(page);
     await page.goto(`/#${route}`, { waitUntil: 'networkidle' });
 
-    await expect(page.locator('#cx42-error')).toBeHidden();
+    await expect(page.locator('#sia-error')).toBeHidden();
     const body = await page.locator('#root').innerText();
     expect(body.trim().length).toBeGreaterThan(0);
     expect(errors).toEqual([]);
@@ -46,7 +46,7 @@ test('unknown route falls through to the 404 element', async ({ page }) => {
 test('portal preview bypasses the app shell', async ({ page }) => {
   await page.goto('/#/portal-preview/acme', { waitUntil: 'networkidle' });
   // The shell's primary nav must not render on this route.
-  await expect(page.locator('#root')).not.toContainText('CX42 Drive');
+  await expect(page.locator('#root')).not.toContainText('Sia Drive');
 });
 
 test('/tickets resolves — it was declared nowhere in the MVP', async ({ page }) => {
@@ -80,7 +80,7 @@ for (const [section, title] of PREVIOUSLY_UNREACHABLE) {
   test(`admin section "${title}" is reachable`, async ({ page }) => {
     await page.goto(`/#/admin?section=${section}`, { waitUntil: 'networkidle' });
     await expect(page.locator('h1')).toContainText(title);
-    await expect(page.locator('#cx42-error')).toBeHidden();
+    await expect(page.locator('#sia-error')).toBeHidden();
   });
 }
 
@@ -152,14 +152,14 @@ for (const route of EMOJI_ROUTES) {
 }
 
 test('the assistant is reachable from the top bar on every module', async ({ page }) => {
-  const ask = page.getByRole('button', { name: 'Ask CX42' });
+  const ask = page.getByRole('button', { name: 'Ask Sia' });
   for (const route of ['/dashboard', '/customers', '/tickets']) {
     await page.goto(`/#${route}`, { waitUntil: 'networkidle' });
     await expect(ask).toBeVisible();
   }
   await ask.click();
   await expect(ask).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('heading', { name: 'Ask CX42' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ask Sia' })).toBeVisible();
 });
 
 test('the top bar carries search and notifications on every route', async ({ page }) => {
@@ -181,9 +181,9 @@ test('the breadcrumb names the module, and the page header does not repeat it', 
 
 // The copilot reads the application's own state, so these assert that what
 // it prints agrees with the page behind it rather than merely appearing.
-test('Ask CX42 opens on the account it was opened from', async ({ page }) => {
+test('Ask Sia opens on the account it was opened from', async ({ page }) => {
   await page.goto('/#/customers/acme', { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: 'Ask CX42' }).click();
+  await page.getByRole('button', { name: 'Ask Sia' }).click();
   const panel = page.locator('aside').last();
   await expect(panel.getByRole('heading', { name: 'Acme Analytics' })).toBeVisible();
   await expect(panel.getByText('Next best actions')).toBeVisible();

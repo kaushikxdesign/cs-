@@ -2,7 +2,7 @@ import React from 'react';
 
 export type Theme = 'light' | 'dark';
 
-const KEY = 'cx42.theme';
+const KEY = 'sia.theme';
 
 function read(): Theme {
   try {

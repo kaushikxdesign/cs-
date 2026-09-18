@@ -204,8 +204,8 @@ describe('email and mailboxes', () => {
   });
 
   it('SET_EMAIL_DOMAINS replaces the domain lists', () => {
-    const s = run({ type: 'SET_EMAIL_DOMAINS', companyDomains: ['cx42.io'], excludedDomains: ['spam.io'] });
-    expect(s.emailConfig.companyDomains).toEqual(['cx42.io']);
+    const s = run({ type: 'SET_EMAIL_DOMAINS', companyDomains: ['sia.io'], excludedDomains: ['spam.io'] });
+    expect(s.emailConfig.companyDomains).toEqual(['sia.io']);
   });
 
   it('UPDATE_EMAIL_CONFIG merges into one section', () => {
@@ -224,7 +224,7 @@ describe('email and mailboxes', () => {
   });
 
   it('support mailboxes add, update and remove', () => {
-    const added = run({ type: 'ADD_SUPPORT_MAILBOX', mailbox: { id: 'mb_new', address: 'new@cx42.io' } });
+    const added = run({ type: 'ADD_SUPPORT_MAILBOX', mailbox: { id: 'mb_new', address: 'new@sia.io' } });
     expect(added.supportMailboxes.some((m: any) => m.id === 'mb_new')).toBe(true);
     const updated = run({ type: 'UPDATE_SUPPORT_MAILBOX', id: 'mb_new', patch: { label: 'New' } }, added);
     expect(updated.supportMailboxes.find((m: any) => m.id === 'mb_new').label).toBe('New');

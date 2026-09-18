@@ -1,4 +1,4 @@
-# CX42 UI Inventory — Phase 0 Audit
+# Sia UI Inventory — Phase 0 Audit
 
 Source of truth: `public/legacy/index.html` (13,781 lines, committed verbatim).
 All line numbers below refer to that file.
@@ -235,7 +235,7 @@ Three divergent sources of truth today, collapsing to **one `nav.ts`** consumed
 by the rail, secondary nav, ⌘K and `NAV_BY_PERSONA`:
 
 1. **Sidebar `NAV`** (1487) — 8 items: Dashboard, My Work, Customers, Risks,
-   Expansion, Actions, CX42 Drive, Admin. Icons are raw glyphs (`▦ ✓ ⬛ ⚠ ↗ ⚡ 📁 ⚙`).
+   Expansion, Actions, Sia Drive, Admin. Icons are raw glyphs (`▦ ✓ ⬛ ⚠ ↗ ⚡ 📁 ⚙`).
 2. **Spotlight `NAV`** (1950) — a shadowed local const with 9 items: the same 8
    plus `Profile settings`, in a different order.
 3. **Pinned bottom buttons** (1900–1909) — "📊 Manager view" (only when

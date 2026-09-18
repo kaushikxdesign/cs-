@@ -86,7 +86,7 @@ export function TopBar({
 }) {
   const { theme, setTheme } = useTheme();
   const userId = ROLES.find((r) => r.id === activeRole)?.userId ?? 'maya';
-  const userName = USERS[userId]?.name ?? 'CX42';
+  const userName = USERS[userId]?.name ?? 'Sia';
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 pl-4 pr-3">
@@ -184,7 +184,7 @@ export function TopBar({
             className="bg-clip-text font-semibold text-transparent"
             style={{ backgroundImage: 'var(--gradient-brand)' }}
           >
-            Ask CX42
+            Ask Sia
           </span>
         </Button>
 

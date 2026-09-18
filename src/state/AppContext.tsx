@@ -39,7 +39,7 @@ export function createInitialState() {
     emailConfig: EMAIL_CONFIG_DEFAULTS,
     supportMailboxes: SUPPORT_MAILBOXES,
     attrChanges: SEED_ATTR_CHANGES,
-    mailbox: { connected:true, provider:'gmail', address:'maya.chen@cx42.io', synced:'12 minutes ago' },
+    mailbox: { connected:true, provider:'gmail', address:'maya.chen@sia.io', synced:'12 minutes ago' },
     assistantOpen: false,
     assistantContext: null,
     lastCreatedGoalId: null,

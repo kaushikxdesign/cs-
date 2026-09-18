@@ -49,7 +49,7 @@ Maya Chen
 Customer Success Manager`;
 
 /**
- * Ask CX42. The panel is layout-coupled — `AppShell` gives it a column rather
+ * Ask Sia. The panel is layout-coupled — `AppShell` gives it a column rather
  * than floating it over the page — so it renders as a plain flex column and
  * owns no positioning of its own.
  */
@@ -158,7 +158,7 @@ export function AssistantPanel() {
         <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-accent-subtle">
           <Sparkles className="size-3.5 text-accent" strokeWidth={1.75} />
         </span>
-        <h2 className="shrink-0 text-body-sm font-semibold text-on-surface">Ask CX42</h2>
+        <h2 className="shrink-0 text-body-sm font-semibold text-on-surface">Ask Sia</h2>
         <Badge tone="neutral" className="min-w-0 max-w-[9rem]">
           <ScopeIcon className="size-3 shrink-0" strokeWidth={1.75} />
           <span className="truncate">{scopeLabel}</span>
@@ -183,13 +183,13 @@ export function AssistantPanel() {
             onCheckedChange={setScoped}
             aria-label={
               scoped
-                ? `Searching ${scopeLabel} only — switch to search all of CX42`
-                : 'Searching all of CX42 — switch back to this module'
+                ? `Searching ${scopeLabel} only — switch to search all of Sia`
+                : 'Searching all of Sia — switch back to this module'
             }
           />
           <div className="min-w-0 flex-1">
             <p className="truncate text-caption font-medium text-on-surface">
-              {scoped ? `Searching within ${scopeLabel}` : 'Searching all of CX42'}
+              {scoped ? `Searching within ${scopeLabel}` : 'Searching all of Sia'}
             </p>
             <p className="truncate text-caption text-on-surface-subtle">
               {scoped ? 'Toggle off to widen the search' : `Toggle on to narrow to ${scopeLabel}`}
@@ -280,7 +280,7 @@ export function AssistantPanel() {
               if (e.key === 'Enter' && input) handlePrompt(input);
             }}
             placeholder="Ask anything about your portfolio…"
-            aria-label="Ask CX42"
+            aria-label="Ask Sia"
             className="flex-1"
           />
           <Button

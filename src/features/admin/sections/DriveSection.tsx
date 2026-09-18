@@ -31,7 +31,7 @@ export function DriveSection({ dispatch }: SectionProps) {
       },
       ...u,
     ]);
-    dispatch({ type: 'ADD_TOAST', msg: 'Template uploaded to CX42 Drive', toastType: 'success' });
+    dispatch({ type: 'ADD_TOAST', msg: 'Template uploaded to Sia Drive', toastType: 'success' });
   }
 
   return (

@@ -44,7 +44,7 @@ export function ProfileSettingsPage() {
   const [tz, setTz] = React.useState('ist');
   const [dateFmt, setDateFmt] = React.useState('dmy');
   const [signature, setSignature] = React.useState(
-    `${user.name}\nCustomer Success · CX42\n${user.id}@cx42.io`,
+    `${user.name}\nCustomer Success · Sia\n${user.id}@sia.io`,
   );
   const [digest, setDigest] = React.useState(true);
   const [mentions, setMentions] = React.useState(true);
@@ -83,7 +83,7 @@ export function ProfileSettingsPage() {
                       <Input value={name} onChange={(e) => setName(e.target.value)} />
                     </Field>
                     <Field label="Email" hint="Managed by your identity provider.">
-                      <Input value={`${user.id}@cx42.io`} readOnly disabled />
+                      <Input value={`${user.id}@sia.io`} readOnly disabled />
                     </Field>
                   </div>
                 </div>
@@ -143,7 +143,7 @@ export function ProfileSettingsPage() {
                       dispatch({
                         type: 'CONNECT_MAILBOX',
                         provider: 'gmail',
-                        address: `${user.id}@cx42.io`,
+                        address: `${user.id}@sia.io`,
                       })
                     }
                   >
@@ -155,7 +155,7 @@ export function ProfileSettingsPage() {
           )}
 
           {tab === 'signature' && (
-            <Card title="Email signature" description="Appended to replies you send from CX42.">
+            <Card title="Email signature" description="Appended to replies you send from Sia.">
               <Field label="Signature">
                 <Textarea
                   value={signature}

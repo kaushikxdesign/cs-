@@ -61,7 +61,7 @@ export function EmailDetail({
       t.body
         .replace(/\{\{contact\.first_name\}\}/g, String(email.from ?? '').split(' ')[0])
         .replace(/\{\{my\.name\}\}/g, 'Maya Chen')
-        .replace(/\{\{my\.calendar\}\}/g, 'cx42.io/maya'),
+        .replace(/\{\{my\.calendar\}\}/g, 'sia.io/maya'),
     );
     dispatch({ type: 'ADD_TOAST', msg: `Template applied — "${t.name}"`, toastType: 'info' });
   }

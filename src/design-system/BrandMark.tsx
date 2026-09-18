@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/cn';
 
 /**
- * The CX42 mark.
+ * The Sia mark.
  *
  * An open ring reaching a solid point: the arc is the account's trajectory,
  * the dot is the outcome it is heading for. Drawn as filled paths rather
@@ -16,7 +16,7 @@ import { cn } from '@/lib/cn';
 export function BrandMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden className={cn('size-5', className)}>
-      {/* The C: a 270° annulus, open to the right. */}
+      {/* A 270° annulus, open to the right. */}
       <path
         d="M18.36 5.64 A9 9 0 1 0 18.36 18.36 L16.07 16.07 A5.75 5.75 0 1 1 16.07 7.93 Z"
         fill="currentColor"

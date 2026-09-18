@@ -4,7 +4,7 @@ export interface ConversationMessage {
   id: string;
   date: string;
   author: string;
-  /** True when the author is from the customer side rather than CX42. */
+  /** True when the author is from the customer side rather than Sia. */
   inbound: boolean;
   body: string;
 }

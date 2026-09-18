@@ -188,7 +188,7 @@ function defaultCommsBody(actionId, automation){
   if (actionId === 'n_slack' || actionId === 'n_teams')
     return `:rotating_light: *{{customer.name}}* — ${trigger}.\nARR {{customer.arr}} · Owner {{customer.owner}}\nOpen the account: {{customer.link}}`;
   if (actionId === 'n_email')
-    return `Hi {{owner.first_name}},\n\n${pm.label.slice(0,-1)} alert on {{customer.name}}: ${trigger.toLowerCase()}.\n\nCurrent health is {{customer.health_band}} and the renewal is {{customer.renewal_date}}. Worth a look before your next check-in.\n\n— CX42`;
+    return `Hi {{owner.first_name}},\n\n${pm.label.slice(0,-1)} alert on {{customer.name}}: ${trigger.toLowerCase()}.\n\nCurrent health is {{customer.health_band}} and the renewal is {{customer.renewal_date}}. Worth a look before your next check-in.\n\n— Sia`;
   return `Hi {{contact.first_name}},\n\nI wanted to reach out personally about your account. ${trigger}, and I'd like to make sure we're supporting you properly.\n\nAre you free for a short call this week?\n\nBest,\n{{owner.name}}`;
 }
 function defaultCommsSubject(actionId, automation){

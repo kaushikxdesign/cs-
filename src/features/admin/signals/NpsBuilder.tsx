@@ -153,7 +153,7 @@ export function NpsBuilder({ dispatch }: BuilderProps) {
           <SettingsGroup title="Shareable form">
             <div className="space-y-3 py-3.5">
               <div className="flex gap-2">
-                <Input readOnly className="flex-1 font-mono" value="https://cx-42.com/s/nps/q3-2025" />
+                <Input readOnly className="flex-1 font-mono" value="https://sia.com/s/nps/q3-2025" />
                 <Button
                   variant="secondary"
                   onClick={() =>

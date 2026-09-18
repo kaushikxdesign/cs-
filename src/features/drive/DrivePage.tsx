@@ -92,7 +92,7 @@ export function DrivePage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <PageHeader
-        title="CX42 Drive"
+        title="Sia Drive"
         meta={<span>{rows.length} templates and documents</span>}
         actions={
           <Button variant="solid" size="sm" onClick={() => navigate('/qbrs')}>

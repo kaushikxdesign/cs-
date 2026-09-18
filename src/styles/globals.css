@@ -1,17 +1,28 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
+/* Unlayered on purpose. When this app is embedded — the artifact host nests
+   the whole document inside one of its own — the wrapper ships its own
+   `body { font: 14px -apple-system; background: …; color: … }`. Unlayered
+   rules beat every @layer regardless of specificity, so the same declarations
+   sitting in `@layer base` below lost silently and the entire app rendered in
+   the host's system font. Nothing about it looked broken, which is why it
+   survived two font changes. These four have to stay outside the cascade
+   layers to reach the page. */
+body {
+  background-color: var(--surface-canvas);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm--line-height);
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background-color: var(--surface-canvas);
-    color: var(--on-surface);
-    font-family: var(--font-sans);
-    font-size: var(--text-body-sm);
-    line-height: var(--text-body-sm--line-height);
     /* Geist needs no stylistic-set overrides; digits are aligned per-element
        with tabular-nums where they sit in columns. */
     -webkit-font-smoothing: antialiased;

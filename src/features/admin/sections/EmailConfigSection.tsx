@@ -19,7 +19,7 @@ const parseDomains = (s: string) =>
 /** Try an address against the current lists before committing them. */
 function DomainTester({ cfg, customers }: { cfg: any; customers: any[] }) {
   const [addr, setAddr] = React.useState('sarah.mitchell@acme-analytics.io');
-  const r = routeEmail({ fromEmail: addr, to: 'maya.chen@cx42.io' } as any, cfg, customers);
+  const r = routeEmail({ fromEmail: addr, to: 'maya.chen@sia.io' } as any, cfg, customers);
   const tone = r.bucket === 'mapped' ? 'success' : r.bucket === 'internal' ? 'neutral' : 'warning';
   const label =
     r.bucket === 'mapped'
@@ -73,7 +73,7 @@ function DkimPanel({ cfg, dispatch }: { cfg: any; dispatch: (a: any) => void }) 
         : { tone: 'neutral' as const, label: 'Not generated' };
 
   function generate() {
-    const sel = 'cx42' + Math.random().toString(36).slice(2, 6);
+    const sel = 'sia' + Math.random().toString(36).slice(2, 6);
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     const key = Array.from({ length: 216 }, () => chars[Math.floor(Math.random() * 64)]).join('');
     dispatch({
@@ -93,7 +93,7 @@ function DkimPanel({ cfg, dispatch }: { cfg: any; dispatch: (a: any) => void }) 
       <div className="rounded-xl border border-border-default bg-subtle px-4 py-3.5">
         <p className="max-w-prose text-body-sm leading-relaxed text-on-surface-muted">
           DKIM signs outbound mail so receiving servers can prove it came from you. Without it,
-          replies sent from CX42 on your domain are far more likely to land in spam.
+          replies sent from Sia on your domain are far more likely to land in spam.
         </p>
       </div>
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * The last survivor of the legacy quarantine. It writes the failure into the
- * static `#cx42-error` block in index.html rather than rendering a fallback,
+ * static `#sia-error` block in index.html rather than rendering a fallback,
  * because the whole point is to surface a render crash with its component
  * stack in an environment that has no devtools open.
  */
@@ -20,7 +20,7 @@ export class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    const el = document.getElementById('cx42-error');
+    const el = document.getElementById('sia-error');
     if (el) {
       el.style.display = 'block';
       el.textContent =

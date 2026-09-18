@@ -66,7 +66,7 @@ export function NavRail({
     <nav className="flex w-16 shrink-0 flex-col items-center gap-1.5 pb-3 pt-3">
       <button
         onClick={() => onNavigate('/dashboard')}
-        aria-label="CX42 home"
+        aria-label="Sia home"
         className="mb-2 flex size-9 items-center justify-center rounded-xl text-accent transition-colors duration-[120ms] hover:bg-hover"
       >
         <BrandMark className="size-6" />

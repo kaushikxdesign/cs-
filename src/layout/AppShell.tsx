@@ -48,7 +48,7 @@ export function AppShell({
 
   /** Module, then the active view within it. Two rungs at most. */
   const crumbs = React.useMemo(() => {
-    if (!activeModule) return [{ label: 'CX42' }];
+    if (!activeModule) return [{ label: 'Sia' }];
     const view = (activeModule.views ?? []).find((v) => {
       const [path, qs] = v.path.split('?');
       if (path !== pathname) return false;

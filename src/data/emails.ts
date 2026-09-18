@@ -3,65 +3,65 @@
 // ============================================================
 const EMAILS = [
   { id:'em1', customerId:'acme', from:'Sarah Mitchell', fromEmail:'sarah.mitchell@acme-analytics.io',
-    to:'maya.chen@cx42.io', subject:'Re: Data sync still failing after the weekend patch',
+    to:'maya.chen@sia.io', subject:'Re: Data sync still failing after the weekend patch',
     received:'Aug 17, 2025 \u00b7 08:12', ago:'2h ago', unread:true, starred:true, hasAttachment:true,
     attachments:[{ name:'sync-error-log-aug17.txt', size:'46 KB' }],
     preview:'Maya \u2014 the sync failed again overnight. We are now 9 days into this and my team has stopped trusting the dashboards.',
     body:'Maya,\n\nThe sync failed again overnight, same error as before. We are now nine days into this issue and my team has effectively stopped trusting the dashboards \u2014 three of them went back to the old spreadsheet process this week.\n\nI have attached the error log from this morning. Can you give me a firm date? I have a board update on the 29th and I need to know whether to include the platform numbers or not.\n\nSarah' },
 
   { id:'em2', customerId:'globex', from:'Tom Rivera', fromEmail:'t.rivera@globexcloud.io',
-    to:'maya.chen@cx42.io', subject:'Renewal paperwork \u2014 who signs on your side?',
+    to:'maya.chen@sia.io', subject:'Renewal paperwork \u2014 who signs on your side?',
     received:'Aug 17, 2025 \u00b7 06:40', ago:'4h ago', unread:true, starred:false, hasAttachment:false, attachments:[],
     preview:'Procurement has the order form in review. They are asking who countersigns and whether the 3-year option is still on the table.',
     body:'Hi Maya,\n\nProcurement has the order form in review. Two questions before they can move it forward:\n\n1. Who countersigns on your side?\n2. Is the three-year option still available at the price we discussed in June?\n\nOur renewal date is the 14th so we have a little time, but I would rather not leave it to the last week.\n\nThanks,\nTom' },
 
   { id:'em3', customerId:'northstar', from:'Priya Anand', fromEmail:'priya@northstarlabs.com',
-    to:'maya.chen@cx42.io', subject:'Finance team wants access \u2014 how do we add seats?',
+    to:'maya.chen@sia.io', subject:'Finance team wants access \u2014 how do we add seats?',
     received:'Aug 16, 2025 \u00b7 17:22', ago:'Yesterday', unread:false, starred:false, hasAttachment:false, attachments:[],
     preview:'Our finance team has been using Dan\u2019s login to pull reports. That is obviously not ideal \u2014 what does adding 12 seats look like?',
     body:'Hi Maya,\n\nSlightly awkward admission: our finance team has been sharing Dan\u2019s login to pull the monthly reports. That is obviously not ideal.\n\nWhat does adding around 12 seats look like commercially? And is there a way to give them a read-only role so they cannot change the shared dashboards?\n\nPriya' },
 
   { id:'em4', customerId:'meridian', from:'James Okafor', fromEmail:'j.okafor@meridianbrands.com',
-    to:'maya.chen@cx42.io', subject:'Thanks for the QBR \u2014 one follow-up',
+    to:'maya.chen@sia.io', subject:'Thanks for the QBR \u2014 one follow-up',
     received:'Aug 16, 2025 \u00b7 11:05', ago:'Yesterday', unread:false, starred:false, hasAttachment:true,
     attachments:[{ name:'meridian-q3-notes.pdf', size:'1.2 MB' }],
     preview:'Good session yesterday. The exec team liked the adoption trend. One follow-up on the API rate limits we discussed.',
     body:'Maya,\n\nGood session yesterday \u2014 the exec team responded well to the adoption trend, particularly the time-to-insight numbers.\n\nOne follow-up: you mentioned the API rate limits could be raised for our integration workload. Could you send over what that involves and whether it affects our current tier?\n\nNotes from our side attached.\n\nJames' },
 
   { id:'em5', customerId:'vertex', from:'Elena Fischer', fromEmail:'elena.fischer@vertexai.co',
-    to:'maya.chen@cx42.io', subject:'Disappointed with the support response time',
+    to:'maya.chen@sia.io', subject:'Disappointed with the support response time',
     received:'Aug 15, 2025 \u00b7 19:48', ago:'2 days ago', unread:true, starred:true, hasAttachment:false, attachments:[],
     preview:'Three tickets this month have gone more than 48 hours without a substantive reply. This is not what we signed up for.',
     body:'Maya,\n\nI need to raise something. Three tickets this month have gone more than 48 hours without a substantive reply \u2014 not an acknowledgement, an actual answer.\n\nWhen we signed we were told enterprise support meant same-business-day response. That has not been our experience since June.\n\nI would like to understand what changed and what you are going to do about it.\n\nElena Fischer\nVP Engineering' },
 
   { id:'em6', customerId:'atlaspay', from:'Dan Kowalski', fromEmail:'dan.k@atlaspay.com',
-    to:'maya.chen@cx42.io', subject:'Out of office until the 25th',
+    to:'maya.chen@sia.io', subject:'Out of office until the 25th',
     received:'Aug 15, 2025 \u00b7 09:00', ago:'2 days ago', unread:false, starred:false, hasAttachment:false, attachments:[],
     preview:'I am away until the 25th. For anything urgent please contact Marissa Cole who is covering my accounts.',
     body:'I am away from the office until August 25th with limited access to email.\n\nFor anything urgent relating to the platform rollout, please contact Marissa Cole (marissa.cole@atlaspay.com) who is covering.\n\nDan' },
 
   { id:'em7', customerId:'helio', from:'Aisha Bello', fromEmail:'aisha@helioworks.com',
-    to:'maya.chen@cx42.io', subject:'Can we bring forward the enablement session?',
+    to:'maya.chen@sia.io', subject:'Can we bring forward the enablement session?',
     received:'Aug 14, 2025 \u00b7 15:30', ago:'3 days ago', unread:false, starred:false, hasAttachment:false, attachments:[],
     preview:'Our new analysts start on the 26th. Any chance we can move the session earlier so they are productive from week one?',
     body:'Hi Maya,\n\nTwo new analysts start with us on the 26th. Any chance we can move the enablement session earlier in that week so they are productive from day one rather than shadowing?\n\nHappy to work around your calendar.\n\nAisha' },
 
   // ── Internal: every participant is on a company domain, so never account-mapped
   { id:'em8', customerId:null, from:'James Park', fromEmail:'james.park@acme.com',
-    to:'maya.chen@cx42.io', cc:['sarah.kim@cx42.io'], subject:'Weekly CSM sync \u2014 agenda for Monday',
+    to:'maya.chen@sia.io', cc:['sarah.kim@sia.io'], subject:'Weekly CSM sync \u2014 agenda for Monday',
     received:'Aug 17, 2025 \u00b7 07:55', ago:'3h ago', unread:true, starred:false, hasAttachment:false, attachments:[],
     preview:'Adding the renewal pipeline review to Monday. Anything you want on the agenda before I send it round?',
     body:'Maya,\n\nAdding the renewal pipeline review to Monday\u2019s sync. Anything you want on the agenda before I circulate it?\n\nJames' },
 
-  { id:'em9', customerId:null, from:'CX42 Finance', fromEmail:'billing@cx42.io',
-    to:'maya.chen@cx42.io', subject:'Your expense claim for July has been approved',
+  { id:'em9', customerId:null, from:'Sia Finance', fromEmail:'billing@sia.io',
+    to:'maya.chen@sia.io', subject:'Your expense claim for July has been approved',
     received:'Aug 16, 2025 \u00b7 09:30', ago:'Yesterday', unread:false, starred:false, hasAttachment:false, attachments:[],
     preview:'Expense claim EXP-4417 was approved and will be paid in the August cycle.',
-    body:'Expense claim EXP-4417 has been approved and will be paid in the August cycle.\n\nCX42 Finance' },
+    body:'Expense claim EXP-4417 has been approved and will be paid in the August cycle.\n\nSia Finance' },
 
   // ── Excluded domain: a personal address, deliberately never mapped
   { id:'em10', customerId:null, from:'Dev Raman', fromEmail:'devraman88@gmail.com',
-    to:'maya.chen@cx42.io', subject:'Following up on the analyst role',
+    to:'maya.chen@sia.io', subject:'Following up on the analyst role',
     received:'Aug 15, 2025 \u00b7 14:10', ago:'2 days ago', unread:false, starred:false, hasAttachment:true,
     attachments:[{ name:'dev-raman-cv.pdf', size:'88 KB' }],
     preview:'I applied for the support analyst opening last week and wanted to check on the status.',
@@ -100,7 +100,7 @@ const SUPPORT_MAILBOXES = [
 
 const EMAIL_CONFIG_DEFAULTS = {
   // Domains — what counts as "us" and what must never be treated as a customer
-  companyDomains: ['acme.com', 'cx42.io'],
+  companyDomains: ['acme.com', 'sia.io'],
   excludedDomains: ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com'],
 
   // Threading — decided on headers, never on what the screen shows

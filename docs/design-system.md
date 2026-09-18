@@ -1,4 +1,4 @@
-# CX42 Design System
+# Sia Design System
 
 Implemented in `src/styles/tokens.css` (tokens) and `src/design-system/`
 (components). Every component and token is rendered together at

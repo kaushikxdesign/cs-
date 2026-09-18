@@ -95,7 +95,7 @@ export interface AssistantScope {
 
 export const ASSISTANT_SCOPES: Record<string, AssistantScope> = {
   global: {
-    id: 'global', label: 'All of CX42', short: 'Global', icon: Sparkles,
+    id: 'global', label: 'All of Sia', short: 'Global', icon: Sparkles,
     prompts: ['What needs my attention today?', 'Which renewals are most exposed?', 'Where do we have expansion evidence?'],
   },
   work: {
@@ -131,7 +131,7 @@ export const ASSISTANT_SCOPES: Record<string, AssistantScope> = {
     prompts: ['Which actions fired most this month?', 'What does this action actually do?', 'Which actions send customer emails?'],
   },
   drive: {
-    id: 'drive', label: 'CX42 Drive', short: 'Drive', icon: FolderOpen,
+    id: 'drive', label: 'Sia Drive', short: 'Drive', icon: FolderOpen,
     prompts: ['Which SOP applies to a churn risk?', 'What is in the onboarding SOP?', 'Find the QBR template for enterprise'],
   },
   admin: {
