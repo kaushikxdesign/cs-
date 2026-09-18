@@ -115,32 +115,35 @@ body {
 @keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-/* Dialog.Content stays centred with left-1/2 + top-1/2 + a -50%/-50%
-   translate throughout, so the keyframe carries that same translate
-   on every frame — swapping it out for scale-only would have the
-   panel drift to the corner for the animation's duration. */
+/* Scale only, not the -50%/-50% centring translate. Dialog.Content's own
+   -translate-x/y-1/2 classes compile to Tailwind v4's standalone `translate`
+   CSS property — a separate track from `transform` that composes with it
+   automatically, not something a `transform`-based keyframe here needs to
+   repeat. It briefly did: the keyframe's own translate(-50%,-50%) stacked on
+   top of the element's already-applied `translate` property, doubling the
+   offset for the animation's duration, then the panel snapped back the
+   instant the animation ended and stopped overriding `transform`. */
 @keyframes dialog-in {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
-  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
 }
 @keyframes dialog-out {
-  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  to   { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.96); }
 }
 
 @keyframes drawer-in  { from { transform: translateX(100%); } to { transform: translateX(0); } }
 @keyframes drawer-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
 
-/* The command palette centres only horizontally (`top-24`, not
-   `top-1/2`), so it carries its own translate rather than reusing
-   dialog-in/out's vertical centring. */
+/* Same reasoning as dialog-in/out: scale only. The command palette's own
+   -translate-x-1/2 already centres it via the `translate` property. */
 @keyframes command-in {
-  from { opacity: 0; transform: translate(-50%, 0) scale(0.98); }
-  to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
 }
 @keyframes command-out {
-  from { opacity: 1; transform: translate(-50%, 0) scale(1); }
-  to   { opacity: 0; transform: translate(-50%, 0) scale(0.98); }
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.98); }
 }
 
 /* Toasts have no Radix Presence to hold them mounted on the way out —

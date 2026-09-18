@@ -42,9 +42,6 @@ export function Dialog({
           className={cn(
             PANEL,
             ANIM_DIALOG,
-            // The dialog-in/out keyframes carry this same translate on every
-            // frame, so the running animation's `transform` and this static
-            // one settle on an identical value and there is nothing to fight.
             'fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl',
             className,
           )}
