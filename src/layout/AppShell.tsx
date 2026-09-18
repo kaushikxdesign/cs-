@@ -2,7 +2,7 @@ import React from 'react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
 import {
-  CommandPalette, ToastViewport, TooltipProvider, useCommandPalette, type CommandItem,
+  CollapsiblePane, CommandPalette, ToastViewport, TooltipProvider, useCommandPalette, type CommandItem,
 } from '@/design-system';
 import { TICKETS } from '@/data/core';
 import { ALL_MODULES, moduleForPath, roleForPath } from './nav';
@@ -146,11 +146,9 @@ export function AppShell({
 
           <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
 
-          {state.assistantOpen && (
-            <aside className="w-96 shrink-0 overflow-hidden border-l border-border-default bg-assistant">
-              {assistant}
-            </aside>
-          )}
+          <CollapsiblePane open={!!state.assistantOpen} className="bg-assistant">
+            {assistant}
+          </CollapsiblePane>
         </div>
         </div>
 

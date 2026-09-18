@@ -25,6 +25,7 @@ export function ConnectorsPage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <PageHeader
+        contained
         breadcrumbs={[{ label: 'Settings' }, { label: 'Connectors' }]}
         title="Connectors"
         meta={
@@ -44,8 +45,8 @@ export function ConnectorsPage() {
         }
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="max-w-4xl">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-5xl px-6 py-5">
           {rows.length === 0 ? (
             <EmptyState
               icon={<Plug className="size-6" strokeWidth={1.5} />}

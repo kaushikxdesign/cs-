@@ -15,6 +15,7 @@ export function PageHeader({
   actions,
   tabs,
   hero,
+  contained,
   className,
 }: {
   breadcrumbs?: Crumb[];
@@ -24,12 +25,23 @@ export function PageHeader({
   tabs?: React.ReactNode;
   /** Decorative brand wash, for headers with nothing else to carry. */
   hero?: boolean;
+  /**
+   * Centers the header's own content to the same capped width as a
+   * centered body, instead of spanning the full pane — for a reading list
+   * (My Work, Actions, Connectors: short rows, not a table) rather than
+   * data-dense screens that want the full width. Without this the header
+   * still spans edge to edge while a centered body sits in an island below
+   * it, and the two disagreeing about where the page's content lives reads
+   * as a mistake even when the centering itself is a deliberate choice for
+   * line length.
+   */
+  contained?: boolean;
   className?: string;
 }) {
   return (
     <header
       className={cn(
-        'relative border-b border-border-default bg-surface px-6 pt-4',
+        'relative border-b border-border-default bg-surface',
         hero && 'overflow-hidden',
         className,
       )}
@@ -44,33 +56,35 @@ export function PageHeader({
           style={{ backgroundImage: 'var(--gradient-brand)' }}
         />
       )}
-      {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav aria-label="Breadcrumb" className="mb-1 flex items-center gap-1 text-caption text-on-surface-subtle">
-          {breadcrumbs.map((c, i) => (
-            <React.Fragment key={i}>
-              {i > 0 && <ChevronRight className="size-3" strokeWidth={1.5} />}
-              {c.onClick ? (
-                <button onClick={c.onClick} className="hover:text-on-surface">
-                  {c.label}
-                </button>
-              ) : (
-                <span>{c.label}</span>
-              )}
-            </React.Fragment>
-          ))}
-        </nav>
-      )}
-      {/* Centered, not top-aligned. The actions are a single row of controls
-          on every screen that has them, so aligning them to the cap height of
-          the title left more space under the button than over it. */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <h1 className="text-title font-semibold text-on-surface truncate">{title}</h1>
-          {meta && <div className="mt-1 flex flex-wrap items-center gap-2 text-caption text-on-surface-subtle">{meta}</div>}
+      <div className={cn('px-6 pt-4', contained && 'mx-auto max-w-5xl')}>
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <nav aria-label="Breadcrumb" className="mb-1 flex items-center gap-1 text-caption text-on-surface-subtle">
+            {breadcrumbs.map((c, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <ChevronRight className="size-3" strokeWidth={1.5} />}
+                {c.onClick ? (
+                  <button onClick={c.onClick} className="hover:text-on-surface">
+                    {c.label}
+                  </button>
+                ) : (
+                  <span>{c.label}</span>
+                )}
+              </React.Fragment>
+            ))}
+          </nav>
+        )}
+        {/* Centered, not top-aligned. The actions are a single row of controls
+            on every screen that has them, so aligning them to the cap height of
+            the title left more space under the button than over it. */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-title font-semibold text-on-surface truncate">{title}</h1>
+            {meta && <div className="mt-1 flex flex-wrap items-center gap-2 text-caption text-on-surface-subtle">{meta}</div>}
+          </div>
+          {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
-        {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+        <div className={cn(tabs ? 'mt-3' : 'pb-4')}>{tabs}</div>
       </div>
-      <div className={cn(tabs ? 'mt-3' : 'pb-4')}>{tabs}</div>
     </header>
   );
 }

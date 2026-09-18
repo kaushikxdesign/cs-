@@ -75,6 +75,7 @@ export function ActionsPage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <PageHeader
+        contained
         title="Actions"
         meta={
           <>
@@ -85,8 +86,8 @@ export function ActionsPage() {
         }
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="max-w-4xl">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-5xl px-6 py-5">
           <div className="mb-3 w-64">
             <SearchInput
               value={search}
