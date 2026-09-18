@@ -344,10 +344,10 @@
   --color-track:      var(--track);
 
   /* ---- Typography ---- */
-  /* Jakarta for the interface: rounder terminals and a wider aperture than
-     Geist, which reads warmer at the small sizes most of this UI runs at.
-     Geist stays behind it as the fallback and keeps the mono. */
-  --font-sans: 'Plus Jakarta Sans Variable', 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Geist for the interface. Tighter sidebearings than Jakarta, so dense
+     tables and the 13px body sizes this UI mostly runs at stay compact,
+     and its numerals line up without stylistic-set overrides. */
+  --font-sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* A step bolder and larger than before. The reference leans on a
