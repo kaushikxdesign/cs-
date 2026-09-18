@@ -12,7 +12,7 @@ import { NextBestActions } from '@/features/assistant/AiOverview';
 import { useApp } from '@/state/AppContext';
 import { useNavigate, useParams } from '@/router';
 import {
-  AXIS_PROPS, Avatar, Badge, Button, Card, EmptyState, GRID_PROPS, MetricRow, PageHeader,
+  AXIS_PROPS, Avatar, Badge, Button, Card, CardHeader, EmptyState, GRID_PROPS, MetricRow, PageHeader,
   TOOLTIP_PROPS, Tabs,
 } from '@/design-system';
 import { CONTACTS, GOALS, HEALTH_SIGNALS, MEETINGS, TICKETS, USERS } from '@/data/core';
@@ -21,7 +21,11 @@ import { AccountPanel } from './AccountPanel';
 
 type TabId = 'overview' | 'health' | 'goals' | 'contacts' | 'activity';
 
-/** A titled block of content. One pattern, used by every tab. */
+/**
+ * A titled block of content. One pattern, used by every tab — now the same
+ * one pattern the dashboard's own cards use, rather than a second, bordered
+ * implementation living only on this page.
+ */
 function Section({
   title,
   action,
@@ -32,13 +36,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-border-default bg-surface">
-      <div className="flex h-11 items-center justify-between gap-3 px-4">
-        <h3 className="truncate text-body font-semibold text-on-surface">{title}</h3>
-        {action}
-      </div>
+    <Card className="overflow-hidden">
+      <CardHeader title={title} actions={action} />
       {children}
-    </section>
+    </Card>
   );
 }
 

@@ -91,12 +91,12 @@ export function GoalDetailPage() {
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 xl:grid-cols-3">
           <div className="space-y-4 xl:col-span-2">
             {goal.description && (
-              <section className="rounded-xl border border-border-default bg-surface px-4 py-3.5">
+              <section className="rounded-xl bg-subtle px-4 py-3.5">
                 <p className="text-body text-on-surface-muted">{goal.description}</p>
               </section>
             )}
 
-            <section className="rounded-xl border border-border-default bg-surface">
+            <section className="rounded-xl bg-subtle">
               {/* A goal is a thing you are closing, so its header shows the
                   dial rather than a count buried in small grey type. */}
               <div className="flex items-center gap-4 px-4 py-3.5">
@@ -167,7 +167,7 @@ export function GoalDetailPage() {
             </section>
           </div>
 
-          <section className="h-fit rounded-xl border border-border-default bg-surface px-4 py-3.5">
+          <section className="h-fit rounded-xl bg-subtle px-4 py-3.5">
             <h3 className="mb-2 flex items-center gap-1.5 text-body-sm font-semibold text-on-surface">
               <Target className="size-4 text-accent" strokeWidth={1.75} />
               Details
