@@ -3,7 +3,7 @@ import { Building2 } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
 import {
-  Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, type Column,
+  Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, SelectionBar, type Column,
 } from '@/design-system';
 import { HEALTH_SIGNALS, USERS } from '@/data/core';
 import { formatCurrency, formatDate, healthTone, titleCase } from '@/lib/format';
@@ -20,7 +20,7 @@ interface CustomerRow {
 }
 
 export function CustomersPage() {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const { query } = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = React.useState('');
@@ -106,7 +106,6 @@ export function CustomersPage() {
             <span>{formatCurrency(rows.reduce((n, c) => n + (c.arr ?? 0), 0))} ARR</span>
           </>
         }
-        actions={selected.length > 0 ? <Button>Export {selected.length}</Button> : undefined}
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto p-6">
@@ -120,6 +119,24 @@ export function CustomersPage() {
           onAdd={(id) => id === 'owner' && navigate('/customers?owner=maya')}
           addOptions={[{ id: 'owner', label: 'My portfolio' }]}
         />
+
+        {/* Answers "what can I do with these" where the old header-button
+            only answered "how many" — the actions that apply to a set of
+            accounts live with the selection, not swapped in above it. */}
+        <SelectionBar count={selected.length} onClear={() => setSelected([])}>
+          <Button
+            size="sm"
+            onClick={() => {
+              dispatch({ type: 'ADD_TOAST', msg: `Exported ${selected.length} account${selected.length === 1 ? '' : 's'}.`, toastType: 'success' });
+              setSelected([]);
+            }}
+          >
+            Export
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => navigate('/tickets')}>
+            Open tickets
+          </Button>
+        </SelectionBar>
 
         <div className="overflow-hidden rounded-lg border border-border-default bg-surface">
           <DataTable

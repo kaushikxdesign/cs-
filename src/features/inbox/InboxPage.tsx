@@ -61,6 +61,28 @@ export function InboxPage() {
   const selected = tickets.find((t) => t.id === selectedId) ?? null;
   const customer = selected ? customersById[selected.customerId] : undefined;
 
+  // j/k walk the list the way the mail clients this pane borrows its shape
+  // from do. Ignored while typing anywhere — the composer, the search box,
+  // any input — so "j" in a reply doesn't jump the selection out from under
+  // the person writing it.
+  React.useEffect(() => {
+    function isTyping(el: EventTarget | null) {
+      const tag = (el as HTMLElement | null)?.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || (el as HTMLElement | null)?.isContentEditable;
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key !== 'j' && e.key !== 'k') return;
+      if (!tickets.length) return;
+      e.preventDefault();
+      const i = tickets.findIndex((t) => t.id === selectedId);
+      const next = e.key === 'j' ? Math.min(i + 1, tickets.length - 1) : Math.max(i - 1, 0);
+      setSelectedId(tickets[Math.max(next, 0)].id);
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [tickets, selectedId]);
+
   return (
     // Three cards on a ground, not three columns sharing rules. Each pane
     // carries its own border, so collapsing one leaves no orphaned edge and

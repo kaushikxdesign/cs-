@@ -238,7 +238,7 @@ export function MyWorkPage() {
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-4xl px-6 py-5">
+        <div className="max-w-4xl px-6 py-5">
           {tab === 'meetings' ? (
             <ul className="divide-y divide-border-default">
               {MEETINGS.map((m: any) => {

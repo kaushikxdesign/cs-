@@ -9,10 +9,23 @@ export interface ConversationMessage {
   body: string;
 }
 
+// "Jul 15: Sarah M. (Acme): body" — the full form, with a named author.
+const DATED_MESSAGE = /^([A-Za-z]{3}\s+\d{1,2}):\s*([^:]+?(?:\s*\([^)]*\))?):\s*(.+)$/;
+// "Jul 22: Admin request received." — a dated line with no author segment.
+// Every one of these in the mock data is a status note we wrote, not
+// something a customer said, so it takes the same authorship as below.
+const DATED_NOTE = /^([A-Za-z]{3}\s+\d{1,2}):\s*(.+)$/;
+
 /**
- * Conversations are stored as a newline-separated transcript in the mock data,
- * each line shaped "Jul 15: Sarah M. (Acme): body". Parsed here so the
- * conversation pane can render real messages rather than a wall of text.
+ * Conversations are stored as a newline-separated transcript in the mock
+ * data, and it is not one shape: most lines are "date: author: body", but
+ * several tickets carry undated or unauthored status notes instead (see
+ * sup1888, sup1955, the auto-generated tickets). The old parser only matched
+ * the first shape, so every other line fell through a fallback that stamped
+ * it `inbound: true` — a note we wrote ourselves, like "Admin access transfer
+ * pending manager approval," rendered as a customer message. Both patterns
+ * are matched explicitly now, and the fallback for genuinely dateless notes
+ * defaults to us, not the customer.
  */
 export function parseConversation(raw: string | undefined): ConversationMessage[] {
   if (!raw) return [];
@@ -21,17 +34,24 @@ export function parseConversation(raw: string | undefined): ConversationMessage[
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line, i) => {
-      const match = line.match(/^([A-Za-z]{3}\s+\d{1,2}):\s*([^:]+):\s*(.*)$/);
-      if (!match) return { id: String(i), date: '', author: '', inbound: true, body: line };
-      const [, date, author, body] = match;
-      return {
-        id: String(i),
-        date: date.trim(),
-        author: author.trim(),
-        // Support/CSM replies are ours; anyone else is the customer.
-        inbound: !/^(support|csm)\b/i.test(author.trim()),
-        body: body.trim(),
-      };
+      const dated = line.match(DATED_MESSAGE);
+      if (dated) {
+        const [, date, author, body] = dated;
+        return {
+          id: String(i),
+          date: date.trim(),
+          author: author.trim(),
+          // Support/CSM replies are ours; anyone else is the customer.
+          inbound: !/^(support|csm|sia)\b/i.test(author.trim()),
+          body: body.trim(),
+        };
+      }
+      const note = line.match(DATED_NOTE);
+      if (note) {
+        const [, date, body] = note;
+        return { id: String(i), date: date.trim(), author: 'Support', inbound: false, body: body.trim() };
+      }
+      return { id: String(i), date: '', author: 'Support', inbound: false, body: line };
     });
 }
 

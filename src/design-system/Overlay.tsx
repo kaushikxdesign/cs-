@@ -10,6 +10,12 @@ import { IconButton } from './Button';
 const OVERLAY = 'fixed inset-0 z-40 bg-scrim';
 const PANEL = 'z-50 border border-border-default bg-surface shadow-lg';
 
+// See globals.css for why Popper-positioned content (Popover, dropdown
+// menu, Tooltip) only ever gets ANIM_FADE, never a transform.
+const ANIM_FADE = 'data-[state=open]:animate-[fade-in_120ms_ease-out] data-[state=closed]:animate-[fade-out_100ms_ease-in]';
+const ANIM_DIALOG = 'data-[state=open]:animate-[dialog-in_150ms_ease-out] data-[state=closed]:animate-[dialog-out_100ms_ease-in]';
+const ANIM_DRAWER = 'data-[state=open]:animate-[drawer-in_200ms_ease-out] data-[state=closed]:animate-[drawer-out_150ms_ease-in]';
+
 /** Blocking confirmation or a short focused form. Anything record-shaped belongs in a Drawer. */
 export function Dialog({
   open,
@@ -31,10 +37,14 @@ export function Dialog({
   return (
     <RDialog.Root open={open} onOpenChange={onOpenChange}>
       <RDialog.Portal>
-        <RDialog.Overlay className={OVERLAY} />
+        <RDialog.Overlay className={cn(OVERLAY, ANIM_FADE)} />
         <RDialog.Content
           className={cn(
             PANEL,
+            ANIM_DIALOG,
+            // The dialog-in/out keyframes carry this same translate on every
+            // frame, so the running animation's `transform` and this static
+            // one settle on an identical value and there is nothing to fight.
             'fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl',
             className,
           )}
@@ -87,10 +97,11 @@ export function Drawer({
   return (
     <RDialog.Root open={open} onOpenChange={onOpenChange}>
       <RDialog.Portal>
-        <RDialog.Overlay className={OVERLAY} />
+        <RDialog.Overlay className={cn(OVERLAY, ANIM_FADE)} />
         <RDialog.Content
           className={cn(
             PANEL,
+            ANIM_DRAWER,
             'fixed right-0 top-0 flex h-full flex-col rounded-l-xl border-y-0 border-r-0',
             width === 'lg' ? 'w-112' : 'w-96',
           )}
@@ -144,6 +155,7 @@ export function Tooltip({
             'z-50 rounded-md bg-inverted px-2 py-1 shadow-md',
             'text-caption font-medium text-on-inverse',
             'select-none',
+            ANIM_FADE,
           )}
         >
           {label}
@@ -185,7 +197,7 @@ export function Popover({
         <RPopover.Content
           align={align}
           sideOffset={4}
-          className={cn(PANEL, "min-w-48 overflow-hidden rounded-xl", className)}
+          className={cn(PANEL, ANIM_FADE, "min-w-48 overflow-hidden rounded-xl", className)}
         >
           {children}
         </RPopover.Content>
@@ -224,7 +236,7 @@ export function DropdownMenu({
           align={align}
           side={side}
           sideOffset={4}
-          className={cn(PANEL, 'min-w-44 rounded-lg p-1')}
+          className={cn(PANEL, ANIM_FADE, 'min-w-44 rounded-lg p-1')}
         >
           {items.map((item, i) => (
             <React.Fragment key={i}>

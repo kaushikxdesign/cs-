@@ -1,8 +1,9 @@
 import React from 'react';
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronsUpDown, X } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Checkbox } from './Form';
 import { EmptyState, SkeletonTable } from './Feedback';
+import { IconButton } from './Button';
 
 export interface Column<T> {
   key: string;
@@ -57,6 +58,37 @@ export function PrimaryCell({
         )}
       </span>
     </span>
+  );
+}
+
+/**
+ * The bar a table's selection actually promised. Swapping the page header's
+ * action for "Export 3" answered "how many" but not "what can I do with
+ * them" — this replaces that with the count, the actions that apply, and an
+ * explicit way out, in the one place people are already looking when they
+ * have rows selected.
+ */
+export function SelectionBar({
+  count,
+  onClear,
+  children,
+}: {
+  count: number;
+  onClear: () => void;
+  children?: React.ReactNode;
+}) {
+  if (!count) return null;
+  return (
+    <div className="mb-3 flex animate-[fade-in_120ms_ease-out] items-center gap-3 rounded-lg border border-border-strong bg-selected px-3 py-2">
+      <span className="text-body-sm font-medium text-on-surface">
+        {count} selected
+      </span>
+      <span className="h-4 w-px bg-border-default" aria-hidden />
+      <div className="flex flex-1 items-center gap-2">{children}</div>
+      <IconButton label="Clear selection" size="sm" onClick={onClear}>
+        <X className="size-4" strokeWidth={1.75} />
+      </IconButton>
+    </div>
   );
 }
 

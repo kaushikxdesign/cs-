@@ -61,10 +61,10 @@ export function CommandPalette({
   return (
     <RDialog.Root open={open} onOpenChange={onOpenChange}>
       <RDialog.Portal>
-        <RDialog.Overlay className="fixed inset-0 z-40 bg-scrim" />
+        <RDialog.Overlay className="fixed inset-0 z-40 bg-scrim data-[state=open]:animate-[fade-in_120ms_ease-out] data-[state=closed]:animate-[fade-out_100ms_ease-in]" />
         <RDialog.Content
           aria-label="Command palette"
-          className="fixed left-1/2 top-24 z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border border-border-default bg-surface shadow-lg"
+          className="fixed left-1/2 top-24 z-50 w-full max-w-xl -translate-x-1/2 overflow-hidden rounded-2xl border border-border-default bg-surface shadow-lg data-[state=open]:animate-[command-in_150ms_ease-out] data-[state=closed]:animate-[command-out_100ms_ease-in]"
         >
           <RDialog.Title className="sr-only">Command palette</RDialog.Title>
           <div className="flex items-center gap-2 border-b border-border-default px-3">

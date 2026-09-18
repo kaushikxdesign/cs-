@@ -86,7 +86,7 @@ export function ActionsPage() {
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-4xl">
+        <div className="max-w-4xl">
           <div className="mb-3 w-64">
             <SearchInput
               value={search}

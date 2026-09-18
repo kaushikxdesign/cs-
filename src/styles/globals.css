@@ -96,3 +96,58 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--on-surface-faint); background-clip: content-box; }
 * { scrollbar-color: var(--border-strong) transparent; scrollbar-width: thin; }
+
+/* ------------------------------------------------------------
+   Overlay motion. Every popover, menu, dialog and drawer used to
+   appear and disappear on a single frame — the one thing every one
+   of them had in common. Radix keeps a closing element mounted for
+   the length of its exit animation (its Presence primitive watches
+   for one), so pairing data-[state=open]/closed with these keyframes
+   is enough; no JS timing to hand-manage.
+
+   Fade-only for anything Radix's Popper positions (Popover, dropdown
+   menu, tooltip): Popper sets its own inline `transform` for
+   placement, and a CSS animation on the same property overrides an
+   inline style for as long as it runs, so a scale or slide there
+   would fight the positioning and the panel would jump to the
+   viewport's corner mid-animation. Dialog and Drawer place themselves
+   with our own classes, not Popper, so they get real motion. */
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* Dialog.Content stays centred with left-1/2 + top-1/2 + a -50%/-50%
+   translate throughout, so the keyframe carries that same translate
+   on every frame — swapping it out for scale-only would have the
+   panel drift to the corner for the animation's duration. */
+@keyframes dialog-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes dialog-out {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to   { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+}
+
+@keyframes drawer-in  { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes drawer-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+/* The command palette centres only horizontally (`top-24`, not
+   `top-1/2`), so it carries its own translate rather than reusing
+   dialog-in/out's vertical centring. */
+@keyframes command-in {
+  from { opacity: 0; transform: translate(-50%, 0) scale(0.98); }
+  to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+@keyframes command-out {
+  from { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  to   { opacity: 0; transform: translate(-50%, 0) scale(0.98); }
+}
+
+/* Toasts have no Radix Presence to hold them mounted on the way out —
+   they leave the array outright on dismiss — so only the entrance is
+   animated; a hand-rolled exit would need its own unmount delay for
+   one transition's worth of polish. */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

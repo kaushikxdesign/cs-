@@ -84,14 +84,26 @@ function appReducer(state, action) {
     }
     
     case 'COMPLETE_TASK': {
+      const prevStatus = state.tasks[action.taskId]?.status;
       const task = { ...state.tasks[action.taskId], status: 'done', outcomeNote: action.note || 'Completed' };
       const tasks = { ...state.tasks, [action.taskId]: task };
-      return { ...state, tasks, toasts: [...state.toasts, { id: Date.now(), msg: 'Task marked complete', type: 'success' }] };
+      return { ...state, tasks, toasts: [...state.toasts, { id: Date.now(), msg: 'Task marked complete', type: 'success',
+        undo: { label: 'Undo', action: { type: 'REOPEN_TASK', taskId: action.taskId, status: prevStatus } } }] };
     }
     
     case 'SKIP_TASK': {
+      const prevStatus = state.tasks[action.taskId]?.status;
       const task = { ...state.tasks[action.taskId], status: 'skipped', outcomeNote: action.reason };
-      return { ...state, tasks: { ...state.tasks, [action.taskId]: task }, toasts: [...state.toasts, { id: Date.now(), msg: 'Task skipped', type: 'info' }] };
+      return { ...state, tasks: { ...state.tasks, [action.taskId]: task }, toasts: [...state.toasts, { id: Date.now(), msg: 'Task skipped', type: 'info',
+        undo: { label: 'Undo', action: { type: 'REOPEN_TASK', taskId: action.taskId, status: prevStatus } } }] };
+    }
+
+    // Reverses COMPLETE_TASK / SKIP_TASK from a toast's Undo button. Restores
+    // the exact prior status rather than a hardcoded 'todo', since a task
+    // undone from "in progress" belongs back there, not at the start.
+    case 'REOPEN_TASK': {
+      const task = { ...state.tasks[action.taskId], status: action.status || 'todo', outcomeNote: undefined };
+      return { ...state, tasks: { ...state.tasks, [action.taskId]: task } };
     }
     
     case 'QUALIFY_EXPANSION': {
@@ -153,7 +165,7 @@ function appReducer(state, action) {
     }
     
     case 'ADD_TOAST':
-      return { ...state, toasts: [...state.toasts, { id: Date.now(), msg: action.msg, type: action.toastType || 'info' }] };
+      return { ...state, toasts: [...state.toasts, { id: Date.now(), msg: action.msg, type: action.toastType || 'info', undo: action.undo }] };
     
     case 'ADD_WIDGET':
       return { ...state, customWidgets: [...state.customWidgets, action.widget], toasts: [...state.toasts, { id: Date.now(), msg: 'Widget added to dashboard', type: 'success' }] };

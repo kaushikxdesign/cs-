@@ -160,8 +160,14 @@ export function AppShell({
             id: t.id,
             message: t.msg,
             tone: t.type === 'success' ? 'success' : t.type === 'danger' ? 'danger' : 'info',
+            undoLabel: t.undo?.label,
           }))}
           onDismiss={(id) => dispatch({ type: 'DISMISS_TOAST', id })}
+          onUndo={(id) => {
+            const toast = (state.toasts ?? []).find((t: any) => t.id === id);
+            if (toast?.undo?.action) dispatch(toast.undo.action);
+            dispatch({ type: 'DISMISS_TOAST', id });
+          }}
         />
       </div>
     </TooltipProvider>

@@ -45,7 +45,7 @@ export function ConnectorsPage() {
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-4xl">
+        <div className="max-w-4xl">
           {rows.length === 0 ? (
             <EmptyState
               icon={<Plug className="size-6" strokeWidth={1.5} />}
