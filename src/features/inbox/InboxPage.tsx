@@ -3,6 +3,7 @@ import { useApp } from '@/state/AppContext';
 import { useLocation } from '@/router';
 import { TICKETS, USERS } from '@/data/core';
 import { ticketSla } from '@/data/tickets';
+import { CollapsiblePane } from '@/design-system';
 import { TicketList, type SortId, type TicketRow } from './TicketList';
 import { TicketConversation } from './TicketConversation';
 import { TicketDetailsPanel } from './TicketDetailsPanel';
@@ -88,18 +89,18 @@ export function InboxPage() {
     // carries its own border, so collapsing one leaves no orphaned edge and
     // the seams stop forming a grid across the screen.
     <div className="flex h-full min-h-0 gap-2 bg-canvas p-2">
-      {listOpen && (
-      <TicketList
-        tickets={tickets}
-        customersById={customersById}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        sort={sort}
-        onSortChange={setSort}
-        statusLabel={LABELS[filter]}
-        onCollapse={() => setListOpen(false)}
-      />
-      )}
+      <CollapsiblePane open={listOpen} width="22rem" bordered={false}>
+        <TicketList
+          tickets={tickets}
+          customersById={customersById}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          sort={sort}
+          onSortChange={setSort}
+          statusLabel={LABELS[filter]}
+          onCollapse={() => setListOpen(false)}
+        />
+      </CollapsiblePane>
 
       <TicketConversation
         ticket={selected}
@@ -124,14 +125,16 @@ export function InboxPage() {
         }
       />
 
-      {selected && panelOpen && (
-        <TicketDetailsPanel
-          ticket={selected}
-          customer={customer}
-          ownerName={customer ? USERS[customer.ownerId]?.name : undefined}
-          onCollapse={() => setPanelOpen(false)}
-        />
-      )}
+      <CollapsiblePane open={panelOpen && !!selected} width="21rem" side="left" bordered={false}>
+        {selected && (
+          <TicketDetailsPanel
+            ticket={selected}
+            customer={customer}
+            ownerName={customer ? USERS[customer.ownerId]?.name : undefined}
+            onCollapse={() => setPanelOpen(false)}
+          />
+        )}
+      </CollapsiblePane>
     </div>
   );
 }

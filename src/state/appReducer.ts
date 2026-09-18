@@ -107,8 +107,17 @@ function appReducer(state, action) {
     }
     
     case 'QUALIFY_EXPANSION': {
+      const prevStatus = state.expansionOpps[action.oppId]?.qualificationStatus;
       const opp = { ...state.expansionOpps[action.oppId], qualificationStatus: 'qualified' };
-      return { ...state, expansionOpps: { ...state.expansionOpps, [action.oppId]: opp }, toasts: [...state.toasts, { id: Date.now(), msg: 'Opportunity qualified — ready for outreach', type: 'success' }] };
+      return { ...state, expansionOpps: { ...state.expansionOpps, [action.oppId]: opp }, toasts: [...state.toasts, { id: Date.now(), msg: 'Opportunity qualified — ready for outreach', type: 'success',
+        undo: { label: 'Undo', action: { type: 'SET_EXPANSION_QUALIFICATION', oppId: action.oppId, status: prevStatus } } }] };
+    }
+
+    // Reverses QUALIFY_EXPANSION from a toast's Undo button — restores the
+    // exact prior qualification status rather than assuming 'unqualified'.
+    case 'SET_EXPANSION_QUALIFICATION': {
+      const opp = { ...state.expansionOpps[action.oppId], qualificationStatus: action.status };
+      return { ...state, expansionOpps: { ...state.expansionOpps, [action.oppId]: opp } };
     }
     
     case 'CREATE_CRM_OPP': {
@@ -147,10 +156,18 @@ function appReducer(state, action) {
     }
 
     case 'DISMISS_PRIORITY':
-      return { ...state, dismissedPriority: [...state.dismissedPriority, action.itemId], toasts: [...state.toasts, { id: Date.now(), msg: 'Item dismissed', type: 'info' }] };
-    
+      return { ...state, dismissedPriority: [...state.dismissedPriority, action.itemId], toasts: [...state.toasts, { id: Date.now(), msg: 'Item dismissed', type: 'info',
+        undo: { label: 'Undo', action: { type: 'UNDISMISS_PRIORITY', itemId: action.itemId } } }] };
+
+    case 'UNDISMISS_PRIORITY':
+      return { ...state, dismissedPriority: state.dismissedPriority.filter(id => id !== action.itemId) };
+
     case 'SNOOZE_PRIORITY':
-      return { ...state, snoozedPriority: [...state.snoozedPriority, action.itemId], toasts: [...state.toasts, { id: Date.now(), msg: 'Snoozed for 7 days', type: 'info' }] };
+      return { ...state, snoozedPriority: [...state.snoozedPriority, action.itemId], toasts: [...state.toasts, { id: Date.now(), msg: 'Snoozed for 7 days', type: 'info',
+        undo: { label: 'Undo', action: { type: 'UNSNOOZE_PRIORITY', itemId: action.itemId } } }] };
+
+    case 'UNSNOOZE_PRIORITY':
+      return { ...state, snoozedPriority: state.snoozedPriority.filter(id => id !== action.itemId) };
     
     case 'UPDATE_RENEWAL_FORECAST': {
       const renewals = state.renewals.map(r => r.id === action.renewalId ? { ...r, forecast: action.forecast } : r);
@@ -268,6 +285,9 @@ function appReducer(state, action) {
         toasts: [...state.toasts, { id: Date.now(), msg: 'Mailbox synced', type: 'success' }] };
     case 'MARK_EMAIL_READ':
       return { ...state, emails: (state.emails||[]).map(e => e.id === action.emailId ? { ...e, unread:false } : e) };
+    case 'SET_TABLE_DENSITY':
+      return { ...state, tableDensity: action.density };
+
     case 'TOGGLE_ASSISTANT':
       return { ...state, assistantOpen: !state.assistantOpen };
     

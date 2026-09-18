@@ -28,6 +28,8 @@ export interface DataTableProps<T> {
   loading?: boolean;
   empty?: React.ReactNode;
   stickyHeader?: boolean;
+  /** 'compact' tightens row padding for a denser, more scannable list. */
+  density?: 'comfortable' | 'compact';
   className?: string;
 }
 
@@ -104,9 +106,11 @@ export function DataTable<T>({
   loading,
   empty,
   stickyHeader = true,
+  density = 'comfortable',
   className,
 }: DataTableProps<T>) {
   const [sort, setSort] = React.useState<{ key: string; dir: 'asc' | 'desc' } | null>(null);
+  const rowPad = density === 'compact' ? 'py-1' : 'py-2.5';
 
   const sorted = React.useMemo(() => {
     if (!sort) return rows;
@@ -153,7 +157,8 @@ export function DataTable<T>({
                 key={c.key}
                 style={c.width ? { width: c.width } : undefined}
                 className={cn(
-                  'whitespace-nowrap px-4 py-2.5 text-caption font-medium text-on-surface-subtle',
+                  'whitespace-nowrap px-4 text-caption font-medium text-on-surface-subtle',
+                  rowPad,
                   c.align === 'right' ? 'text-right' : 'text-left',
                 )}
               >
@@ -212,7 +217,8 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     className={cn(
-                      'whitespace-nowrap px-4 py-2.5 align-middle text-on-surface-muted',
+                      'whitespace-nowrap px-4 align-middle text-on-surface-muted',
+                      rowPad,
                       c.align === 'right' && 'text-right tabular-nums',
                     )}
                   >

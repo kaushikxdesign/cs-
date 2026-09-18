@@ -321,7 +321,7 @@ export function CodeBlock({
           {copied ? 'Copied' : 'Copy'}
         </Button>
       </div>
-      <pre className="overflow-x-auto rounded-lg bg-[#16161A] p-3 font-mono text-caption leading-relaxed text-[#D6D6DE]">
+      <pre className="overflow-x-auto rounded-lg bg-code-bg p-3 font-code text-caption leading-relaxed text-code-fg">
         {code}
       </pre>
     </div>

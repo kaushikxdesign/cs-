@@ -1,12 +1,15 @@
 // SECTION 1: MOCK DATA
 // ============================================================
 
+// No `color` field: the Avatar component derives a hue from the name
+// itself (deterministic hash into the --av-* token ramp), so a fixed hex
+// per user here would just be dead data nothing ever reads — it wasn't.
 const USERS = {
-  maya: { id: 'maya', name: 'Maya Chen', role: 'csm', initials: 'MC', color: '#4f46e5' },
-  daniel: { id: 'daniel', name: 'Daniel Ortiz', role: 'manager', initials: 'DO', color: '#0891b2' },
-  priya: { id: 'priya', name: 'Priya Raman', role: 'executive', initials: 'PR', color: '#7c3aed' },
-  james: { id: 'james', name: 'James Park', role: 'csm', initials: 'JP', color: '#059669' },
-  sarah: { id: 'sarah', name: 'Sarah Kim', role: 'csm', initials: 'SK', color: '#d97706' },
+  maya: { id: 'maya', name: 'Maya Chen', role: 'csm', initials: 'MC' },
+  daniel: { id: 'daniel', name: 'Daniel Ortiz', role: 'manager', initials: 'DO' },
+  priya: { id: 'priya', name: 'Priya Raman', role: 'executive', initials: 'PR' },
+  james: { id: 'james', name: 'James Park', role: 'csm', initials: 'JP' },
+  sarah: { id: 'sarah', name: 'Sarah Kim', role: 'csm', initials: 'SK' },
 };
 
 // Health score calculator

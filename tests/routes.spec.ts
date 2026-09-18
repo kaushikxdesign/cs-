@@ -126,7 +126,10 @@ test('the primary action is legible, not black on black', async ({ page }) => {
 
 test('status labels are Title Case, never raw enum values', async ({ page }) => {
   await page.goto('/#/tickets', { waitUntil: 'networkidle' });
-  const details = page.locator('aside');
+  // The list pane collapsing into an animated `aside` too (same
+  // CollapsiblePane the details pane uses) means a bare `aside` locator
+  // now matches both — anchor on content only the details pane has.
+  const details = page.locator('aside').filter({ hasText: 'Assignment' });
   await expect(details).toContainText(/Critical|High|Medium|Low/);
   await expect(details).not.toContainText(/\bcritical\b|\bmid_market\b/);
 });

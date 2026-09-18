@@ -21,6 +21,7 @@ export function CollapsiblePane({
   open,
   width = '24rem',
   side = 'right',
+  bordered = true,
   className,
   children,
 }: {
@@ -29,6 +30,14 @@ export function CollapsiblePane({
   width?: string;
   /** Which edge the border sits on — the side it is docked against. */
   side?: 'left' | 'right';
+  /**
+   * False for a pane that already draws its own full border and rounding
+   * (a card on a ground, gapped from its neighbours rather than flush
+   * against them) — this wrapper then contributes nothing but the width
+   * animation, and a second border-l/r on top of the card's own would be
+   * a visible double edge.
+   */
+  bordered?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -72,7 +81,7 @@ export function CollapsiblePane({
       }}
       className={cn(
         'shrink-0 overflow-hidden transition-[width] duration-200 ease-out',
-        side === 'right' ? 'border-l border-border-default' : 'border-r border-border-default',
+        bordered && (side === 'right' ? 'border-l border-border-default' : 'border-r border-border-default'),
         className,
       )}
     >

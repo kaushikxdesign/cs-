@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from '@/router';
 import {
   Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, SelectionBar, type Column,
 } from '@/design-system';
-import { HEALTH_SIGNALS, USERS } from '@/data/core';
+import { HEALTH_SIGNALS, RENEWALS, USERS } from '@/data/core';
 import { formatCurrency, formatDate, healthTone, titleCase } from '@/lib/format';
 
 interface CustomerRow {
@@ -38,6 +38,12 @@ export function CustomersPage() {
   }, [state.customers, ownerFilter, search]);
 
   const health = (c: CustomerRow) => HEALTH_SIGNALS[c.healthId];
+  // The Renewals module already carries a hand-authored day-count per
+  // account; reusing it here (rather than computing a fresh one against
+  // some other anchor) means the two screens can never disagree about how
+  // many days out the same renewal is.
+  const daysToRenewal = (c: CustomerRow) =>
+    (RENEWALS as any[]).find((r) => r.customerId === c.id)?.daysRemaining as number | undefined;
 
   const columns: Column<CustomerRow>[] = [
     {
@@ -84,7 +90,17 @@ export function CustomersPage() {
       key: 'renewal',
       header: 'Renewal',
       sortValue: (c) => c.renewalDate,
-      render: (c) => formatDate(c.renewalDate),
+      render: (c) => {
+        const days = daysToRenewal(c);
+        return (
+          <span>
+            {formatDate(c.renewalDate)}
+            {days !== undefined && (
+              <span className="ml-1.5 text-caption text-on-surface-subtle tabular-nums">{days}d</span>
+            )}
+          </span>
+        );
+      },
     },
     {
       key: 'arr',
@@ -140,6 +156,7 @@ export function CustomersPage() {
 
         <div className="overflow-hidden rounded-lg border border-border-default bg-surface">
           <DataTable
+            density={state.tableDensity}
             rows={rows}
             columns={columns}
             rowKey={(c) => c.id}

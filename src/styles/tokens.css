@@ -157,6 +157,14 @@
   --chart-axis: var(--n-400);
 
   --track: var(--n-200);
+
+  /* A code/embed-snippet surface is chrome, not content — it reads as a
+     terminal in either theme, the way a code block does on most docs
+     sites, so it is declared once here and never redefined in the dark
+     block below. Previously two literal hex values sitting directly in a
+     component; the values are unchanged, only where they live. */
+  --code-bg: #16161A;
+  --code-fg: #D6D6DE;
 }
 
 /* ============================================================
@@ -354,8 +362,14 @@
      than as a second voice. Geist Mono was never actually loaded, so what
      these places rendered in was the system monospace, which matched nothing.
      The one place a real monospace would earn its keep is the copyable embed
-     snippet in Settings; restoring it there is this line plus a class. */
+     snippet in Settings — a real monospace there so `1`/`l`/`I` and `0`/`O`
+     stay distinguishable in code someone is about to paste into their own
+     site, which is what `font-code` below is for. */
   --font-mono: var(--font-sans);
+  --font-code: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
 
   /* A step bolder and larger than before. The reference leans on a
      genuinely large conversation title to anchor the pane. */

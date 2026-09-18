@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText, FolderOpen, Presentation, Target, type LucideIcon } from 'lucide-react';
+import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
 import {
   Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, SegmentedControl, type Column,
@@ -20,6 +21,7 @@ const KIND_ICON: Record<string, LucideIcon> = {
 };
 
 export function DrivePage() {
+  const { state } = useApp();
   const navigate = useNavigate();
   const [kind, setKind] = React.useState<string>('all');
   const [search, setSearch] = React.useState('');
@@ -116,6 +118,7 @@ export function DrivePage() {
         />
         <div className="overflow-hidden rounded-xl border border-border-default bg-surface">
           <DataTable
+            density={state.tableDensity}
             rows={rows}
             columns={columns}
             rowKey={(f) => f.id}

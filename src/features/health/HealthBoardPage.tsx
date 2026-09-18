@@ -170,6 +170,7 @@ export function HealthBoardPage() {
 
         <div className="mt-2 overflow-hidden rounded-xl border border-border-default bg-surface">
           <DataTable
+            density={state.tableDensity}
             rows={rows}
             columns={columns}
             rowKey={(c) => c.id}

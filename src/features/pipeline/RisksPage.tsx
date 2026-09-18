@@ -122,6 +122,7 @@ export function RisksPage() {
         />
         <div className="overflow-hidden rounded-lg border border-border-default bg-surface">
           <DataTable
+            density={state.tableDensity}
             rows={rows}
             columns={columns}
             rowKey={(r) => r.id}

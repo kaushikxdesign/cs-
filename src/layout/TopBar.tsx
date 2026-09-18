@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, ChevronRight, Command, Search, Sparkles } from 'lucide-react';
+import { Bell, ChevronRight, Command, Rows3, Rows4, Search, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import {
   Avatar, Badge, Button, CountBadge, DropdownMenu, IconButton, Popover, Tooltip,
@@ -70,17 +70,22 @@ export function TopBar({
   activeRole,
   notices,
   assistantOpen,
+  tableDensity,
   onNavigate,
   onOpenSearch,
   onToggleAssistant,
+  onToggleDensity,
 }: {
   crumbs: Array<{ label: string; path?: string }>;
   activeRole: string;
   notices: ReturnType<typeof buildNotices>;
   assistantOpen?: boolean;
+  /** A global preference, not per-page — every table in the product reads it. */
+  tableDensity?: 'comfortable' | 'compact';
   onNavigate: (path: string) => void;
   onOpenSearch: () => void;
   onToggleAssistant: () => void;
+  onToggleDensity: () => void;
 }) {
   const { theme, setTheme } = useTheme();
   const userId = ROLES.find((r) => r.id === activeRole)?.userId ?? 'maya';
@@ -187,6 +192,16 @@ export function TopBar({
         </Button>
 
         <span className="mx-0.5 h-5 w-px bg-border-default" aria-hidden />
+
+        <Tooltip label={tableDensity === 'compact' ? 'Comfortable rows' : 'Compact rows'} side="bottom">
+          <IconButton label="Toggle table density" size="md" onClick={onToggleDensity}>
+            {tableDensity === 'compact' ? (
+              <Rows3 className="size-[1.125rem]" strokeWidth={1.75} />
+            ) : (
+              <Rows4 className="size-[1.125rem]" strokeWidth={1.75} />
+            )}
+          </IconButton>
+        </Tooltip>
 
         <Tooltip label={theme === 'dark' ? 'Switch to light' : 'Switch to dark'} side="bottom">
           <IconButton

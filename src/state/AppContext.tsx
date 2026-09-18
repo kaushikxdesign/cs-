@@ -43,6 +43,10 @@ export function createInitialState() {
     assistantOpen: false,
     assistantContext: null,
     lastCreatedGoalId: null,
+    // A global preference, not a per-page one — switching it on Customers
+    // and having Risks still run heavy would read as the toggle being
+    // broken rather than a choice.
+    tableDensity: 'comfortable',
   };
 }
 

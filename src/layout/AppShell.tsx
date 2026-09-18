@@ -128,9 +128,16 @@ export function AppShell({
           activeRole={state.activeRole}
           notices={notices}
           assistantOpen={state.assistantOpen}
+          tableDensity={state.tableDensity}
           onNavigate={navigate}
           onOpenSearch={() => setPaletteOpen(true)}
           onToggleAssistant={() => dispatch({ type: 'TOGGLE_ASSISTANT' })}
+          onToggleDensity={() =>
+            dispatch({
+              type: 'SET_TABLE_DENSITY',
+              density: state.tableDensity === 'compact' ? 'comfortable' : 'compact',
+            })
+          }
         />
 
         <div className="flex min-h-0 flex-1 overflow-hidden rounded-tl-2xl border-l border-t border-border-default bg-surface">

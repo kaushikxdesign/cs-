@@ -70,7 +70,7 @@ export function TicketList({
   onCollapse?: () => void;
 }) {
   return (
-    <div className="flex w-[22rem] shrink-0 flex-col overflow-hidden rounded-xl border border-border-default bg-surface">
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-border-default bg-surface">
       <div className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border-default px-3">
         <span className="text-body-sm font-semibold text-on-surface">
           {tickets.length} {statusLabel}
