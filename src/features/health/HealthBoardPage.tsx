@@ -39,9 +39,9 @@ export function HealthBoardPage() {
   }, [customers]);
 
   const distribution = [
-    { name: 'At risk', count: counts.red, fill: 'var(--danger-solid)' },
-    { name: 'Needs attention', count: counts.yellow, fill: 'var(--warning-solid)' },
-    { name: 'Healthy', count: counts.green, fill: 'var(--success-solid)' },
+    { name: 'At risk', count: counts.red, fill: 'var(--band-risk)' },
+    { name: 'Needs attention', count: counts.yellow, fill: 'var(--band-watch)' },
+    { name: 'Healthy', count: counts.green, fill: 'var(--band-good)' },
   ];
 
   const rows = React.useMemo(
@@ -139,10 +139,10 @@ export function HealthBoardPage() {
           </div>
           <div className="px-2 py-3">
             <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={distribution} margin={{ top: 8, right: 8, bottom: 0, left: -24 }}>
+              <BarChart data={distribution} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                 <CartesianGrid {...GRID_PROPS} />
                 <XAxis dataKey="name" {...AXIS_PROPS} />
-                <YAxis allowDecimals={false} {...AXIS_PROPS} />
+                <YAxis width={36} allowDecimals={false} {...AXIS_PROPS} />
                 <RTooltip {...TOOLTIP_PROPS} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                   {distribution.map((d) => (

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   AtSign, Bookmark, ChevronDown, Inbox, MessagesSquare, MoreHorizontal, Moon, Paperclip,
-  Phone, Smile, Star, Ticket, Zap, CornerDownLeft, Command,
+  Phone, Smile, Sparkles, Star, Ticket, Zap, CornerDownLeft, Command,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Avatar, Button, EmptyState, IconButton, Kbd, Tooltip } from '@/design-system';
@@ -86,10 +86,13 @@ export function TicketConversation({
   return (
     <div className="flex min-w-0 flex-1 flex-col bg-surface">
       <header className="flex h-14 shrink-0 items-center gap-1.5 border-b border-border-default px-4">
-        <h2 className="min-w-0 flex-1 truncate text-title font-semibold text-on-surface">
-          {customerName}
-        </h2>
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-title-sm font-semibold text-on-surface">{customerName}</h2>
+          <p className="truncate text-caption text-on-surface-subtle">
+            {ticket.subject}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-0.5">
 
         <Tooltip label={following ? 'Unfollow' : 'Follow'} side="bottom">
           <IconButton
@@ -124,7 +127,10 @@ export function TicketConversation({
             <Moon className="size-4" strokeWidth={1.75} />
           </IconButton>
         </Tooltip>
-        {/* One unmistakable primary action, in solid rather than accent. */}
+        {/* A rule separates the five secondary tools from the one action
+            that ends the conversation — without it the Close button reads as
+            the sixth item in an icon strip. */}
+        <span className="mx-1.5 h-5 w-px bg-border-default" aria-hidden />
         <Button
           size="sm"
           variant="solid"
@@ -136,14 +142,18 @@ export function TicketConversation({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-3xl flex-col gap-4 px-6 py-6">
+      {/* A short thread sits against the composer rather than hanging from
+          the top of an empty pane — the newest message is the one you came
+          to read, so it belongs next to the box you reply in. */}
+      <div className="flex min-h-0 flex-1 flex-col justify-end overflow-y-auto">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-6 py-6">
           {ticket.summary && (
-            <div className="rounded-xl border border-border-default bg-subtle px-3.5 py-3">
-              <p className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+            <div className="border-l-2 border-accent-muted pl-3.5">
+              <p className="flex items-center gap-1.5 text-caption font-medium text-accent">
+                <Sparkles className="size-3.5" strokeWidth={1.75} />
                 Summary
               </p>
-              <p className="mt-1.5 text-body text-on-surface-muted">{ticket.summary}</p>
+              <p className="mt-1 text-body text-on-surface-muted">{ticket.summary}</p>
             </div>
           )}
 
@@ -160,8 +170,8 @@ export function TicketConversation({
         </div>
       </div>
 
-      <div className="shrink-0 p-4 pt-0">
-        <div className="mx-auto max-w-3xl overflow-hidden rounded-xl border border-border-default bg-surface shadow-sm">
+      <div className="shrink-0 border-t border-border-default bg-surface px-4 py-3">
+        <div className="mx-auto max-w-3xl overflow-hidden rounded-lg border border-border-default bg-canvas focus-within:border-border-strong">
           <div className="flex items-center gap-1.5 px-3 pt-2.5">
             <MessagesSquare className="size-4 text-on-surface" strokeWidth={1.75} />
             <span className="text-body-sm font-semibold text-on-surface">Reply</span>

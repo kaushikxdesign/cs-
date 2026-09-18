@@ -29,21 +29,47 @@ export function EmptyState({
   title,
   description,
   action,
+  compact,
   className,
 }: {
   icon?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
   action?: { label: string; onClick: () => void };
+  /** Inside a card or a panel section, where a full-page empty state would
+      make the empty case the tallest thing on the screen. */
+  compact?: boolean;
   className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col items-center justify-center px-6 py-12 text-center', className)}>
-      {icon && <div className="mb-3 text-on-surface-subtle">{icon}</div>}
-      <p className="text-title-sm font-semibold text-on-surface">{title}</p>
-      {description && <p className="mt-1 max-w-sm text-body-sm text-on-surface-subtle">{description}</p>}
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center text-center',
+        compact ? 'px-4 py-7' : 'px-6 py-12',
+        className,
+      )}
+    >
+      {icon && <div className={cn('text-on-surface-faint', compact ? 'mb-2' : 'mb-3')}>{icon}</div>}
+      <p
+        className={cn(
+          'font-medium text-on-surface',
+          compact ? 'text-body-sm' : 'text-title-sm font-semibold',
+        )}
+      >
+        {title}
+      </p>
+      {description && (
+        <p
+          className={cn(
+            'mt-1 max-w-sm text-on-surface-subtle',
+            compact ? 'text-caption' : 'text-body-sm',
+          )}
+        >
+          {description}
+        </p>
+      )}
       {action && (
-        <Button variant="secondary" className="mt-4" onClick={action.onClick}>
+        <Button variant="secondary" size="sm" className={compact ? 'mt-3' : 'mt-4'} onClick={action.onClick}>
           {action.label}
         </Button>
       )}

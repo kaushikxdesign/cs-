@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  Activity, AlertTriangle, ArrowUpRight, CalendarDays, Crosshair, Mail, Ticket, TrendingUp, Users,
+  Activity, AlertTriangle, ArrowUpRight, CalendarDays, Crosshair, Mail, ShieldCheck, Ticket,
+  TrendingUp, Users,
 } from 'lucide-react';
 import {
   Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis,
@@ -9,7 +10,8 @@ import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import { useNavigate, useParams } from '@/router';
 import {
-  AXIS_PROPS, Avatar, Badge, Button, EmptyState, GRID_PROPS, PageHeader, TOOLTIP_PROPS, Tabs,
+  AXIS_PROPS, Avatar, Badge, Button, Card, EmptyState, GRID_PROPS, MetricRow, PageHeader,
+  TOOLTIP_PROPS, Tabs,
 } from '@/design-system';
 import { CONTACTS, GOALS, HEALTH_SIGNALS, MEETINGS, TICKETS, USERS } from '@/data/core';
 import { formatCurrency, formatDate, healthTone, severityTone, titleCase } from '@/lib/format';
@@ -28,9 +30,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-border-default bg-surface">
-      <div className="flex items-center justify-between gap-3 border-b border-border-default px-4 py-2.5">
-        <h3 className="text-body-sm font-semibold text-on-surface">{title}</h3>
+    <section className="overflow-hidden rounded-xl border border-border-default bg-surface">
+      <div className="flex h-11 items-center justify-between gap-3 px-4">
+        <h3 className="truncate text-body font-semibold text-on-surface">{title}</h3>
         {action}
       </div>
       {children}
@@ -38,19 +40,25 @@ function Section({
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: React.ReactNode; tone?: string }) {
+const BAND_LABEL: Record<string, string> = { green: 'Healthy', yellow: 'Needs attention', red: 'At risk' };
+const bandLabel = (b?: string) => BAND_LABEL[b ?? ''] ?? 'Not scored';
+
+function Stat({
+  label, value, hint, tone,
+}: { label: string; value: React.ReactNode; hint?: string; tone?: string }) {
   return (
-    <div className="px-4 py-3">
-      <p className="text-caption text-on-surface-subtle">{label}</p>
+    <Card className="px-4 py-3.5">
+      <p className="text-caption font-medium text-on-surface-muted">{label}</p>
       <p
         className={cn(
-          'mt-0.5 text-title-sm font-semibold tabular-nums',
+          'mt-1.5 text-title-lg font-semibold tracking-tight tabular-nums',
           tone === 'danger' ? 'text-danger-fg' : 'text-on-surface',
         )}
       >
         {value}
       </p>
-    </div>
+      {hint && <p className="mt-1 truncate text-caption text-on-surface-subtle">{hint}</p>}
+    </Card>
   );
 }
 
@@ -88,6 +96,7 @@ export function Customer360Page() {
   ) as any[];
   const tickets = TICKETS.filter((t: any) => t.customerId === customer.id);
   const meetings = MEETINGS.filter((m: any) => m.customerId === customer.id);
+  const openTickets = tickets.filter((t: any) => t.status !== 'resolved');
   const owner = USERS[customer.ownerId];
 
   const history = (health?.history ?? []).map((h: any) => ({
@@ -158,30 +167,39 @@ export function Customer360Page() {
         <div className="min-h-0 flex-1 overflow-y-auto p-5">
           {tab === 'overview' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <Section title="Health">
-                  <Stat
-                    label="Composite"
-                    value={health ? health.compositeScore : '—'}
-                    tone={health?.band === 'red' ? 'danger' : undefined}
-                  />
-                </Section>
-                <Section title="Open risks">
-                  <Stat label="Exposure" value={formatCurrency(risks.reduce((n, r) => n + (r.amountAtRisk ?? 0), 0))} tone={risks.length ? 'danger' : undefined} />
-                </Section>
-                <Section title="Expansion">
-                  <Stat label="Potential" value={formatCurrency(opps.reduce((n, o) => n + (o.estimatedArr ?? 0), 0))} />
-                </Section>
-                <Section title="Support">
-                  <Stat label="Open tickets" value={tickets.filter((t: any) => t.status !== 'resolved').length} />
-                </Section>
-              </div>
+              {/* One label per number. The first pass wrapped each of these in
+                  a titled panel as well, so "Health / Composite / 30" spent
+                  three lines saying one thing. */}
+              <MetricRow>
+                <Stat
+                  label="Health score"
+                  value={health ? health.compositeScore : '—'}
+                  hint={health ? bandLabel(health.band) : 'Not scored'}
+                  tone={health?.band === 'red' ? 'danger' : undefined}
+                />
+                <Stat
+                  label="Risk exposure"
+                  value={formatCurrency(risks.reduce((n, r) => n + (r.amountAtRisk ?? 0), 0))}
+                  hint={risks.length ? `${risks.length} open` : 'None open'}
+                  tone={risks.length ? 'danger' : undefined}
+                />
+                <Stat
+                  label="Expansion potential"
+                  value={formatCurrency(opps.reduce((n, o) => n + (o.estimatedArr ?? 0), 0))}
+                  hint={opps.length ? `${opps.length} signal${opps.length === 1 ? '' : 's'}` : 'No signals'}
+                />
+                <Stat
+                  label="Open tickets"
+                  value={tickets.filter((t: any) => t.status !== 'resolved').length}
+                  hint={`${tickets.length} all time`}
+                />
+              </MetricRow>
 
-              <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+              <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-3">
                 <div className="space-y-4 xl:col-span-2">
                   <Section title="Open risks">
                     {risks.length === 0 ? (
-                      <EmptyState title="No open risks" description="Nothing is flagged on this account." />
+                      <EmptyState compact icon={<ShieldCheck className="size-5" strokeWidth={1.5} />} title="No open risks" description="Nothing is flagged on this account." />
                     ) : (
                       <ul className="divide-y divide-border-default">
                         {risks.map((r) => (
@@ -209,7 +227,7 @@ export function Customer360Page() {
                     }
                   >
                     {opps.length === 0 ? (
-                      <EmptyState title="No signals" description="No expansion signals detected yet." />
+                      <EmptyState compact icon={<TrendingUp className="size-5" strokeWidth={1.5} />} title="No expansion signals" description="Nothing detected on this account yet." />
                     ) : (
                       <ul className="divide-y divide-border-default">
                         {opps.map((o) => (
@@ -227,11 +245,40 @@ export function Customer360Page() {
                       </ul>
                     )}
                   </Section>
+
+                  <Section
+                    title="Open support"
+                    action={
+                      <Button size="xs" variant="ghost" onClick={() => setTab('activity')}>
+                        View all
+                      </Button>
+                    }
+                  >
+                    {openTickets.length === 0 ? (
+                      <EmptyState compact icon={<Ticket className="size-5" strokeWidth={1.5} />} title="No open tickets" description="Nothing outstanding for this account." />
+                    ) : (
+                      <ul className="divide-y divide-border-default">
+                        {openTickets.slice(0, 5).map((t: any) => (
+                          <li key={t.id} className="flex items-center gap-3 px-4 py-2.5">
+                            <Ticket className="size-4 shrink-0 text-on-surface-faint" strokeWidth={1.75} />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-body-sm font-medium text-on-surface">{t.subject}</p>
+                              <p className="truncate text-caption text-on-surface-subtle">
+                                {t.id} · {titleCase(t.status)}
+                              </p>
+                            </div>
+                            {t.priority && <Badge tone={severityTone(t.priority)}>{t.priority}</Badge>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Section>
                 </div>
 
+                <div className="space-y-4">
                 <Section title="Active goals">
                   {goals.length === 0 ? (
-                    <EmptyState title="No goals" description="No success plan on this account." />
+                    <EmptyState compact icon={<Crosshair className="size-5" strokeWidth={1.5} />} title="No goals" description="No success plan on this account." />
                   ) : (
                     <ul className="divide-y divide-border-default">
                       {goals.slice(0, 6).map((g) => (
@@ -255,6 +302,33 @@ export function Customer360Page() {
                     </ul>
                   )}
                 </Section>
+
+                <Section
+                  title="Key contacts"
+                  action={
+                    <Button size="xs" variant="ghost" onClick={() => setTab('contacts')}>
+                      View all
+                    </Button>
+                  }
+                >
+                  {contacts.length === 0 ? (
+                    <EmptyState compact icon={<Users className="size-5" strokeWidth={1.5} />} title="No contacts" description="Nobody mapped on this account." />
+                  ) : (
+                    <ul className="divide-y divide-border-default">
+                      {contacts.slice(0, 4).map((c: any) => (
+                        <li key={c.id} className="flex items-center gap-2.5 px-4 py-2.5">
+                          <Avatar name={c.name} size="md" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-body-sm font-medium text-on-surface">{c.name}</p>
+                            <p className="truncate text-caption text-on-surface-subtle">{c.title ?? c.role}</p>
+                          </div>
+                          {c.isChampion && <Badge tone="success">Champion</Badge>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Section>
+                </div>
               </div>
             </div>
           )}
@@ -264,7 +338,7 @@ export function Customer360Page() {
               <Section title="Composite score, last 90 days">
                 <div className="px-2 py-3">
                   <ResponsiveContainer width="100%" height={220}>
-                    <AreaChart data={history} margin={{ top: 8, right: 12, bottom: 0, left: -18 }}>
+                    <AreaChart data={history} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
                       <defs>
                         <linearGradient id="healthFill" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.25} />
@@ -273,7 +347,7 @@ export function Customer360Page() {
                       </defs>
                       <CartesianGrid {...GRID_PROPS} />
                       <XAxis dataKey="date" {...AXIS_PROPS} interval="preserveStartEnd" minTickGap={40} />
-                      <YAxis domain={[0, 100]} {...AXIS_PROPS} />
+                      <YAxis width={36} domain={[0, 100]} {...AXIS_PROPS} />
                       <RTooltip {...TOOLTIP_PROPS} />
                       <Area
                         type="monotone"
@@ -318,7 +392,7 @@ export function Customer360Page() {
           {tab === 'goals' && (
             <Section title="Success plan">
               {goals.length === 0 ? (
-                <EmptyState title="No goals yet" description="Create a goal to start a success plan." />
+                <EmptyState compact icon={<Crosshair className="size-5" strokeWidth={1.5} />} title="No goals yet" description="Create a goal to start a success plan." />
               ) : (
                 <ul className="divide-y divide-border-default">
                   {goals.map((g) => (
@@ -388,7 +462,7 @@ export function Customer360Page() {
             <div className="space-y-4">
               <Section title="Support tickets">
                 {tickets.length === 0 ? (
-                  <EmptyState title="No tickets" description="This account has raised no tickets." />
+                  <EmptyState compact title="No tickets" description="This account has raised none." />
                 ) : (
                   <ul className="divide-y divide-border-default">
                     {tickets.map((t: any) => (
@@ -414,7 +488,7 @@ export function Customer360Page() {
 
               <Section title="Meetings">
                 {meetings.length === 0 ? (
-                  <EmptyState title="No meetings" description="Nothing has been logged for this account." />
+                  <EmptyState compact title="No meetings" description="Nothing logged for this account." />
                 ) : (
                   <ul className="divide-y divide-border-default">
                     {meetings.map((m: any) => (

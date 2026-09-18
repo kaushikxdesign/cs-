@@ -134,10 +134,10 @@ export function ManagerDashboardPage() {
           </div>
           <div className="px-2 py-3">
             <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={chart} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
+              <BarChart data={chart} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                 <CartesianGrid {...GRID_PROPS} />
                 <XAxis dataKey="name" {...AXIS_PROPS} />
-                <YAxis {...AXIS_PROPS} unit="K" />
+                <YAxis width={36} {...AXIS_PROPS} unit="K" />
                 <RTooltip {...TOOLTIP_PROPS} formatter={(v: any) => [`$${v}K`, 'ARR']} />
                 <Bar dataKey="arr" radius={[4, 4, 0, 0]}>
                   {chart.map((c) => (
@@ -198,9 +198,9 @@ export function ExecutiveDashboardPage() {
       if (b) acc[b] = (acc[b] ?? 0) + (c.arr ?? 0);
     }
     return [
-      { name: 'At risk', arr: Math.round(acc.red / 1000), fill: 'var(--danger-solid)' },
-      { name: 'Watch', arr: Math.round(acc.yellow / 1000), fill: 'var(--warning-solid)' },
-      { name: 'Healthy', arr: Math.round(acc.green / 1000), fill: 'var(--success-solid)' },
+      { name: 'At risk', arr: Math.round(acc.red / 1000), fill: 'var(--band-risk)' },
+      { name: 'Watch', arr: Math.round(acc.yellow / 1000), fill: 'var(--band-watch)' },
+      { name: 'Healthy', arr: Math.round(acc.green / 1000), fill: 'var(--band-good)' },
     ];
   }, [customers]);
 
@@ -225,10 +225,10 @@ export function ExecutiveDashboardPage() {
             </div>
             <div className="px-2 py-3">
               <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={bandSplit} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
+                <BarChart data={bandSplit} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                   <CartesianGrid {...GRID_PROPS} />
                   <XAxis dataKey="name" {...AXIS_PROPS} />
-                  <YAxis {...AXIS_PROPS} unit="K" />
+                  <YAxis width={36} {...AXIS_PROPS} unit="K" />
                   <RTooltip {...TOOLTIP_PROPS} formatter={(v: any) => [`$${v}K`, 'ARR']} />
                   <Bar dataKey="arr" radius={[4, 4, 0, 0]}>
                     {bandSplit.map((b) => (

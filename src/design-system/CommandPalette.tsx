@@ -88,7 +88,7 @@ export function CommandPalette({
               return (
                 <React.Fragment key={item.id}>
                   {showGroup && (
-                    <p className="px-2 pb-1 pt-3 text-caption font-medium uppercase tracking-wide text-on-surface-subtle">
+                    <p className="px-2 pb-1 pt-3 text-caption font-medium text-on-surface-subtle">
                       {item.group}
                     </p>
                   )}

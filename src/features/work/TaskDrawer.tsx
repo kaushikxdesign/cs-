@@ -141,7 +141,7 @@ export function TaskDrawer({
 
         {task.outcomeNote && (
           <div>
-            <p className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+            <p className="text-body-sm font-semibold text-on-surface">
               Outcome
             </p>
             <p className="mt-1.5 text-body text-on-surface-muted">{task.outcomeNote}</p>
@@ -150,7 +150,7 @@ export function TaskDrawer({
 
         {!finished && (
           <div>
-            <p className="mb-1.5 text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+            <p className="mb-1.5 text-body-sm font-semibold text-on-surface">
               Outcome note
             </p>
             <Textarea

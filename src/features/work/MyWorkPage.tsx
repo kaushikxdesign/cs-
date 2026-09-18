@@ -19,16 +19,20 @@ type Range = 'all' | 'week' | 'overdue';
 function WorkRow({
   task,
   customerName,
+  currentUserId,
   onToggle,
   onOpen,
 }: {
   task: WorkTask;
   customerName?: string;
+  currentUserId?: string;
   onToggle: () => void;
   onOpen: () => void;
 }) {
   const goal = task.goalId ? GOALS[task.goalId] : undefined;
-  const owner = task.ownerId ? USERS[task.ownerId] : undefined;
+  // Shown only when the task belongs to someone else — otherwise it is
+  // the same face on every row of a list that is mine by definition.
+  const owner = task.ownerId && task.ownerId !== currentUserId ? USERS[task.ownerId] : undefined;
   const done = isFinished(task.status);
   const overdue = (daysFromToday(task.dueDate) ?? 0) < 0 && !done;
 
@@ -103,7 +107,7 @@ function WorkRow({
 function GroupHeading({ label, count, tone }: { label: string; count: number; tone: string }) {
   return (
     <div className="flex items-center gap-2 px-2.5 pb-1 pt-4 first:pt-1">
-      <h3 className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+      <h3 className="text-body-sm font-semibold text-on-surface">
         {label}
       </h3>
       <span
@@ -323,6 +327,7 @@ export function MyWorkPage() {
                             <WorkRow
                               task={t}
                               customerName={customersById[t.customerId ?? '']?.name}
+                              currentUserId={state.activeUser}
                               onToggle={() => toggle(t)}
                               onOpen={() => setOpenId(t.id)}
                             />

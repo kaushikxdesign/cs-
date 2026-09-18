@@ -100,7 +100,7 @@ export function PortalPreview() {
                     <span className="text-on-surface-muted">Progress</span>
                     <span className="font-semibold tabular-nums text-on-surface">{progress}%</span>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-subtle">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-track">
                     <div
                       className="h-full rounded-full bg-accent transition-all"
                       style={{ width: `${progress}%` }}

@@ -9172,9 +9172,9 @@ function SignalsAdmin({ onBack, dispatch }){
   const s = SIGNAL_SOURCES.find(x=>x.id===sig);
   const [settings, setSettings] = useState({});
 
-  const statusPill = st => st==='active' ? React.createElement(CxPill,{tone:'green'},'Active')
-                        : st==='attention' ? React.createElement(CxPill,{tone:'amber'},'Needs attention')
-                        : React.createElement(CxPill,{tone:'slate'},'Inactive');
+  const statusPill = st => st==='active' ? React.createElement(CxPill,{key:'s',tone:'green'},'Active')
+                        : st==='attention' ? React.createElement(CxPill,{key:'s',tone:'amber'},'Needs attention')
+                        : React.createElement(CxPill,{key:'s',tone:'slate'},'Inactive');
 
   if (!sig) {
     return React.createElement('div', { className:'space-y-4' },
@@ -9612,8 +9612,8 @@ function NotificationsAdmin({ onBack, dispatch }){
 
   const c = NOTIFY_CHANNELS.find(x=>x.id===chan);
   const statusPill = st => st==='connected'
-    ? React.createElement(CxPill,{tone:'green'},'Connected')
-    : React.createElement(CxPill,{tone:'slate'},'Not connected');
+    ? React.createElement(CxPill,{key:'s',tone:'green'},'Connected')
+    : React.createElement(CxPill,{key:'s',tone:'slate'},'Not connected');
 
   const toggleCell = (evId, ch) =>
     setMatrix(m => m.map(e => e.id===evId ? {...e, [ch]: !e[ch]} : e));

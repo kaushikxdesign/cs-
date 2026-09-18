@@ -168,7 +168,7 @@ export function ActionsPage() {
         {open && (
           <div className="space-y-5">
             <div className="space-y-2">
-              <p className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+              <p className="text-body-sm font-semibold text-on-surface">
                 Rule
               </p>
               <RuleRow keyword="When">

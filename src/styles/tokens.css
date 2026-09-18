@@ -51,10 +51,13 @@
   --b-50: #EFF8FF; --b-200: #B2DDFF; --b-600: #1570EF; --b-700: #175CD3;
 
   /* ---- Primitives: avatar hues ----
-     Assigned deterministically per name. Colour on people is what
-     makes a dense list scannable — grey avatars carry no signal. */
-  --av-1: #6366F1; --av-2: #0EA5E9; --av-3: #10B981; --av-4: #F59E0B;
-  --av-5: #EC4899; --av-6: #8B5CF6; --av-7: #14B8A6; --av-8: #EF4444;
+     Assigned deterministically per name. Colour on people is what makes a
+     dense list scannable, but eight fully saturated hues turned the ticket
+     list into a bag of sweets. These sit at one lightness and one modest
+     saturation, so they read as a family and the status colours stay the
+     only loud thing on the screen. */
+  --av-1: #5B64B0; --av-2: #3D77A3; --av-3: #3B8A6E; --av-4: #96763A;
+  --av-5: #A05A76; --av-6: #755CA0; --av-7: #3A8788; --av-8: #A05B4C;
 
   /* ============================================================
      SEMANTIC — surfaces, stacked by elevation in the app chrome.
@@ -117,6 +120,18 @@
   /* ---- Charts (muted, so status stays the loudest thing) ---- */
   --chart-1: #5B63C4; --chart-2: #3E8DBE; --chart-3: #429B90;
   --chart-4: #C0913F; --chart-5: #8A6BAE; --chart-6: #6B7280;
+
+  /* Health bands as DATA, not as status. A distribution chart is not an
+     alert, so it uses the muted end of green/amber/red rather than the
+     solids the badges use — three saturated bars beside a grey table read
+     as six alarms going off at once. */
+  --band-good: #4E9E7A; --band-watch: #C2913F; --band-risk: #C2635A;
+
+  /* Grid and axis furniture. Chart chrome should sit under the data. */
+  --chart-grid: var(--n-150);
+  --chart-axis: var(--n-400);
+
+  --track: var(--n-200);
 }
 
 /* ============================================================
@@ -128,22 +143,27 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --surface-rail:     var(--n-950);
-  --surface-sidebar:  var(--n-900);
-  --surface-canvas:   var(--n-900);
-  --surface-default:  var(--n-850);
-  --surface-panel:    var(--n-900);
-  --surface-subtle:   var(--n-800);
-  --surface-hover:    var(--n-800);
-  --surface-selected: #26263A;
+  /* The ladder is wider than the first pass. Canvas and surface were two
+     steps apart on paper but indistinguishable on a screen, so every card
+     dissolved into the page. */
+  --surface-rail:     #0A0A0C;
+  --surface-sidebar:  #121215;
+  --surface-canvas:   #131316;
+  --surface-default:  #1B1B20;
+  --surface-panel:    #161619;
+  --surface-subtle:   #232329;
+  --surface-hover:    #26262D;
+  --surface-selected: #23233D;
   --inverted:         var(--n-0);
   --scrim:            rgb(0 0 0 / 0.5);
 
   --bubble-in:  var(--n-800);
   --bubble-out: #2E2E52;
 
-  --border-default: #2B2B33;
-  --border-strong:  #3C3C46;
+  /* A hairline at 1.15:1 against its own surface is not a hairline, it is
+     nothing. These clear 1.4:1 and 2.2:1. */
+  --border-default: #32323B;
+  --border-strong:  #474752;
 
   --on-surface:        var(--n-50);
   --on-surface-muted:  #A8A8B3;
@@ -177,6 +197,25 @@
 
   --chart-1: #7B7FE8; --chart-2: #56A8DC; --chart-3: #4FB8AB;
   --chart-4: #D9A94E; --chart-5: #A484CC; --chart-6: #8B909C;
+
+  --band-good: #52A87F; --band-watch: #C99A48; --band-risk: #C96B60;
+
+  --chart-grid: #2A2A31;
+  --chart-axis: #6B6B76;
+
+  --track: #34343D;
+
+  /* Elevation on a dark ground comes from a lighter edge, not a darker
+     shadow — a black shadow on near-black is invisible. */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5), inset 0 1px 0 0 rgb(255 255 255 / 0.03);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.55), inset 0 1px 0 0 rgb(255 255 255 / 0.04);
+  --shadow-lg: 0 16px 40px -8px rgb(0 0 0 / 0.65), inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+
+  /* Avatars lift in lightness on a dark ground so white initials still
+     clear 4.5:1, but drop in chroma at the same time — a hue that is merely
+     bright next to a near-black canvas reads as neon. */
+  --av-1: #69709E; --av-2: #4D7B96; --av-3: #4B8A74; --av-4: #917A4C;
+  --av-5: #9A6A7E; --av-6: #7D6A98; --av-7: #4C8687; --av-8: #986A5E;
 }
 
 /* ============================================================
@@ -248,6 +287,12 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-chart-6: var(--chart-6);
+  --color-band-good:  var(--band-good);
+  --color-band-watch: var(--band-watch);
+  --color-band-risk:  var(--band-risk);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+  --color-track:      var(--track);
 
   /* ---- Typography ---- */
   --font-sans: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

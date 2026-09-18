@@ -56,7 +56,7 @@ export function PanelSection({
         aria-expanded={open}
         className="flex h-10 w-full items-center justify-between gap-2 px-4 text-left"
       >
-        <span className="text-caption font-medium uppercase tracking-wide text-on-surface-subtle">{title}</span>
+        <span className="text-body-sm font-semibold text-on-surface">{title}</span>
         <ChevronDown
           className={cn('size-4 text-on-surface-subtle transition-transform duration-[180ms]', !open && '-rotate-90')}
           strokeWidth={1.5}

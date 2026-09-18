@@ -67,7 +67,7 @@ export function TicketList({
 }) {
   return (
     <div className="flex w-[22rem] shrink-0 flex-col border-r border-border-default bg-surface">
-      <div className="flex h-12 items-center justify-between gap-2 px-3">
+      <div className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border-default px-3">
         <span className="text-body-sm font-semibold text-on-surface">
           {tickets.length} {statusLabel}
         </span>

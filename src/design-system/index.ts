@@ -1,7 +1,7 @@
 export { Button, IconButton, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
 export { Badge, CountBadge, StatusDot, Kbd, humanize, type Tone } from './Badge';
 export { Avatar, AvatarGroup } from './Avatar';
-export { Card, CardHeader, CardBody, MetricCard, ChartCard, KeyValueList } from './Card';
+export { Card, CardHeader, CardBody, MetricCard, MetricRow, ChartCard, KeyValueList } from './Card';
 export {
   Field, Label, Input, SearchInput, Textarea, Select, Checkbox, Switch,
   RadioGroup, SegmentedControl, type SelectOption,
@@ -12,6 +12,7 @@ export { Tabs, type TabItem } from './Tabs';
 export { DataTable, type Column } from './DataTable';
 export { FilterBar, type FilterChip } from './FilterBar';
 export { EmptyState, ErrorState, Skeleton, SkeletonTable } from './Feedback';
+export { Meter, toneForScore, type MeterTone } from './Meter';
 export { Timeline, type TimelineItem } from './Timeline';
 export { Stepper, StepperFooter, type Step } from './Stepper';
 export { RuleRow, RuleValue } from './RuleRow';

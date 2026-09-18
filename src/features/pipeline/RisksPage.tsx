@@ -151,13 +151,13 @@ export function RisksPage() {
             />
             {open.rootCause && (
               <div>
-                <p className="text-caption font-medium uppercase tracking-wide text-on-surface-subtle">Root cause</p>
+                <p className="text-caption font-medium text-on-surface-subtle">Root cause</p>
                 <p className="mt-1 text-body text-on-surface-muted">{open.rootCause}</p>
               </div>
             )}
             {open.evidence && open.evidence.length > 0 && (
               <div>
-                <p className="text-caption font-medium uppercase tracking-wide text-on-surface-subtle">Evidence</p>
+                <p className="text-caption font-medium text-on-surface-subtle">Evidence</p>
                 <ul className="mt-1 space-y-1">
                   {open.evidence.map((e, i) => (
                     <li key={i} className="text-body-sm text-on-surface-muted">• {e}</li>

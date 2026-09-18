@@ -164,7 +164,7 @@ export function ProfileSettingsPage() {
                 />
               </Field>
               <div className="mt-3 rounded-lg border border-border-default bg-subtle px-3 py-2.5">
-                <p className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+                <p className="text-body-sm font-semibold text-on-surface">
                   Preview
                 </p>
                 <p className="mt-1.5 whitespace-pre-wrap text-body text-on-surface-muted">{signature}</p>

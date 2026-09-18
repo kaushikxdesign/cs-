@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { Avatar, Badge, CountBadge } from '@/design-system';
+import { Avatar, Badge, CountBadge, Meter } from '@/design-system';
 import { USERS } from '@/data/core';
 import { formatCurrency, formatDate, healthTone, titleCase } from '@/lib/format';
 
@@ -24,7 +24,7 @@ export function PanelSection({
         aria-expanded={open}
         className="flex w-full items-center gap-2 text-left"
       >
-        <span className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+        <span className="text-body-sm font-semibold text-on-surface">
           {title}
         </span>
         {count !== undefined && <CountBadge>{count}</CountBadge>}
@@ -89,7 +89,7 @@ export function AccountPanel({
       {health && (
         <PanelSection title="Health breakdown">
           <div className="space-y-2.5">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 pb-0.5">
               <Badge tone={healthTone(health.band)} dot>
                 {health.band === 'yellow' ? 'Watch' : health.band === 'red' ? 'At risk' : 'Healthy'}
               </Badge>
@@ -103,27 +103,7 @@ export function AccountPanel({
               </span>
             </div>
             {(health.dimensions ?? []).map((d: any) => (
-              <div key={d.key}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-caption text-on-surface-muted">{d.label}</span>
-                  <span className="shrink-0 text-caption tabular-nums text-on-surface-subtle">
-                    {d.effectiveScore}
-                  </span>
-                </div>
-                <div className="mt-1 h-1 overflow-hidden rounded-full bg-subtle">
-                  <div
-                    className={cn(
-                      'h-full rounded-full',
-                      d.effectiveScore >= 70
-                        ? 'bg-success-solid'
-                        : d.effectiveScore >= 45
-                          ? 'bg-warning-solid'
-                          : 'bg-danger-solid',
-                    )}
-                    style={{ width: `${Math.max(2, Math.min(100, d.effectiveScore))}%` }}
-                  />
-                </div>
-              </div>
+              <Meter key={d.key} label={d.label} value={d.effectiveScore} />
             ))}
           </div>
         </PanelSection>

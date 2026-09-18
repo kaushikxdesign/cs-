@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown, PanelRightClose, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { Avatar, Badge, Checkbox, CountBadge, IconButton, Tooltip } from '@/design-system';
+import { Avatar, Badge, Checkbox, CountBadge, IconButton, Meter, Tooltip } from '@/design-system';
 import { actionsForTicket, ticketSla } from '@/data/tickets';
 import { formatCurrency, formatDate, titleCase } from '@/lib/format';
 import { sentimentTone, severityTone, slaTone, statusLabel } from './ticketModel';
@@ -26,7 +26,7 @@ function Section({
         aria-expanded={open}
         className="flex w-full items-center gap-2 text-left"
       >
-        <span className="text-caption font-semibold uppercase tracking-wide text-on-surface-subtle">
+        <span className="text-body-sm font-semibold text-on-surface">
           {title}
         </span>
         {count !== undefined && <CountBadge>{count}</CountBadge>}
@@ -150,17 +150,14 @@ export function TicketDetailsPanel({
               ) : (
                 <div className="space-y-3">
                   {stepCount > 0 && (
-                    <div className="flex items-center gap-2 pb-1">
-                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-subtle">
-                        <div
-                          className="h-full rounded-full bg-accent transition-[width] duration-[180ms]"
-                          style={{ width: `${(doneCount / stepCount) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-caption tabular-nums text-on-surface-subtle">
-                        {doneCount}/{stepCount}
-                      </span>
-                    </div>
+                    <Meter
+                      label="Steps complete"
+                      value={doneCount}
+                      max={stepCount}
+                      display={`${doneCount}/${stepCount}`}
+                      tone={doneCount === stepCount ? 'good' : 'accent'}
+                      className="pb-1"
+                    />
                   )}
                   {sops.map((sop: any) => (
                     <div key={sop.id}>
