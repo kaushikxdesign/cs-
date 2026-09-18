@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ErrorBoundary } from './legacy/app';
+import { ErrorBoundary } from './lib/ErrorBoundary';
 import { App } from './App';
 // Self-hosted so the app has no runtime font dependency on a CDN.
 import '@fontsource-variable/geist';

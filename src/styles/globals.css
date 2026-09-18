@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import './tokens.css';
-@import './legacy.css';
 
 @layer base {
   html {
@@ -69,3 +68,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+
+/* ------------------------------------------------------------
+   Scrollbars. The legacy sheet pinned these to two slate hex
+   values, so in dark mode every scrollable pane carried a pale
+   grey track. They follow the tokens now.
+   ------------------------------------------------------------ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--on-surface-faint); background-clip: content-box; }
+* { scrollbar-color: var(--border-strong) transparent; scrollbar-width: thin; }
