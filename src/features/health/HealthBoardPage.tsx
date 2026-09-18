@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
 import {
-  AXIS_PROPS, Avatar, Badge, Card, CardHeader, DataTable, EmptyState, GRID_PROPS, MetricCard, PageHeader,
+  AXIS_PROPS, Avatar, Badge, DataTable, EmptyState, GRID_PROPS, MetricCard, PageHeader,
   SegmentedControl, TOOLTIP_PROPS, type Column,
 } from '@/design-system';
 import { HEALTH_SIGNALS, USERS } from '@/data/core';
@@ -133,8 +133,10 @@ export function HealthBoardPage() {
           <MetricCard label="Healthy" value={counts.green} />
         </div>
 
-        <Card className="mt-4">
-          <CardHeader title="Distribution by band" />
+        <div className="mt-4 rounded-xl border border-border-default bg-surface">
+          <div className="border-b border-border-default px-4 py-2.5">
+            <h3 className="text-body-sm font-semibold text-on-surface">Distribution by band</h3>
+          </div>
           <div className="px-2 py-3">
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={distribution} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
@@ -150,7 +152,7 @@ export function HealthBoardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </div>
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <h3 className="text-body-sm font-semibold text-on-surface">Accounts</h3>

@@ -10,8 +10,8 @@ type TabId = 'profile' | 'mailbox' | 'signature' | 'locale';
 
 function Card({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl bg-subtle">
-      <div className="px-4 pb-2 pt-3.5">
+    <section className="rounded-xl border border-border-default bg-surface">
+      <div className="border-b border-border-default px-4 py-3">
         <h3 className="text-body-sm font-semibold text-on-surface">{title}</h3>
         {description && <p className="mt-0.5 text-caption text-on-surface-subtle">{description}</p>}
       </div>

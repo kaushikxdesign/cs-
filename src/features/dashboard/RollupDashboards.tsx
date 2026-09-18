@@ -6,7 +6,7 @@ import {
 import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
 import {
-  AXIS_PROPS, Avatar, Badge, Card, CardHeader, DataTable, EmptyState, GRID_PROPS, MetricCard, PageHeader,
+  AXIS_PROPS, Avatar, Badge, DataTable, EmptyState, GRID_PROPS, MetricCard, PageHeader,
   TOOLTIP_PROPS, type Column,
 } from '@/design-system';
 import { HEALTH_SIGNALS, RENEWALS, USERS } from '@/data/core';
@@ -128,8 +128,10 @@ export function ManagerDashboardPage() {
           <MetricCard label="Accounts at risk" value={owners.reduce((n, o) => n + o.red, 0)} />
         </div>
 
-        <Card className="mt-4">
-          <CardHeader title="ARR by CSM" />
+        <div className="mt-4 rounded-xl border border-border-default bg-surface">
+          <div className="border-b border-border-default px-4 py-2.5">
+            <h3 className="text-body-sm font-semibold text-on-surface">ARR by CSM</h3>
+          </div>
           <div className="px-2 py-3">
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={chart} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
@@ -145,7 +147,7 @@ export function ManagerDashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </div>
 
         <div className="mt-4 overflow-hidden rounded-xl border border-border-default bg-surface">
           <DataTable
@@ -217,8 +219,10 @@ export function ExecutiveDashboardPage() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
-          <Card>
-            <CardHeader title="ARR by health band" />
+          <div className="rounded-xl border border-border-default bg-surface">
+            <div className="border-b border-border-default px-4 py-2.5">
+              <h3 className="text-body-sm font-semibold text-on-surface">ARR by health band</h3>
+            </div>
             <div className="px-2 py-3">
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={bandSplit} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
@@ -234,17 +238,13 @@ export function ExecutiveDashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </Card>
+          </div>
 
-          <Card>
-            <CardHeader
-              title={
-                <span className="flex items-center gap-2">
-                  <ShieldCheck className="size-4 shrink-0 text-on-surface-subtle" strokeWidth={1.75} />
-                  Renewal forecast
-                </span>
-              }
-            />
+          <div className="rounded-xl border border-border-default bg-surface">
+            <div className="flex items-center gap-2 border-b border-border-default px-4 py-2.5">
+              <ShieldCheck className="size-4 text-on-surface-subtle" strokeWidth={1.75} />
+              <h3 className="text-body-sm font-semibold text-on-surface">Renewal forecast</h3>
+            </div>
             <ul className="divide-y divide-border-default">
               {renewals.slice(0, 7).map((r) => {
                 const cust = customers.find((c: any) => c.id === r.customerId);
@@ -266,18 +266,14 @@ export function ExecutiveDashboardPage() {
                 );
               })}
             </ul>
-          </Card>
+          </div>
         </div>
 
-        <Card className="mt-4">
-          <CardHeader
-            title={
-              <span className="flex items-center gap-2">
-                <TrendingUp className="size-4 shrink-0 text-on-surface-subtle" strokeWidth={1.75} />
-                Portfolio by CSM
-              </span>
-            }
-          />
+        <div className="mt-4 rounded-xl border border-border-default bg-surface">
+          <div className="flex items-center gap-2 border-b border-border-default px-4 py-2.5">
+            <TrendingUp className="size-4 text-on-surface-subtle" strokeWidth={1.75} />
+            <h3 className="text-body-sm font-semibold text-on-surface">Portfolio by CSM</h3>
+          </div>
           <ul className="divide-y divide-border-default">
             {owners.map((o) => (
               <li key={o.id} className="flex items-center gap-3 px-4 py-2.5">
@@ -295,7 +291,7 @@ export function ExecutiveDashboardPage() {
               </li>
             ))}
           </ul>
-        </Card>
+        </div>
       </div>
     </div>
   );

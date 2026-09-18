@@ -3,22 +3,16 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { Sparkline } from './Sparkline';
 
-/**
- * A soft fill, not a box. The separation from the page is the one step up
- * the elevation ladder from `bg-surface` to `bg-subtle` — the same relation
- * as a Notion callout to the page around it — rather than a hairline drawn
- * around the content. No shadow: elevation here is for overlays only, and a
- * shadow under something that isn't floating just reads as dirt.
- */
+/** Cards carry a hairline border and no shadow — elevation is for overlays only. */
 export function Card({ className, children, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       onClick={onClick}
       className={cn(
-        'rounded-lg bg-subtle',
-        // A card you can press says so before you press it — a deeper fill,
-        // not a lift or a border, the same move as its own resting state.
-        onClick && 'cursor-pointer transition-colors duration-[120ms] hover:bg-hover',
+        'rounded-lg border border-border-default bg-surface',
+        // A card you can press says so before you press it.
+        onClick &&
+          'cursor-pointer transition-[box-shadow,transform,border-color] duration-[160ms] hover:-translate-y-px hover:border-border-strong hover:shadow-md',
         className,
       )}
       {...props}
