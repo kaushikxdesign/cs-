@@ -173,14 +173,19 @@
   --surface-sidebar:  #060609;
   --surface-canvas:   #050507;
   --surface-default:  #0D0D11;
-  --surface-panel:    #08080B;
-  --surface-subtle:   #15151B;
-  --surface-hover:    #1B1B22;
+  /* A side panel sits ON the content, so it has to be at least as light as
+     it. At #08080B it was two steps DARKER than the pane beside it and read
+     as a hole cut in the page rather than something laid over it. Raising it
+     pushes subtle and hover up too, or the chips inside a panel land on the
+     same value as the panel and vanish. */
+  --surface-panel:    #141419;
+  --surface-subtle:   #1C1C24;
+  --surface-hover:    #22222B;
   --surface-selected: #17163A;
   --inverted:         var(--n-0);
   --scrim:            rgb(0 0 0 / 0.5);
 
-  --bubble-in:  #16161C;
+  --bubble-in:  #1C1C24;
   --bubble-out: #241F52;
 
   /* Borders hold their contrast against the deeper surfaces rather than
@@ -233,7 +238,7 @@
   --gradient-brand-soft: linear-gradient(135deg, #16143A 0%, #241640 100%);
   --glow-accent: 0 1px 2px 0 rgb(0 0 0 / 0.6), 0 6px 20px -6px rgb(139 132 255 / 0.4);
 
-  --track: #1E1E26;
+  --track: #26262F;
 
   /* Elevation on a dark ground comes from a lighter edge, not a darker
      shadow — a black shadow on near-black is invisible. */

@@ -1,6 +1,7 @@
 export { Button, IconButton, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
 export { Badge, CountBadge, StatusDot, Kbd, humanize, type Tone } from './Badge';
 export { Avatar, AvatarGroup } from './Avatar';
+export { BrandMark } from './BrandMark';
 export { Card, CardHeader, CardBody, MetricCard, MetricRow, ChartCard, KeyValueList } from './Card';
 export {
   Field, Label, Input, SearchInput, Textarea, Select, Checkbox, Switch,

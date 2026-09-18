@@ -1,7 +1,7 @@
 import React from 'react';
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { CountBadge, Tooltip } from '@/design-system';
+import { BrandMark, CountBadge, Tooltip } from '@/design-system';
 import { ADMIN_MODULE, MODULES, type NavModule } from './nav';
 
 function RailLink({
@@ -70,7 +70,7 @@ export function NavRail({
         className="mb-2 flex size-9 items-center justify-center rounded-xl text-white shadow-glow"
         style={{ backgroundImage: 'var(--gradient-brand)' }}
       >
-        <span className="text-caption font-bold tracking-tight">CX</span>
+        <BrandMark />
       </button>
 
       {MODULES.map((m) => (

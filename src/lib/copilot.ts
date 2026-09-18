@@ -42,6 +42,10 @@ const band = (b?: string) =>
 
 const plural = (n: number, one: string, many = one + 's') => `${n} ${n === 1 ? one : many}`;
 
+/** "in 0 days" is not something anyone says. */
+const when = (days: number) =>
+  days <= 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;
+
 /** Ranked, highest first, capped — a list of twelve is not a recommendation. */
 function rank(actions: NextAction[]) {
   return actions.sort((a, b) => b.weight - a.weight).slice(0, 4);
@@ -338,7 +342,7 @@ export function portfolioOverview(state: any): Overview {
         ? `${plural(risks.length, 'open risk')} carrying ${formatCurrency(exposure)}${worstName ? `, the largest at ${worstName}` : ''}.`
         : 'No open risks.',
       soon.length
-        ? `${plural(soon.length, 'renewal')} inside 60 days, the nearest being ${soon[0].c.name} in ${soon[0].d} days.`
+        ? `${plural(soon.length, 'renewal')} inside 60 days, the nearest being ${soon[0].c.name} ${when(soon[0].d!)}.`
         : 'Nothing renews inside 60 days.',
       upside ? `${formatCurrency(upside)} of expansion signal is detected and unqualified.` : '',
     ].filter(Boolean),
