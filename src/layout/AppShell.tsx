@@ -100,12 +100,14 @@ export function AppShell({
 
   return (
     <TooltipProvider>
-      {/* The app is a card on a backdrop rather than the whole viewport.
-          It costs 12px a side and buys the shell an outside edge, which is
-          what lets the rail and the content read as one object instead of
-          two regions that happen to touch. */}
-      <div className="h-screen overflow-hidden bg-app-backdrop p-1.5">
-      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-border-default bg-canvas shadow-lg">
+      {/* Two nested cards, not one.
+          The outer card is the app: backdrop behind it, and the bar and the
+          rail sit directly on its tinted ground. The inner card is the
+          content, in plain surface, inset on three sides so the rail curves
+          with the shell and the page it navigates to reads as something
+          held inside it rather than a region butted up against it. */}
+      <div className="h-screen overflow-hidden bg-app-backdrop p-2">
+      <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-sidebar shadow-lg">
         <TopBar
           crumbs={crumbs}
           activeRole={state.activeRole}
@@ -139,11 +141,17 @@ export function AppShell({
             />
           )}
 
-          <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
+          <div className="flex min-h-0 min-w-0 flex-1 gap-2 p-2 pl-0">
+            <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border-default bg-surface">
+              {children}
+            </main>
 
-          {state.assistantOpen && (
-            <div className="w-96 shrink-0 border-l border-border-default">{assistant}</div>
-          )}
+            {state.assistantOpen && (
+              <aside className="w-96 shrink-0 overflow-hidden rounded-xl border border-border-default bg-panel">
+                {assistant}
+              </aside>
+            )}
+          </div>
         </div>
 
         <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} items={commands} />

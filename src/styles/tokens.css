@@ -140,6 +140,14 @@
      as six alarms going off at once. */
   --band-good: #16B57F; --band-watch: #F2A63B; --band-risk: #EE5A6C;
 
+  /* Two ramps the brand can lean on where a flat fill would read as
+     administrative: the mark, the assistant, the primary action. Used
+     sparingly — a gradient on everything is the same as a gradient on
+     nothing. */
+  --gradient-brand: linear-gradient(135deg, var(--a-500) 0%, var(--v-500) 100%);
+  --gradient-brand-soft: linear-gradient(135deg, var(--a-50) 0%, #F6EEFF 100%);
+  --glow-accent: 0 1px 2px 0 rgb(13 13 15 / 0.08), 0 6px 16px -6px rgb(99 91 255 / 0.45);
+
   /* Grid and axis furniture. Chart chrome should sit under the data. */
   --chart-grid: var(--n-150);
   --chart-axis: var(--n-400);
@@ -161,25 +169,25 @@
      vibrant accent over it, washed out. Everything drops roughly a third,
      and the steps between rungs widen so the ladder still reads. */
   --app-backdrop:     #000000;
-  --surface-rail:     #08080A;
-  --surface-sidebar:  #0B0B0E;
-  --surface-canvas:   #0A0A0D;
-  --surface-default:  #131317;
-  --surface-panel:    #0E0E12;
-  --surface-subtle:   #1A1A20;
-  --surface-hover:    #1F1F26;
-  --surface-selected: #1C1B3D;
+  --surface-rail:     #050507;
+  --surface-sidebar:  #060609;
+  --surface-canvas:   #050507;
+  --surface-default:  #0D0D11;
+  --surface-panel:    #08080B;
+  --surface-subtle:   #15151B;
+  --surface-hover:    #1B1B22;
+  --surface-selected: #17163A;
   --inverted:         var(--n-0);
   --scrim:            rgb(0 0 0 / 0.5);
 
-  --bubble-in:  #1C1C23;
+  --bubble-in:  #16161C;
   --bubble-out: #241F52;
 
   /* Borders hold their contrast against the deeper surfaces rather than
      dropping with them — on a darker ground a hairline needs MORE lift,
      not less, or the whole screen turns into one flat sheet. */
-  --border-default: #2F2F3A;
-  --border-strong:  #43434F;
+  --border-default: #2C2C38;
+  --border-strong:  #3C3C48;
 
   /* Text lifts as the ground drops, so body copy clears 12:1 rather than
      the 8:1 it had. */
@@ -193,7 +201,7 @@
   --accent:         var(--a-400);
   --accent-hover:   #A49EFF;
   --accent-active:  var(--a-200);
-  --accent-subtle:  #1E1B45;
+  --accent-subtle:  #16143A;
   --accent-muted:   #332C6B;
   --accent-on-subtle: var(--a-200);
 
@@ -204,13 +212,13 @@
 
   --focus-ring: var(--a-400);
 
-  --success-subtle: #05231A; --success-border: #12603F;
+  --success-subtle: #04190F; --success-border: #12603F;
   --success-fg:     #3BE8A5; --success-solid:  #00C880;
-  --warning-subtle: #241804; --warning-border: #6B4410;
+  --warning-subtle: #1C1303; --warning-border: #6B4410;
   --warning-fg:     #FFC94D; --warning-solid:  #FFA51F;
-  --danger-subtle:  #260C12; --danger-border:  #6B1F30;
+  --danger-subtle:  #1E080D; --danger-border:  #6B1F30;
   --danger-fg:      #FF8898; --danger-solid:   #FF4D64;
-  --info-subtle:    #051A31; --info-border:    #0E4B85;
+  --info-subtle:    #041426; --info-border:    #0E4B85;
   --info-fg:        #6BBBFF; --info-solid:     #2196FF;
 
   --chart-1: #8B84FF; --chart-2: #3FB0FF; --chart-3: #23D5A0;
@@ -218,10 +226,14 @@
 
   --band-good: #1FD196; --band-watch: #FFB545; --band-risk: #FF6E80;
 
-  --chart-grid: #21212A;
+  --chart-grid: #1B1B23;
   --chart-axis: #65656F;
 
-  --track: #26262F;
+  --gradient-brand: linear-gradient(135deg, var(--a-400) 0%, var(--v-400) 100%);
+  --gradient-brand-soft: linear-gradient(135deg, #16143A 0%, #241640 100%);
+  --glow-accent: 0 1px 2px 0 rgb(0 0 0 / 0.6), 0 6px 20px -6px rgb(139 132 255 / 0.4);
+
+  --track: #1E1E26;
 
   /* Elevation on a dark ground comes from a lighter edge, not a darker
      shadow — a black shadow on near-black is invisible. */
@@ -276,6 +288,7 @@
   --color-on-solid:          var(--on-solid);
 
   --color-violet:            var(--v-500);
+  --shadow-glow:             var(--glow-accent);
   --color-accent:            var(--accent);
   --color-accent-hover:      var(--accent-hover);
   --color-accent-active:     var(--accent-active);
@@ -317,7 +330,10 @@
   --color-track:      var(--track);
 
   /* ---- Typography ---- */
-  --font-sans: 'Geist Variable', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Jakarta for the interface: rounder terminals and a wider aperture than
+     Geist, which reads warmer at the small sizes most of this UI runs at.
+     Geist stays behind it as the fallback and keeps the mono. */
+  --font-sans: 'Plus Jakarta Sans Variable', 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* A step bolder and larger than before. The reference leans on a

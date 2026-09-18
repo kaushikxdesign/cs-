@@ -32,7 +32,7 @@ function RailLink({
       >
         <Icon className="size-5" strokeWidth={active ? 2 : 1.75} />
         {count ? (
-          <CountBadge tone="danger" className="absolute -right-0.5 -top-0.5 ring-2 ring-rail">
+          <CountBadge tone="danger" className="absolute -right-0.5 -top-0.5 ring-2 ring-sidebar">
             {count}
           </CountBadge>
         ) : null}
@@ -63,7 +63,7 @@ export function NavRail({
   onToggleNav: () => void;
 }) {
   return (
-    <nav className="flex w-16 shrink-0 flex-col items-center gap-1.5 border-r border-border-default bg-rail py-3">
+    <nav className="flex w-16 shrink-0 flex-col items-center gap-1.5 py-2.5">
       {MODULES.map((m) => (
         <RailLink
           key={m.id}

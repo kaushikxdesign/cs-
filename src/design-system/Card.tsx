@@ -1,12 +1,20 @@
 import React from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { Sparkline } from './Sparkline';
 
 /** Cards carry a hairline border and no shadow — elevation is for overlays only. */
-export function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function Card({ className, children, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-lg border border-border-default bg-surface', className)}
+      onClick={onClick}
+      className={cn(
+        'rounded-lg border border-border-default bg-surface',
+        // A card you can press says so before you press it.
+        onClick &&
+          'cursor-pointer transition-[box-shadow,transform,border-color] duration-[160ms] hover:-translate-y-px hover:border-border-strong hover:shadow-md',
+        className,
+      )}
       {...props}
     >
       {children}
@@ -57,6 +65,11 @@ export interface MetricCardProps {
   /** When higher numbers are worse (churn, tickets), invert the tone. */
   invertDelta?: boolean;
   hint?: string;
+  /** A tinted chip beside the label. Gives a strip of numbers a silhouette. */
+  icon?: React.ReactNode;
+  /** Trend behind the figure — texture, not a chart. */
+  spark?: number[];
+  sparkTone?: 'accent' | 'good' | 'watch' | 'risk';
   className?: string;
 }
 
@@ -64,11 +77,20 @@ export interface MetricCardProps {
  * One number, one label, one optional qualifier — and never a title above
  * the label. A stat tile that needs a heading is a panel, not a tile.
  */
-export function MetricCard({ label, value, delta, invertDelta, hint, className }: MetricCardProps) {
+export function MetricCard({
+  label, value, delta, invertDelta, hint, icon, spark, sparkTone, className,
+}: MetricCardProps) {
   const good = delta === undefined ? null : invertDelta ? delta < 0 : delta > 0;
   return (
-    <Card className={cn('px-4 py-3.5', className)}>
-      <p className="text-caption font-medium text-on-surface-muted">{label}</p>
+    <Card className={cn('relative overflow-hidden px-4 py-3.5', className)}>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-caption font-medium text-on-surface-muted">{label}</p>
+        {icon && (
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-accent-subtle text-accent">
+            {icon}
+          </span>
+        )}
+      </div>
       <div className="mt-1.5 flex items-baseline gap-2">
         <span className="text-title-lg font-semibold tracking-tight text-on-surface tabular-nums">{value}</span>
         {delta !== undefined && (
@@ -88,6 +110,11 @@ export function MetricCard({ label, value, delta, invertDelta, hint, className }
         )}
       </div>
       {hint && <p className="mt-1 truncate text-caption text-on-surface-subtle">{hint}</p>}
+      {spark && spark.length > 1 && (
+        <div className="pointer-events-none -mx-4 -mb-3.5 mt-2.5">
+          <Sparkline values={spark} tone={sparkTone} />
+        </div>
+      )}
     </Card>
   );
 }

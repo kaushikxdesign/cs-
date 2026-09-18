@@ -89,11 +89,12 @@ export function TopBar({
   const userName = USERS[userId]?.name ?? 'CX42';
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border-default bg-surface px-3">
+    <header className="flex h-14 shrink-0 items-center gap-3 px-3">
       <button
         onClick={() => onNavigate('/dashboard')}
         aria-label="CX42 home"
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-solid text-on-solid"
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-white shadow-glow"
+        style={{ backgroundImage: 'var(--gradient-brand)' }}
       >
         <span className="text-caption font-bold tracking-tight">CX</span>
       </button>
@@ -152,7 +153,7 @@ export function TopBar({
               {notices.length > 0 && (
                 <CountBadge
                   tone="danger"
-                  className="pointer-events-none absolute -right-0.5 -top-0.5 ring-2 ring-surface"
+                  className="pointer-events-none absolute -right-0.5 -top-0.5 ring-2 ring-sidebar"
                 >
                   {notices.length}
                 </CountBadge>
@@ -175,10 +176,25 @@ export function TopBar({
           variant={assistantOpen ? 'subtle' : 'secondary'}
           size="sm"
           aria-pressed={assistantOpen}
-          icon={<Sparkles className="size-4 text-accent" strokeWidth={1.75} />}
+          className={cn(
+            'border-accent-muted',
+            assistantOpen && 'shadow-glow',
+          )}
+          icon={
+            <Sparkles
+              className="size-4"
+              strokeWidth={1.75}
+              style={{ color: 'var(--accent)' }}
+            />
+          }
           onClick={onToggleAssistant}
         >
-          Ask CX42
+          <span
+            className="bg-clip-text font-semibold text-transparent"
+            style={{ backgroundImage: 'var(--gradient-brand)' }}
+          >
+            Ask CX42
+          </span>
         </Button>
 
         <span className="mx-0.5 h-5 w-px bg-border-default" aria-hidden />

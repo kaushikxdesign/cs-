@@ -11,10 +11,14 @@ export type ButtonVariant = 'solid' | 'primary' | 'secondary' | 'ghost' | 'subtl
 export type ButtonSize = 'xs' | 'sm' | 'md';
 
 const VARIANTS: Record<ButtonVariant, string> = {
+  // The two committing actions cast a little light. A flat near-black
+  // button on a flat card is the most administrative thing on a screen,
+  // and these are the moments the product should feel like it wants to be
+  // pressed.
   solid:
-    'bg-solid text-on-solid hover:bg-solid-hover border border-transparent',
+    'bg-solid text-on-solid hover:bg-solid-hover border border-transparent shadow-sm hover:shadow-md',
   primary:
-    'bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-active border border-transparent',
+    'bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-active border border-transparent shadow-glow',
   secondary:
     'bg-surface text-on-surface border border-border-default hover:bg-hover',
   subtle:

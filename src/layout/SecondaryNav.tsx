@@ -46,8 +46,8 @@ export function SecondaryNav({
   }
 
   return (
-    <div className="flex w-56 shrink-0 flex-col border-r border-border-default bg-sidebar">
-      <div className="min-h-0 flex-1 overflow-y-auto p-2">
+    <div className="flex w-56 shrink-0 flex-col">
+      <div className="min-h-0 flex-1 overflow-y-auto p-2 pl-1">
         <ul className="space-y-0.5">
           {module.views.map((v) => {
             const active = isActive(v.path);

@@ -14,6 +14,7 @@ export function PageHeader({
   meta,
   actions,
   tabs,
+  hero,
   className,
 }: {
   breadcrumbs?: Crumb[];
@@ -21,10 +22,28 @@ export function PageHeader({
   meta?: React.ReactNode;
   actions?: React.ReactNode;
   tabs?: React.ReactNode;
+  /** Decorative brand wash, for headers with nothing else to carry. */
+  hero?: boolean;
   className?: string;
 }) {
   return (
-    <header className={cn('border-b border-border-default bg-surface px-6 pt-4', className)}>
+    <header
+      className={cn(
+        'relative border-b border-border-default bg-surface px-6 pt-4',
+        hero && 'overflow-hidden',
+        className,
+      )}
+    >
+      {/* A wash, not a banner. It belongs only on a header that carries no
+          data of its own — the morning greeting — and it has to sit under
+          the type rather than tint it. */}
+      {hero && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -top-28 size-64 rounded-full opacity-20 blur-3xl"
+          style={{ backgroundImage: 'var(--gradient-brand)' }}
+        />
+      )}
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav aria-label="Breadcrumb" className="mb-1 flex items-center gap-1 text-caption text-on-surface-subtle">
           {breadcrumbs.map((c, i) => (

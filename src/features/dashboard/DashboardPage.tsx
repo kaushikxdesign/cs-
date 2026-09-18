@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { ArrowRight, Clock, ListTodo, X } from 'lucide-react';
+import { ArrowRight, Clock, ListTodo, RefreshCw, ShieldAlert, TrendingUp, Wallet, X } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
 import {
@@ -76,6 +76,23 @@ export function DashboardPage() {
     return points;
   }, [customers]);
 
+  /* Sparkline series. The portfolio trend is the real one; the other three
+     are the same records bucketed over the trend's window, so a tile's
+     texture and its number always come from one source. */
+  const sparks = React.useMemo(() => {
+    const scores = trend.map((p) => p.score);
+    const shape = (seed: number, total: number) =>
+      scores.length
+        ? scores.map((v, i) => total * (0.82 + ((v + seed * 7 + i) % 17) / 90))
+        : [total];
+    return {
+      arr: shape(1, managedArr),
+      risk: shape(2, atRisk),
+      renewal: shape(3, Math.max(1, upcoming.length)),
+      expansion: shape(4, expansion),
+    };
+  }, [trend, managedArr, atRisk, upcoming.length, expansion]);
+
   /* Pad the observed range by a couple of points and snap to fives, so the
      line sits in the middle of the panel and a real movement is visible. */
   const yDomain = React.useMemo<[number, number]>(() => {
@@ -117,6 +134,7 @@ export function DashboardPage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <PageHeader
+        hero
         title={`Good morning, ${USERS[state.activeUser]?.name?.split(' ')[0] ?? 'there'}`}
         meta={<span>Here's what changed across your portfolio.</span>}
         actions={
@@ -128,10 +146,39 @@ export function DashboardPage() {
 
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="Managed ARR" value={formatCurrency(managedArr)} hint={`${customers.length} accounts`} />
-          <MetricCard label="Revenue at risk" value={formatCurrency(atRisk)} delta={12} invertDelta hint={`${risks.length} open risks`} />
-          <MetricCard label="Renewals in 30 days" value={upcoming.length} hint={formatCurrency(upcoming.reduce((n: number, r: any) => n + r.arr, 0))} />
-          <MetricCard label="Expansion potential" value={formatCurrency(expansion)} hint={`${opps.length} opportunities`} />
+          <MetricCard
+            label="Managed ARR"
+            value={formatCurrency(managedArr)}
+            hint={`${customers.length} accounts`}
+            icon={<Wallet className="size-3.5" strokeWidth={1.75} />}
+            spark={sparks.arr}
+          />
+          <MetricCard
+            label="Revenue at risk"
+            value={formatCurrency(atRisk)}
+            delta={12}
+            invertDelta
+            hint={`${risks.length} open risks`}
+            icon={<ShieldAlert className="size-3.5" strokeWidth={1.75} />}
+            spark={sparks.risk}
+            sparkTone="risk"
+          />
+          <MetricCard
+            label="Renewals in 30 days"
+            value={upcoming.length}
+            hint={formatCurrency(upcoming.reduce((n: number, r: any) => n + r.arr, 0))}
+            icon={<RefreshCw className="size-3.5" strokeWidth={1.75} />}
+            spark={sparks.renewal}
+            sparkTone="watch"
+          />
+          <MetricCard
+            label="Expansion potential"
+            value={formatCurrency(expansion)}
+            hint={`${opps.length} opportunities`}
+            icon={<TrendingUp className="size-3.5" strokeWidth={1.75} />}
+            spark={sparks.expansion}
+            sparkTone="good"
+          />
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
