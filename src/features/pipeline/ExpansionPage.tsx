@@ -2,7 +2,9 @@ import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
-import { Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, type Column, type Tone } from '@/design-system';
+import {
+  Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, type Column, type Tone,
+} from '@/design-system';
 import { USERS } from '@/data/core';
 import { formatCurrency, titleCase } from '@/lib/format';
 
@@ -52,12 +54,12 @@ export function ExpansionPage() {
     {
       key: 'account',
       header: 'Opportunity',
+      width: '34%',
       sortValue: (o) => customersById[o.customerId]?.name ?? '',
       render: (o) => (
-        <div className="min-w-0">
-          <p className="truncate font-medium text-on-surface">{customersById[o.customerId]?.name}</p>
-          {o.headline && <p className="truncate text-caption text-on-surface-subtle">{o.headline}</p>}
-        </div>
+        <PrimaryCell icon={<Avatar name={customersById[o.customerId]?.name} size="md" />} sub={o.headline}>
+          {customersById[o.customerId]?.name}
+        </PrimaryCell>
       ),
     },
     { key: 'type', header: 'Type', sortValue: (o) => o.type, render: (o) => titleCase(o.type) },
@@ -88,7 +90,15 @@ export function ExpansionPage() {
       key: 'owner',
       header: 'Owner',
       sortValue: (o) => USERS[o.ownerId]?.name ?? '',
-      render: (o) => USERS[o.ownerId]?.name ?? '—',
+      render: (o) =>
+        USERS[o.ownerId] ? (
+          <span className="flex items-center gap-2">
+            <Avatar name={USERS[o.ownerId].name} size="sm" />
+            {USERS[o.ownerId].name}
+          </span>
+        ) : (
+          '—'
+        ),
     },
     {
       key: 'arr',

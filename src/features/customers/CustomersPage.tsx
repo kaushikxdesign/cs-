@@ -3,7 +3,7 @@ import { Building2 } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
 import {
-  Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, type Column,
+  Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, type Column,
 } from '@/design-system';
 import { HEALTH_SIGNALS, USERS } from '@/data/core';
 import { formatCurrency, formatDate, healthTone, titleCase } from '@/lib/format';
@@ -43,12 +43,12 @@ export function CustomersPage() {
     {
       key: 'name',
       header: 'Account',
+      width: '30%',
       sortValue: (c) => c.name,
       render: (c) => (
-        <span className="flex items-center gap-2">
-          <Avatar name={c.name} size="md" />
-          <span className="font-medium text-on-surface">{c.name}</span>
-        </span>
+        <PrimaryCell icon={<Avatar name={c.name} size="md" />} sub={c.domain}>
+          {c.name}
+        </PrimaryCell>
       ),
     },
     {
@@ -70,7 +70,15 @@ export function CustomersPage() {
       key: 'owner',
       header: 'Owner',
       sortValue: (c) => USERS[c.ownerId]?.name ?? '',
-      render: (c) => USERS[c.ownerId]?.name ?? '—',
+      render: (c) =>
+        USERS[c.ownerId] ? (
+          <span className="flex items-center gap-2">
+            <Avatar name={USERS[c.ownerId].name} size="sm" />
+            {USERS[c.ownerId].name}
+          </span>
+        ) : (
+          '—'
+        ),
     },
     {
       key: 'renewal',

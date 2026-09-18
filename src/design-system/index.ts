@@ -9,7 +9,7 @@ export {
 export { Combobox, type ComboboxOption } from './Combobox';
 export { Dialog, Drawer, Tooltip, TooltipProvider, Popover, DropdownMenu, type MenuItem } from './Overlay';
 export { Tabs, type TabItem } from './Tabs';
-export { DataTable, type Column } from './DataTable';
+export { DataTable, PrimaryCell, type Column } from './DataTable';
 export { FilterBar, type FilterChip } from './FilterBar';
 export { EmptyState, ErrorState, Skeleton, SkeletonTable } from './Feedback';
 export { Meter, toneForScore, type MeterTone } from './Meter';

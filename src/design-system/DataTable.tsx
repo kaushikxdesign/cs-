@@ -30,6 +30,36 @@ export interface DataTableProps<T> {
   className?: string;
 }
 
+/**
+ * A row's primary label, with an optional second line.
+ *
+ * Every table that had this pattern spelled it out inline and drifted:
+ * different weights, different muted tokens, one of them nesting a <p> per
+ * line and another a <span>. The secondary line is the reason the body
+ * cells are muted — the name has to be the only thing at full contrast.
+ */
+export function PrimaryCell({
+  children,
+  sub,
+  icon,
+}: {
+  children: React.ReactNode;
+  sub?: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <span className="flex items-center gap-2.5">
+      {icon}
+      <span className="min-w-0">
+        <span className="block truncate text-body-sm font-medium text-on-surface">{children}</span>
+        {sub && (
+          <span className="mt-0.5 block truncate text-caption text-on-surface-subtle">{sub}</span>
+        )}
+      </span>
+    </span>
+  );
+}
+
 export function DataTable<T>({
   rows,
   columns,
@@ -79,7 +109,7 @@ export function DataTable<T>({
         <thead className={cn(stickyHeader && 'sticky top-0 z-10')}>
           <tr className="border-b border-border-default bg-subtle">
             {selectable && (
-              <th className="w-10 px-3">
+              <th className="w-10 pl-4 pr-0">
                 <Checkbox
                   checked={allSelected}
                   onCheckedChange={(c) => onSelectedChange?.(c ? rows.map(rowKey) : [])}
@@ -91,7 +121,7 @@ export function DataTable<T>({
                 key={c.key}
                 style={c.width ? { width: c.width } : undefined}
                 className={cn(
-                  'h-9 px-3 text-caption font-medium text-on-surface-subtle',
+                  'whitespace-nowrap px-4 py-2.5 text-caption font-medium text-on-surface-subtle',
                   c.align === 'right' ? 'text-right' : 'text-left',
                 )}
               >
@@ -135,7 +165,7 @@ export function DataTable<T>({
                 )}
               >
                 {selectable && (
-                  <td className="px-3" onClick={(e) => e.stopPropagation()}>
+                  <td className="pl-4 pr-0 align-middle" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={(c) =>
@@ -150,7 +180,7 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     className={cn(
-                      'h-10 px-3 text-on-surface',
+                      'whitespace-nowrap px-4 py-2.5 align-middle text-on-surface-muted',
                       c.align === 'right' && 'text-right tabular-nums',
                     )}
                   >
@@ -158,8 +188,8 @@ export function DataTable<T>({
                   </td>
                 ))}
                 {rowActions && (
-                  <td className="px-3" onClick={(e) => e.stopPropagation()}>
-                    <div className="opacity-0 transition-opacity duration-[120ms] group-hover:opacity-100 focus-within:opacity-100">
+                  <td className="px-4 align-middle" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end opacity-0 transition-opacity duration-[120ms] group-hover:opacity-100 focus-within:opacity-100">
                       {rowActions(row)}
                     </div>
                   </td>

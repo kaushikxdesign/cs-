@@ -2,7 +2,7 @@ import React from 'react';
 import { FileText, FolderOpen, Presentation, Target, type LucideIcon } from 'lucide-react';
 import { useNavigate } from '@/router';
 import {
-  Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, SegmentedControl, type Column,
+  Avatar, Badge, Button, DataTable, EmptyState, FilterBar, PageHeader, PrimaryCell, SegmentedControl, type Column,
 } from '@/design-system';
 import { DRIVE_FILES, DRIVE_KINDS } from '@/data/drive';
 import { titleCase } from '@/lib/format';
@@ -45,24 +45,32 @@ export function DrivePage() {
     {
       key: 'name',
       header: 'File',
+      width: '32%',
       sortValue: (f) => f.name,
       render: (f) => {
         const Icon = KIND_ICON[f.kind] ?? FileText;
         return (
-          <span className="flex items-center gap-2.5">
-            <Icon className="size-4 shrink-0 text-on-surface-subtle" strokeWidth={1.75} />
-            <span className="min-w-0">
-              <span className="block truncate font-medium text-on-surface">{f.name}</span>
-              <span className="block text-caption text-on-surface-subtle">
-                {f.fmt} · {f.size}
-              </span>
-            </span>
-          </span>
+          <PrimaryCell
+            icon={<Icon className="size-4 shrink-0 text-on-surface-faint" strokeWidth={1.75} />}
+            sub={`${f.fmt} · ${f.size}`}
+          >
+            {f.name}
+          </PrimaryCell>
         );
       },
     },
     { key: 'kind', header: 'Type', sortValue: (f) => f.kind, render: (f) => titleCase(f.kind) },
-    { key: 'owner', header: 'Owner', sortValue: (f) => f.owner, render: (f) => f.owner },
+    {
+      key: 'owner',
+      header: 'Owner',
+      sortValue: (f) => f.owner,
+      render: (f) => (
+        <span className="flex items-center gap-2">
+          <Avatar name={f.owner} size="sm" />
+          {f.owner}
+        </span>
+      ),
+    },
     {
       key: 'status',
       header: 'Status',

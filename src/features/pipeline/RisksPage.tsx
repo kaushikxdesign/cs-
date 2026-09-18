@@ -3,7 +3,7 @@ import { ShieldCheck } from 'lucide-react';
 import { useApp } from '@/state/AppContext';
 import { useLocation, useNavigate } from '@/router';
 import {
-  Badge, DataTable, Drawer, EmptyState, FilterBar, KeyValueList, PageHeader, type Column,
+  Avatar, Badge, DataTable, Drawer, EmptyState, FilterBar, KeyValueList, PageHeader, PrimaryCell, type Column,
 } from '@/design-system';
 import { USERS } from '@/data/core';
 import { formatCurrency, severityTone, titleCase } from '@/lib/format';
@@ -53,12 +53,10 @@ export function RisksPage() {
     {
       key: 'title',
       header: 'Risk',
+      width: '34%',
       sortValue: (r) => r.title,
       render: (r) => (
-        <div className="min-w-0">
-          <p className="truncate font-medium text-on-surface">{r.title}</p>
-          <p className="truncate text-caption text-on-surface-subtle">{customersById[r.customerId]?.name}</p>
-        </div>
+        <PrimaryCell sub={customersById[r.customerId]?.name}>{r.title}</PrimaryCell>
       ),
     },
     {
@@ -72,7 +70,15 @@ export function RisksPage() {
       key: 'owner',
       header: 'Owner',
       sortValue: (r) => USERS[r.ownerId]?.name ?? '',
-      render: (r) => USERS[r.ownerId]?.name ?? '—',
+      render: (r) =>
+        USERS[r.ownerId] ? (
+          <span className="flex items-center gap-2">
+            <Avatar name={USERS[r.ownerId].name} size="sm" />
+            {USERS[r.ownerId].name}
+          </span>
+        ) : (
+          '—'
+        ),
     },
     {
       key: 'status',

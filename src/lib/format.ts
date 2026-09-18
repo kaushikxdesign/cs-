@@ -33,7 +33,15 @@ export function severityTone(severity: string | undefined): Tone {
   return 'neutral';
 }
 
+/**
+ * Acronyms the dataset stores in mixed case. Without this, `titleCase('QBR')`
+ * lowercases the two letters it did not touch and prints "Qbr".
+ */
+const ACRONYMS = new Set(['QBR', 'EBR', 'SOP', 'NPS', 'CSAT', 'SLA', 'ARR', 'CRM', 'API', 'CSM']);
+
 export function titleCase(s: string | undefined) {
   if (!s) return '—';
+  const up = s.toUpperCase();
+  if (ACRONYMS.has(up)) return up;
   return s.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 }
