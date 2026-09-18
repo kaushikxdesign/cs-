@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarDays, CheckCircle2, Crosshair, Plus, Reply, Video, Zap } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Target, Plus, Reply, Video, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import { useNavigate } from '@/router';
@@ -66,7 +66,7 @@ function WorkRow({
               <>
                 {customerName && <span aria-hidden>·</span>}
                 <span className="inline-flex min-w-0 items-center gap-1">
-                  <Crosshair className="size-3 shrink-0 text-accent" strokeWidth={2} />
+                  <Target className="size-3 shrink-0 text-accent" strokeWidth={2} />
                   <span className="truncate">{goal.title}</span>
                 </span>
               </>

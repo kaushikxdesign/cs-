@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Crosshair, SkipForward } from 'lucide-react';
+import { Building2, Target, SkipForward } from 'lucide-react';
 import { Avatar, Badge, Button, Drawer, KeyValueList, Textarea } from '@/design-system';
 import { GOALS, USERS } from '@/data/core';
 import { relativeDue } from '@/lib/demoDate';
@@ -126,7 +126,7 @@ export function TaskDrawer({
                     label: 'Goal',
                     value: (
                       <span className="inline-flex items-center gap-1.5">
-                        <Crosshair className="size-3.5 text-accent" strokeWidth={1.75} />
+                        <Target className="size-3.5 text-accent" strokeWidth={1.75} />
                         {goal.title}
                       </span>
                     ),

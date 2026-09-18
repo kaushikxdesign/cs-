@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Crosshair } from 'lucide-react';
+import { AlertTriangle, Target } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import { useNavigate, useParams } from '@/router';
@@ -169,7 +169,7 @@ export function GoalDetailPage() {
 
           <section className="h-fit rounded-xl border border-border-default bg-surface px-4 py-3.5">
             <h3 className="mb-2 flex items-center gap-1.5 text-body-sm font-semibold text-on-surface">
-              <Crosshair className="size-4 text-accent" strokeWidth={1.75} />
+              <Target className="size-4 text-accent" strokeWidth={1.75} />
               Details
             </h3>
             <KeyValueList

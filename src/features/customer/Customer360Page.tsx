@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Activity, AlertTriangle, ArrowUpRight, CalendarDays, Crosshair, Mail, ShieldCheck, Ticket,
+  Activity, AlertTriangle, ArrowUpRight, CalendarDays, Target, Mail, ShieldCheck, Ticket,
   TrendingUp, Users,
 } from 'lucide-react';
 import {
@@ -289,7 +289,7 @@ export function Customer360Page() {
                 <div className="space-y-4">
                 <Section title="Active goals">
                   {goals.length === 0 ? (
-                    <EmptyState compact icon={<Crosshair className="size-5" strokeWidth={1.5} />} title="No goals" description="No success plan on this account." />
+                    <EmptyState compact icon={<Target className="size-5" strokeWidth={1.5} />} title="No goals" description="No success plan on this account." />
                   ) : (
                     <ul className="divide-y divide-border-default">
                       {goals.slice(0, 6).map((g) => (
@@ -298,7 +298,7 @@ export function Customer360Page() {
                             onClick={() => navigate(`/goals/${g.id}`)}
                             className="flex w-full items-start gap-2.5 px-4 py-2.5 text-left transition-colors duration-[120ms] hover:bg-hover"
                           >
-                            <Crosshair className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.75} />
+                            <Target className="mt-0.5 size-4 shrink-0 text-accent" strokeWidth={1.75} />
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-body-sm font-medium text-on-surface">
                                 {g.title}
@@ -403,7 +403,7 @@ export function Customer360Page() {
           {tab === 'goals' && (
             <Section title="Success plan">
               {goals.length === 0 ? (
-                <EmptyState compact icon={<Crosshair className="size-5" strokeWidth={1.5} />} title="No goals yet" description="Create a goal to start a success plan." />
+                <EmptyState compact icon={<Target className="size-5" strokeWidth={1.5} />} title="No goals yet" description="Create a goal to start a success plan." />
               ) : (
                 <ul className="divide-y divide-border-default">
                   {goals.map((g) => (
@@ -412,7 +412,7 @@ export function Customer360Page() {
                         onClick={() => navigate(`/goals/${g.id}`)}
                         className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors duration-[120ms] hover:bg-hover"
                       >
-                        <Crosshair className="size-4 shrink-0 text-accent" strokeWidth={1.75} />
+                        <Target className="size-4 shrink-0 text-accent" strokeWidth={1.75} />
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-body-sm font-medium text-on-surface">
                             {g.title}
