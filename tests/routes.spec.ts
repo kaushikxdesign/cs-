@@ -61,7 +61,7 @@ test('the role switcher changes user and lands on that role\'s dashboard', async
   await page.locator('button[aria-label="Account menu"]').click();
   await page.getByRole('menuitem', { name: /Manager/ }).click();
   await expect(page).toHaveURL(/#\/manager/);
-  await expect(page.locator('nav button[aria-label="Account menu"]')).toContainText('DO');
+  await expect(page.locator('header button[aria-label="Account menu"]')).toContainText('DO');
 });
 
 // Seven admin screens were wired into AdminPage but had no tile, so nothing
@@ -151,11 +151,30 @@ for (const route of EMOJI_ROUTES) {
   });
 }
 
-test('the assistant panel is reachable from the rail', async ({ page }) => {
-  await page.goto('/#/dashboard', { waitUntil: 'networkidle' });
-  await page.locator('button[aria-label="CX42 Assistant"]').click();
-  await expect(page.locator('button[aria-label="CX42 Assistant"]')).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+test('the assistant is reachable from the top bar on every module', async ({ page }) => {
+  const ask = page.getByRole('button', { name: 'Ask CX42' });
+  for (const route of ['/dashboard', '/customers', '/tickets']) {
+    await page.goto(`/#${route}`, { waitUntil: 'networkidle' });
+    await expect(ask).toBeVisible();
+  }
+  await ask.click();
+  await expect(ask).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('heading', { name: 'Ask CX42' })).toBeVisible();
+});
+
+test('the top bar carries search and notifications on every route', async ({ page }) => {
+  for (const route of ['/dashboard', '/work', '/admin?section=users']) {
+    await page.goto(`/#${route}`, { waitUntil: 'networkidle' });
+    await expect(page.getByRole('button', { name: 'Search' })).toBeVisible();
+    await expect(page.locator('button[aria-label="Notifications"]')).toBeVisible();
+  }
+  // The field is the palette given a resting shape, so it must open it.
+  await page.getByRole('button', { name: 'Search' }).click();
+  await expect(page.getByPlaceholder(/search/i).last()).toBeVisible();
+});
+
+test('the breadcrumb names the module, and the page header does not repeat it', async ({ page }) => {
+  await page.goto('/#/customers', { waitUntil: 'networkidle' });
+  await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Customers');
+  await expect(page.getByRole('heading', { name: 'All accounts' })).toBeVisible();
 });

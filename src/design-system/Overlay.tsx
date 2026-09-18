@@ -185,7 +185,7 @@ export function Popover({
         <RPopover.Content
           align={align}
           sideOffset={4}
-          className={cn(PANEL, 'min-w-48 rounded-lg p-3', className)}
+          className={cn(PANEL, "min-w-48 overflow-hidden rounded-xl", className)}
         >
           {children}
         </RPopover.Content>

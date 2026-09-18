@@ -64,6 +64,7 @@
      The reference differentiates panes by GROUND, not by border:
      rail darkest, sidebar tinted, content white.
      ============================================================ */
+  --app-backdrop:     var(--n-200);
   --surface-rail:     var(--n-100);
   --surface-sidebar:  var(--n-50);
   --surface-canvas:   var(--n-50);
@@ -146,6 +147,7 @@
   /* The ladder is wider than the first pass. Canvas and surface were two
      steps apart on paper but indistinguishable on a screen, so every card
      dissolved into the page. */
+  --app-backdrop:     #000000;
   --surface-rail:     #0A0A0C;
   --surface-sidebar:  #121215;
   --surface-canvas:   #131316;
@@ -223,6 +225,7 @@
    rather than a resolved colour, so the dark block above applies.
    ============================================================ */
 @theme inline {
+  --color-app-backdrop:    var(--app-backdrop);
   --color-rail:            var(--surface-rail);
   --color-sidebar:         var(--surface-sidebar);
   --color-canvas:          var(--surface-canvas);
