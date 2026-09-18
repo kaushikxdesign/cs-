@@ -348,7 +348,14 @@
      tables and the 13px body sizes this UI mostly runs at stay compact,
      and its numerals line up without stylistic-set overrides. */
   --font-sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* One typeface. `font-mono` is still used to MARK machine text — privilege
+     keys, DKIM records, mailbox addresses — but it now renders in Geist like
+     everything else, so those strings read as part of the interface rather
+     than as a second voice. Geist Mono was never actually loaded, so what
+     these places rendered in was the system monospace, which matched nothing.
+     The one place a real monospace would earn its keep is the copyable embed
+     snippet in Settings; restoring it there is this line plus a class. */
+  --font-mono: var(--font-sans);
 
   /* A step bolder and larger than before. The reference leans on a
      genuinely large conversation title to anchor the pane. */

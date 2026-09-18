@@ -60,7 +60,10 @@ export function PageHeader({
           ))}
         </nav>
       )}
-      <div className="flex items-start justify-between gap-4">
+      {/* Centered, not top-aligned. The actions are a single row of controls
+          on every screen that has them, so aligning them to the cap height of
+          the title left more space under the button than over it. */}
+      <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-title font-semibold text-on-surface truncate">{title}</h1>
           {meta && <div className="mt-1 flex flex-wrap items-center gap-2 text-caption text-on-surface-subtle">{meta}</div>}
