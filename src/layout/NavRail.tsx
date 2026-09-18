@@ -63,7 +63,16 @@ export function NavRail({
   onToggleNav: () => void;
 }) {
   return (
-    <nav className="flex w-16 shrink-0 flex-col items-center gap-1.5 py-2.5">
+    <nav className="flex w-16 shrink-0 flex-col items-center gap-1.5 pb-3 pt-3">
+      <button
+        onClick={() => onNavigate('/dashboard')}
+        aria-label="CX42 home"
+        className="mb-2 flex size-9 items-center justify-center rounded-xl text-white shadow-glow"
+        style={{ backgroundImage: 'var(--gradient-brand)' }}
+      >
+        <span className="text-caption font-bold tracking-tight">CX</span>
+      </button>
+
       {MODULES.map((m) => (
         <RailLink
           key={m.id}

@@ -89,16 +89,7 @@ export function TopBar({
   const userName = USERS[userId]?.name ?? 'CX42';
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 px-3">
-      <button
-        onClick={() => onNavigate('/dashboard')}
-        aria-label="CX42 home"
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-white shadow-glow"
-        style={{ backgroundImage: 'var(--gradient-brand)' }}
-      >
-        <span className="text-caption font-bold tracking-tight">CX</span>
-      </button>
-
+    <header className="flex h-14 shrink-0 items-center gap-3 pl-4 pr-3">
       {/* Where you are. The last crumb is the page; the ones before it are
           links, which is the only reason to print them at all. */}
       <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1">
