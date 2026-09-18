@@ -80,6 +80,10 @@
   --surface-canvas:   var(--n-50);
   --surface-default:  var(--n-0);
   --surface-panel:    var(--n-50);
+  /* The assistant is the one panel that reads as a sheet of paper laid on
+     the app rather than a tinted chrome pane — it holds long-form reading,
+     so it gets the same clean ground the content does. */
+  --surface-assistant: var(--n-0);
   --surface-subtle:   var(--n-75);
   --surface-hover:    var(--n-100);
   --surface-selected: var(--a-50);
@@ -179,6 +183,10 @@
      pushes subtle and hover up too, or the chips inside a panel land on the
      same value as the panel and vanish. */
   --surface-panel:    #141419;
+  /* Dark has no white to give, so the assistant keeps the raised panel
+     value: the point of the light token is separation from the content
+     beside it, and here that is what separation looks like. */
+  --surface-assistant: #141419;
   --surface-subtle:   #1C1C24;
   --surface-hover:    #22222B;
   --surface-selected: #17163A;
@@ -266,6 +274,7 @@
   --color-canvas:          var(--surface-canvas);
   --color-surface:         var(--surface-default);
   --color-panel:           var(--surface-panel);
+  --color-assistant:       var(--surface-assistant);
   --color-subtle:          var(--surface-subtle);
   --color-hover:           var(--surface-hover);
   --color-selected:        var(--surface-selected);

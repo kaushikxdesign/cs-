@@ -153,7 +153,7 @@ export function AssistantPanel() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-panel">
+    <div className="flex h-full min-h-0 flex-col bg-assistant">
       <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border-default px-4">
         <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-accent-subtle">
           <Sparkles className="size-3.5 text-accent" strokeWidth={1.75} />
@@ -215,7 +215,7 @@ export function AssistantPanel() {
                   key={s}
                   onClick={() => handlePrompt(s)}
                   className={cn(
-                    'block w-full rounded-lg border border-border-default bg-surface px-3 py-2 text-left',
+                    'block w-full rounded-lg border border-border-default bg-subtle px-3 py-2 text-left',
                     'text-body-sm text-on-surface transition-colors duration-[120ms]',
                     'hover:border-border-strong hover:bg-hover',
                   )}

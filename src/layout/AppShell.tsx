@@ -142,7 +142,7 @@ export function AppShell({
           <main className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</main>
 
           {state.assistantOpen && (
-            <aside className="w-96 shrink-0 overflow-hidden border-l border-border-default bg-panel">
+            <aside className="w-96 shrink-0 overflow-hidden border-l border-border-default bg-assistant">
               {assistant}
             </aside>
           )}

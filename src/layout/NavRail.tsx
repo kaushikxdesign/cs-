@@ -67,10 +67,9 @@ export function NavRail({
       <button
         onClick={() => onNavigate('/dashboard')}
         aria-label="CX42 home"
-        className="mb-2 flex size-9 items-center justify-center rounded-xl text-white shadow-glow"
-        style={{ backgroundImage: 'var(--gradient-brand)' }}
+        className="mb-2 flex size-9 items-center justify-center rounded-xl text-accent transition-colors duration-[120ms] hover:bg-hover"
       >
-        <BrandMark />
+        <BrandMark className="size-6" />
       </button>
 
       {MODULES.map((m) => (
