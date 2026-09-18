@@ -35,20 +35,30 @@
   --n-900: #151518;
   --n-950: #0D0D0F;
 
-  /* ---- Primitives: accent ---- */
-  --a-50:  #EEF0FE;
-  --a-100: #DFE2FC;
-  --a-200: #C4C9F8;
-  --a-400: #7B7FE8;
-  --a-500: #5B5BD6;
-  --a-600: #4B4ACB;
-  --a-700: #3C3BA8;
+  /* ---- Primitives: accent ----
+     Electric indigo rather than the muted one this started with. The first
+     pass reads as an enterprise console; the product is a young one, and
+     the accent is the single token that decides which. */
+  --a-50:  #EFEEFF;
+  --a-100: #E0DDFF;
+  --a-200: #C3BDFF;
+  --a-400: #8B84FF;
+  --a-500: #635BFF;
+  --a-600: #5147E8;
+  --a-700: #3F35C4;
 
-  /* ---- Primitives: status ---- */
-  --g-50: #ECFDF3; --g-200: #A9EFC5; --g-600: #079455; --g-700: #06773F;
-  --y-50: #FFFAEB; --y-200: #FEDF89; --y-600: #DC6803; --y-700: #B25406;
-  --r-50: #FEF3F2; --r-200: #FECDCA; --r-600: #D92D20; --r-700: #B42318;
-  --b-50: #EFF8FF; --b-200: #B2DDFF; --b-600: #1570EF; --b-700: #175CD3;
+  /* A second hue, for the places the accent alone cannot carry a gradient
+     or separate two adjacent accent surfaces. */
+  --v-400: #C084FC;
+  --v-500: #A855F7;
+
+  /* ---- Primitives: status ----
+     A step brighter across the board. These carry meaning, so they should
+     be the most saturated thing on a screen, not the most tasteful. */
+  --g-50: #E8FCF1; --g-200: #93EFBC; --g-600: #00A96E; --g-700: #04814F;
+  --y-50: #FFF8E6; --y-200: #FFDD80; --y-600: #F59E0B; --y-700: #B45309;
+  --r-50: #FFF0EF; --r-200: #FFC7C2; --r-600: #F0384B; --r-700: #C41E36;
+  --b-50: #EBF5FF; --b-200: #A5D6FF; --b-600: #0C7FF2; --b-700: #0A62BC;
 
   /* ---- Primitives: avatar hues ----
      Assigned deterministically per name. Colour on people is what makes a
@@ -56,8 +66,8 @@
      list into a bag of sweets. These sit at one lightness and one modest
      saturation, so they read as a family and the status colours stay the
      only loud thing on the screen. */
-  --av-1: #5B64B0; --av-2: #3D77A3; --av-3: #3B8A6E; --av-4: #96763A;
-  --av-5: #A05A76; --av-6: #755CA0; --av-7: #3A8788; --av-8: #A05B4C;
+  --av-1: #5D5BD4; --av-2: #2C7FC4; --av-3: #159C77; --av-4: #C08A2E;
+  --av-5: #C25A85; --av-6: #8B5CD6; --av-7: #1B9295; --av-8: #C4614C;
 
   /* ============================================================
      SEMANTIC — surfaces, stacked by elevation in the app chrome.
@@ -109,6 +119,8 @@
   --focus-ring: var(--a-500);
 
   /* ---- Status quads ---- */
+  --violet: var(--v-500);
+
   --success-subtle: var(--g-50); --success-border: var(--g-200);
   --success-fg:     var(--g-700); --success-solid:  var(--g-600);
   --warning-subtle: var(--y-50); --warning-border: var(--y-200);
@@ -119,14 +131,14 @@
   --info-fg:        var(--b-700); --info-solid:     var(--b-600);
 
   /* ---- Charts (muted, so status stays the loudest thing) ---- */
-  --chart-1: #5B63C4; --chart-2: #3E8DBE; --chart-3: #429B90;
-  --chart-4: #C0913F; --chart-5: #8A6BAE; --chart-6: #6B7280;
+  --chart-1: #635BFF; --chart-2: #0C9BE8; --chart-3: #00B894;
+  --chart-4: #F0A02B; --chart-5: #A855F7; --chart-6: #8B93A5;
 
   /* Health bands as DATA, not as status. A distribution chart is not an
      alert, so it uses the muted end of green/amber/red rather than the
      solids the badges use — three saturated bars beside a grey table read
      as six alarms going off at once. */
-  --band-good: #4E9E7A; --band-watch: #C2913F; --band-risk: #C2635A;
+  --band-good: #16B57F; --band-watch: #F2A63B; --band-risk: #EE5A6C;
 
   /* Grid and axis furniture. Chart chrome should sit under the data. */
   --chart-grid: var(--n-150);
@@ -144,41 +156,45 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* The ladder is wider than the first pass. Canvas and surface were two
-     steps apart on paper but indistinguishable on a screen, so every card
-     dissolved into the page. */
+  /* Properly dark. The previous ladder sat in the #13–#26 range, which on
+     a bright screen reads as charcoal rather than dark — pale, and with the
+     vibrant accent over it, washed out. Everything drops roughly a third,
+     and the steps between rungs widen so the ladder still reads. */
   --app-backdrop:     #000000;
-  --surface-rail:     #0A0A0C;
-  --surface-sidebar:  #121215;
-  --surface-canvas:   #131316;
-  --surface-default:  #1B1B20;
-  --surface-panel:    #161619;
-  --surface-subtle:   #232329;
-  --surface-hover:    #26262D;
-  --surface-selected: #23233D;
+  --surface-rail:     #08080A;
+  --surface-sidebar:  #0B0B0E;
+  --surface-canvas:   #0A0A0D;
+  --surface-default:  #131317;
+  --surface-panel:    #0E0E12;
+  --surface-subtle:   #1A1A20;
+  --surface-hover:    #1F1F26;
+  --surface-selected: #1C1B3D;
   --inverted:         var(--n-0);
   --scrim:            rgb(0 0 0 / 0.5);
 
-  --bubble-in:  var(--n-800);
-  --bubble-out: #2E2E52;
+  --bubble-in:  #1C1C23;
+  --bubble-out: #241F52;
 
-  /* A hairline at 1.15:1 against its own surface is not a hairline, it is
-     nothing. These clear 1.4:1 and 2.2:1. */
-  --border-default: #32323B;
-  --border-strong:  #474752;
+  /* Borders hold their contrast against the deeper surfaces rather than
+     dropping with them — on a darker ground a hairline needs MORE lift,
+     not less, or the whole screen turns into one flat sheet. */
+  --border-default: #2F2F3A;
+  --border-strong:  #43434F;
 
-  --on-surface:        var(--n-50);
-  --on-surface-muted:  #A8A8B3;
-  --on-surface-subtle: #8A8A95;
-  --on-surface-faint:  #6B6B76;
+  /* Text lifts as the ground drops, so body copy clears 12:1 rather than
+     the 8:1 it had. */
+  --on-surface:        #F4F4F7;
+  --on-surface-muted:  #B2B2BF;
+  --on-surface-subtle: #8C8C9A;
+  --on-surface-faint:  #65656F;
   --on-accent:         var(--n-0);
   --on-inverse:        var(--n-900);
 
   --accent:         var(--a-400);
-  --accent-hover:   #8E92EF;
+  --accent-hover:   #A49EFF;
   --accent-active:  var(--a-200);
-  --accent-subtle:  #232346;
-  --accent-muted:   #343465;
+  --accent-subtle:  #1E1B45;
+  --accent-muted:   #332C6B;
   --accent-on-subtle: var(--a-200);
 
   /* Inverted in dark: the strongest action is light on dark. */
@@ -188,24 +204,24 @@
 
   --focus-ring: var(--a-400);
 
-  --success-subtle: #0E2A1C; --success-border: #1C4D33;
-  --success-fg:     #6EE7A8; --success-solid:  #10B981;
-  --warning-subtle: #2E2008; --warning-border: #573C12;
-  --warning-fg:     #FCD34D; --warning-solid:  #F59E0B;
-  --danger-subtle:  #2E1414; --danger-border:  #5A2220;
-  --danger-fg:      #FCA5A5; --danger-solid:   #EF4444;
-  --info-subtle:    #0C2136; --info-border:    #16436E;
-  --info-fg:        #93C5FD; --info-solid:     #3B82F6;
+  --success-subtle: #05231A; --success-border: #12603F;
+  --success-fg:     #3BE8A5; --success-solid:  #00C880;
+  --warning-subtle: #241804; --warning-border: #6B4410;
+  --warning-fg:     #FFC94D; --warning-solid:  #FFA51F;
+  --danger-subtle:  #260C12; --danger-border:  #6B1F30;
+  --danger-fg:      #FF8898; --danger-solid:   #FF4D64;
+  --info-subtle:    #051A31; --info-border:    #0E4B85;
+  --info-fg:        #6BBBFF; --info-solid:     #2196FF;
 
-  --chart-1: #7B7FE8; --chart-2: #56A8DC; --chart-3: #4FB8AB;
-  --chart-4: #D9A94E; --chart-5: #A484CC; --chart-6: #8B909C;
+  --chart-1: #8B84FF; --chart-2: #3FB0FF; --chart-3: #23D5A0;
+  --chart-4: #FFB545; --chart-5: #C084FC; --chart-6: #8B93A5;
 
-  --band-good: #52A87F; --band-watch: #C99A48; --band-risk: #C96B60;
+  --band-good: #1FD196; --band-watch: #FFB545; --band-risk: #FF6E80;
 
-  --chart-grid: #2A2A31;
-  --chart-axis: #6B6B76;
+  --chart-grid: #21212A;
+  --chart-axis: #65656F;
 
-  --track: #34343D;
+  --track: #26262F;
 
   /* Elevation on a dark ground comes from a lighter edge, not a darker
      shadow — a black shadow on near-black is invisible. */
@@ -216,8 +232,10 @@
   /* Avatars lift in lightness on a dark ground so white initials still
      clear 4.5:1, but drop in chroma at the same time — a hue that is merely
      bright next to a near-black canvas reads as neon. */
-  --av-1: #69709E; --av-2: #4D7B96; --av-3: #4B8A74; --av-4: #917A4C;
-  --av-5: #9A6A7E; --av-6: #7D6A98; --av-7: #4C8687; --av-8: #986A5E;
+  --violet: var(--v-400);
+
+  --av-1: #7A77E0; --av-2: #3D93D6; --av-3: #19B089; --av-4: #D0A046;
+  --av-5: #D4739B; --av-6: #A177E5; --av-7: #2BA6A9; --av-8: #D4785F;
 }
 
 /* ============================================================
@@ -257,6 +275,7 @@
   --color-on-inverse:        var(--on-inverse);
   --color-on-solid:          var(--on-solid);
 
+  --color-violet:            var(--v-500);
   --color-accent:            var(--accent);
   --color-accent-hover:      var(--accent-hover);
   --color-accent-active:     var(--accent-active);

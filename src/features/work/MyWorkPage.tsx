@@ -1,16 +1,19 @@
 import React from 'react';
-import { CalendarDays, CheckCircle2, Crosshair, Plus, Zap } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Crosshair, Plus, Reply, Video, Zap } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
+import { useNavigate } from '@/router';
 import {
   Avatar, Badge, Button, Checkbox, Dialog, EmptyState, Field, Input, PageHeader, SearchInput,
   SegmentedControl, Tabs, Textarea, Tooltip,
 } from '@/design-system';
 import { GOALS, MEETINGS, USERS } from '@/data/core';
 import { relativeDue, daysFromToday } from '@/lib/demoDate';
-import { formatDate } from '@/lib/format';
+import { formatDate, titleCase } from '@/lib/format';
 import { BUCKETS, bucketFor, isFinished, statusLabel, statusTone, type BucketId } from './workModel';
 import { TaskDrawer, type WorkTask } from './TaskDrawer';
+import { EmailDetail } from './EmailDetail';
+import { MomentumStrip } from './MomentumStrip';
 
 type TabId = 'all' | 'tasks' | 'meetings' | 'email';
 type Range = 'all' | 'week' | 'overdue';
@@ -129,6 +132,8 @@ export function MyWorkPage() {
   const [range, setRange] = React.useState<Range>('all');
   const [search, setSearch] = React.useState('');
   const [openId, setOpenId] = React.useState<string | null>(null);
+  const [openEmailId, setOpenEmailId] = React.useState<string | null>(null);
+  const navigate = useNavigate();
   const [showDone, setShowDone] = React.useState(false);
   const [composeOpen, setComposeOpen] = React.useState(false);
   const [draftTitle, setDraftTitle] = React.useState('');
@@ -180,6 +185,13 @@ export function MyWorkPage() {
   ).length;
   const emails = state.emails ?? [];
   const openTask = tasks.find((t) => t.id === openId) ?? null;
+  const openMail = openEmailId ? emails.find((e: any) => e.id === openEmailId) : null;
+
+  /** Opening a message is also what marks it read — the two are the same act. */
+  function openEmail(e: any) {
+    if (e.unread) dispatch({ type: 'MARK_EMAIL_READ', emailId: e.id });
+    setOpenEmailId(e.id);
+  }
 
   function toggle(t: WorkTask) {
     if (isFinished(t.status)) return;
@@ -228,56 +240,133 @@ export function MyWorkPage() {
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-4xl px-6 py-5">
           {tab === 'meetings' ? (
-            <ul className="space-y-1">
-              {MEETINGS.map((m: any) => (
-                <li
-                  key={m.id}
-                  className="flex items-center gap-3 rounded-lg px-2.5 py-2.5 transition-colors duration-[120ms] hover:bg-hover"
-                >
-                  <CalendarDays className="size-4 shrink-0 text-on-surface-subtle" strokeWidth={1.75} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-body-sm font-medium text-on-surface">{m.title}</p>
-                    <p className="mt-0.5 truncate text-caption text-on-surface-subtle">
-                      {customersById[m.customerId]?.name} · {m.participants?.length ?? 0} attendees
-                    </p>
-                  </div>
-                  <Badge tone="neutral">{m.status}</Badge>
-                  <span className="w-24 shrink-0 text-right text-caption tabular-nums text-on-surface-subtle">
-                    {formatDate(m.date)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : tab === 'email' ? (
-            <ul className="space-y-1">
-              {emails.map((e: any) => (
-                <li key={e.id}>
-                  <button
-                    onClick={() => dispatch({ type: 'MARK_EMAIL_READ', emailId: e.id })}
-                    className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left transition-colors duration-[120ms] hover:bg-hover"
+            <ul className="divide-y divide-border-default">
+              {MEETINGS.map((m: any) => {
+                const account = customersById[m.customerId];
+                const upcoming = m.status === 'upcoming';
+                return (
+                  <li
+                    key={m.id}
+                    className="group flex items-center gap-3 px-2.5 py-3 transition-colors duration-[120ms] hover:bg-hover"
                   >
-                  <Avatar name={e.from} size="lg" className="shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p
+                    <span
                       className={cn(
-                        'truncate text-body-sm',
-                        e.unread ? 'font-semibold text-on-surface' : 'text-on-surface',
+                        'flex size-8 shrink-0 items-center justify-center rounded-lg',
+                        upcoming ? 'bg-accent-subtle text-accent' : 'bg-subtle text-on-surface-faint',
                       )}
                     >
-                      {e.from}
-                    </p>
-                    <p className="mt-0.5 truncate text-caption text-on-surface-subtle">{e.subject}</p>
-                  </div>
-                  {e.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
+                      <CalendarDays className="size-4" strokeWidth={1.75} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-body-sm font-medium text-on-surface">{m.title}</p>
+                      <p className="mt-0.5 flex min-w-0 items-center gap-1.5 text-caption text-on-surface-subtle">
+                        {account && (
+                          <>
+                            <button
+                              onClick={() => navigate(`/customers/${account.id}`)}
+                              className="truncate font-medium text-accent transition-colors hover:text-accent-hover"
+                            >
+                              {account.name}
+                            </button>
+                            <span aria-hidden>·</span>
+                          </>
+                        )}
+                        <span className="truncate">{m.participants?.length ?? 0} attendees</span>
+                      </p>
+                    </div>
+                    <Badge tone={upcoming ? 'accent' : 'neutral'}>{titleCase(m.status)}</Badge>
+                    <span className="w-24 shrink-0 text-right text-caption tabular-nums text-on-surface-subtle">
+                      {formatDate(m.date)}
+                    </span>
+                    {upcoming ? (
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        icon={<Video className="size-4" strokeWidth={1.75} />}
+                        onClick={() =>
+                          dispatch({
+                            type: 'ADD_TOAST',
+                            msg: `Joining ${m.title}`,
+                            toastType: 'info',
+                          })
+                        }
+                      >
+                        Join
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="opacity-0 transition-opacity duration-[120ms] group-hover:opacity-100 focus-visible:opacity-100"
+                        onClick={() =>
+                          dispatch({
+                            type: 'ADD_TOAST',
+                            msg: 'Opening the meeting notes',
+                            toastType: 'info',
+                          })
+                        }
+                      >
+                        Notes
+                      </Button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : tab === 'email' ? (
+            openMail ? (
+              <EmailDetail
+                email={openMail}
+                customers={state.customers ?? []}
+                onBack={() => setOpenEmailId(null)}
+                onNavigate={navigate}
+                dispatch={dispatch}
+              />
+            ) : (
+            <ul className="divide-y divide-border-default">
+              {emails.map((e: any) => (
+                <li key={e.id} className="group flex items-center gap-3 pr-2.5 transition-colors duration-[120ms] hover:bg-hover">
+                  <button
+                    onClick={() => openEmail(e)}
+                    className="flex min-w-0 flex-1 items-center gap-3 px-2.5 py-3 text-left"
+                  >
+                    <Avatar name={e.from} size="xl" className="shrink-0" />
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={cn(
+                          'block truncate text-body-sm',
+                          e.unread ? 'font-semibold text-on-surface' : 'text-on-surface',
+                        )}
+                      >
+                        {e.from}
+                      </span>
+                      <span className="mt-0.5 block truncate text-caption text-on-surface-subtle">
+                        {e.subject}
+                      </span>
+                    </span>
+                    {e.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
                     <span className="w-20 shrink-0 text-right text-caption tabular-nums text-on-surface-subtle">
                       {e.ago}
                     </span>
                   </button>
+                  {/* Replying is the common case, so it gets its own affordance
+                      rather than living one click inside the message. */}
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="shrink-0 opacity-0 transition-opacity duration-[120ms] group-hover:opacity-100 focus-visible:opacity-100"
+                    icon={<Reply className="size-4" strokeWidth={1.75} />}
+                    onClick={() => openEmail(e)}
+                  >
+                    Reply
+                  </Button>
                 </li>
               ))}
             </ul>
+            )
           ) : (
             <>
+              <MomentumStrip tasks={tasks} />
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <div className="w-56">
                   <SearchInput

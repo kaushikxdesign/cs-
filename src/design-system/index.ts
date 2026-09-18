@@ -13,6 +13,7 @@ export { DataTable, PrimaryCell, type Column } from './DataTable';
 export { FilterBar, type FilterChip } from './FilterBar';
 export { EmptyState, ErrorState, Skeleton, SkeletonTable } from './Feedback';
 export { Meter, toneForScore, type MeterTone } from './Meter';
+export { ProgressRing, StepPips, ringToneForScore, type RingTone } from './ProgressRing';
 export { Timeline, type TimelineItem } from './Timeline';
 export { Stepper, StepperFooter, type Step } from './Stepper';
 export { RuleRow, RuleValue } from './RuleRow';

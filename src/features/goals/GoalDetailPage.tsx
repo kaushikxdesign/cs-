@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn';
 import { useApp } from '@/state/AppContext';
 import { useNavigate, useParams } from '@/router';
 import {
-  Avatar, Badge, Button, Checkbox, EmptyState, KeyValueList, PageHeader, Select,
+  Avatar, Badge, Button, Checkbox, EmptyState, KeyValueList, PageHeader, ProgressRing, Select, StepPips,
 } from '@/design-system';
 import { USERS } from '@/data/core';
 import { formatDate } from '@/lib/format';
@@ -97,11 +97,28 @@ export function GoalDetailPage() {
             )}
 
             <section className="rounded-xl border border-border-default bg-surface">
-              <div className="flex items-center justify-between gap-3 border-b border-border-default px-4 py-2.5">
-                <h3 className="text-body-sm font-semibold text-on-surface">Plan</h3>
-                <span className="text-caption tabular-nums text-on-surface-subtle">
-                  {doneCount} of {tasks.length} done
-                </span>
+              {/* A goal is a thing you are closing, so its header shows the
+                  dial rather than a count buried in small grey type. */}
+              <div className="flex items-center gap-4 px-4 py-3.5">
+                <ProgressRing
+                  value={doneCount}
+                  max={Math.max(1, tasks.length)}
+                  size={52}
+                  tone={tasks.length && doneCount === tasks.length ? 'good' : 'accent'}
+                />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-body font-semibold text-on-surface">Plan</h3>
+                  <p className="mt-0.5 text-caption text-on-surface-subtle">
+                    {tasks.length === 0
+                      ? 'No steps yet'
+                      : doneCount === tasks.length
+                        ? `All ${tasks.length} steps complete`
+                        : `${doneCount} of ${tasks.length} done · ${tasks.length - doneCount} to go`}
+                  </p>
+                </div>
+                {tasks.length > 0 && tasks.length <= 8 && (
+                  <StepPips total={tasks.length} done={doneCount} />
+                )}
               </div>
               {tasks.length === 0 ? (
                 <EmptyState title="No steps yet" description="This goal has no tasks on it." />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown, PanelRightClose, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { Avatar, Badge, Checkbox, CountBadge, IconButton, Meter, Tooltip } from '@/design-system';
+import { Avatar, Badge, Checkbox, CountBadge, IconButton, StepPips, Tooltip } from '@/design-system';
 import { actionsForTicket, ticketSla } from '@/data/tickets';
 import { formatCurrency, formatDate, titleCase } from '@/lib/format';
 import { sentimentTone, severityTone, slaTone, statusLabel } from './ticketModel';
@@ -150,14 +150,15 @@ export function TicketDetailsPanel({
               ) : (
                 <div className="space-y-3">
                   {stepCount > 0 && (
-                    <Meter
-                      label="Steps complete"
-                      value={doneCount}
-                      max={stepCount}
-                      display={`${doneCount}/${stepCount}`}
-                      tone={doneCount === stepCount ? 'good' : 'accent'}
-                      className="pb-1"
-                    />
+                    <div className="flex items-center justify-between gap-3 pb-1">
+                      <span className="text-body-sm text-on-surface-muted">Steps complete</span>
+                      <span className="flex items-center gap-2">
+                        <StepPips total={stepCount} done={doneCount} />
+                        <span className="text-body-sm font-medium tabular-nums text-on-surface">
+                          {doneCount}/{stepCount}
+                        </span>
+                      </span>
+                    </div>
                   )}
                   {sops.map((sop: any) => (
                     <div key={sop.id}>
