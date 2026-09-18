@@ -58,10 +58,23 @@ test('/tickets resolves — it was declared nowhere in the MVP', async ({ page }
 
 test('the role switcher changes user and lands on that role\'s dashboard', async ({ page }) => {
   await page.goto('/#/dashboard', { waitUntil: 'networkidle' });
-  await page.locator('button[aria-label="Account menu"]').click();
-  await page.getByRole('menuitem', { name: /Manager/ }).click();
+  // It lives in the rail now, not the account menu.
+  await page.locator('nav button[aria-label^="Viewing as"]').click();
+  await page.getByRole('menuitem', { name: /Manager view/ }).click();
   await expect(page).toHaveURL(/#\/manager/);
   await expect(page.locator('header button[aria-label="Account menu"]')).toContainText('DO');
+  // And it reports the seat it switched to.
+  await expect(page.locator('nav button[aria-label^="Viewing as"]')).toHaveAttribute(
+    'aria-label',
+    /Viewing as Manager/,
+  );
+});
+
+test('the dashboard role views are gone from the view pane', async ({ page }) => {
+  await page.goto('/#/dashboard', { waitUntil: 'networkidle' });
+  // One view left, so by the single-view rule there is no view pane at all.
+  await expect(page.locator('#root')).not.toContainText('Manager view');
+  await expect(page.locator('#root')).not.toContainText('Executive view');
 });
 
 // Seven admin screens were wired into AdminPage but had no tile, so nothing

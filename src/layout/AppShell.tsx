@@ -5,7 +5,7 @@ import {
   CommandPalette, ToastViewport, TooltipProvider, useCommandPalette, type CommandItem,
 } from '@/design-system';
 import { TICKETS } from '@/data/core';
-import { ALL_MODULES, moduleForPath } from './nav';
+import { ALL_MODULES, moduleForPath, roleForPath } from './nav';
 import { NavRail } from './NavRail';
 import { SecondaryNav } from './SecondaryNav';
 import { TopBar } from './TopBar';
@@ -58,6 +58,10 @@ export function AppShell({
         return query[k] === val;
       });
     });
+    const role = roleForPath(pathname);
+    if (role && role.path !== activeModule.path) {
+      return [{ label: activeModule.label, path: activeModule.path }, { label: role.viewLabel }];
+    }
     const isRoot = activeModule.path === pathname && !query.section;
     if (view && !isRoot) {
       return [{ label: activeModule.label, path: activeModule.path }, { label: view.label }];
@@ -107,9 +111,14 @@ export function AppShell({
       <div className="flex h-screen overflow-hidden bg-sidebar">
         <NavRail
           activeModuleId={activeModule?.id}
+          activeRole={state.activeRole}
           counts={railCounts}
           navCollapsed={navCollapsed}
           onNavigate={navigate}
+          onSwitchRole={(roleId, userId, path) => {
+            dispatch({ type: 'SWITCH_ROLE', role: roleId, userId });
+            navigate(path);
+          }}
           onToggleNav={() => setNavCollapsed((v) => !v)}
         />
 
@@ -122,10 +131,6 @@ export function AppShell({
           onNavigate={navigate}
           onOpenSearch={() => setPaletteOpen(true)}
           onToggleAssistant={() => dispatch({ type: 'TOGGLE_ASSISTANT' })}
-          onSwitchRole={(roleId, userId, path) => {
-            dispatch({ type: 'SWITCH_ROLE', role: roleId, userId });
-            navigate(path);
-          }}
         />
 
         <div className="flex min-h-0 flex-1 overflow-hidden rounded-tl-2xl border-l border-t border-border-default bg-surface">

@@ -1,8 +1,9 @@
 import React from 'react';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Check, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { cn } from '@/lib/cn';
-import { BrandMark, CountBadge, Tooltip } from '@/design-system';
-import { ADMIN_MODULE, MODULES, type NavModule } from './nav';
+import { BrandMark, CountBadge, DropdownMenu, Tooltip } from '@/design-system';
+import { USERS } from '@/data/core';
+import { ADMIN_MODULE, MODULES, ROLES, type NavModule } from './nav';
 
 function RailLink({
   module,
@@ -42,6 +43,57 @@ function RailLink({
 }
 
 /**
+ * Whose dashboard am I looking at.
+ *
+ * This is a presentation control, not a permission one — nothing in the app
+ * is gated by it. It was three entries in the Dashboard module's view list,
+ * which read as "three dashboards" when it is really one dashboard seen from
+ * three seats. In the rail it sits with the other whole-app controls, and the
+ * icon shows the current seat without the menu having to be opened.
+ */
+function RoleSwitcher({
+  activeRole,
+  onSwitch,
+}: {
+  activeRole?: string;
+  onSwitch: (roleId: string, userId: string, path: string) => void;
+}) {
+  const current = ROLES.find((r) => r.id === activeRole) ?? ROLES[0];
+  const Icon = current.icon;
+
+  return (
+    <DropdownMenu
+      side="right"
+      align="end"
+      trigger={
+        <button
+          aria-label={`Viewing as ${current.label} — change view`}
+          className="flex size-10 items-center justify-center rounded-xl text-on-surface-subtle transition-colors duration-[120ms] hover:bg-hover hover:text-on-surface"
+        >
+          <Icon className="size-5" strokeWidth={1.75} />
+        </button>
+      }
+      items={ROLES.map((r) => ({
+        label: (
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate">{r.viewLabel}</span>
+            <span className="truncate text-caption text-on-surface-subtle">
+              {USERS[r.userId]?.name ?? r.userId}
+            </span>
+          </span>
+        ),
+        icon: <r.icon className="size-4 text-on-surface-subtle" strokeWidth={1.75} />,
+        trailing:
+          r.id === current.id ? (
+            <Check className="size-4 shrink-0 text-accent" strokeWidth={2} />
+          ) : undefined,
+        onSelect: () => onSwitch(r.id, r.userId, r.path),
+      }))}
+    />
+  );
+}
+
+/**
  * Icon-only module rail.
  *
  * The logo, the assistant, the theme switch and the account menu have all
@@ -51,15 +103,19 @@ function RailLink({
  */
 export function NavRail({
   activeModuleId,
+  activeRole,
   counts = {},
   navCollapsed,
   onNavigate,
+  onSwitchRole,
   onToggleNav,
 }: {
   activeModuleId?: string;
+  activeRole?: string;
   counts?: Record<string, number>;
   navCollapsed?: boolean;
   onNavigate: (path: string) => void;
+  onSwitchRole: (roleId: string, userId: string, path: string) => void;
   onToggleNav: () => void;
 }) {
   return (
@@ -83,6 +139,10 @@ export function NavRail({
       ))}
 
       <div className="mt-auto flex flex-col items-center gap-1.5">
+        {/* A rule, because what follows is not another module: the view you
+            are in, the settings for the whole app, and the nav toggle. */}
+        <span className="mb-1 h-px w-6 bg-border-default" aria-hidden />
+        <RoleSwitcher activeRole={activeRole} onSwitch={onSwitchRole} />
         <RailLink
           module={ADMIN_MODULE}
           active={ADMIN_MODULE.id === activeModuleId}

@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  Building2, FolderOpen, Inbox, LayoutDashboard, ListTodo, Settings,
-  ShieldAlert, TrendingUp, Zap,
+  Building2, FolderOpen, Gauge, Inbox, LayoutDashboard, ListTodo, Settings,
+  ShieldAlert, TrendingUp, User, Users, Zap,
 } from 'lucide-react';
 
 /**
@@ -38,11 +38,12 @@ export const MODULES: NavModule[] = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     path: '/dashboard',
-    views: [
-      { path: '/dashboard', label: 'My dashboard' },
-      { path: '/manager', label: 'Manager view' },
-      { path: '/executive', label: 'Executive view' },
-    ],
+    /* The three role dashboards used to be secondary-nav views here. They are
+       not views of a module — they are the same module seen as somebody else —
+       so they moved to the role switcher in the rail, and the module keeps the
+       one view it actually has. */
+    views: [{ path: '/dashboard', label: 'My dashboard' }],
+    owns: ['/manager', '/executive'],
   },
   {
     id: 'work',
@@ -142,10 +143,16 @@ export const ALL_MODULES = [...MODULES, ADMIN_MODULE];
 
 /** Roles the switcher offers, and where each one lands. */
 export const ROLES = [
-  { id: 'csm', userId: 'maya', label: 'CSM', path: '/dashboard' },
-  { id: 'manager', userId: 'daniel', label: 'Manager', path: '/manager' },
-  { id: 'executive', userId: 'priya', label: 'Executive', path: '/executive' },
+  { id: 'csm', userId: 'maya', label: 'CSM', viewLabel: 'My dashboard', icon: User, path: '/dashboard' },
+  { id: 'manager', userId: 'daniel', label: 'Manager', viewLabel: 'Manager view', icon: Users, path: '/manager' },
+  { id: 'executive', userId: 'priya', label: 'Executive', viewLabel: 'Executive view', icon: Gauge, path: '/executive' },
 ] as const;
+
+export type Role = (typeof ROLES)[number];
+
+export function roleForPath(path: string): Role | undefined {
+  return ROLES.find((r) => r.path === path);
+}
 
 export function moduleForPath(path: string): NavModule | undefined {
   return ALL_MODULES.find(

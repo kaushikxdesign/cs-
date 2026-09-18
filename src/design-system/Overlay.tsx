@@ -197,6 +197,8 @@ export function Popover({
 export interface MenuItem {
   label: React.ReactNode;
   icon?: React.ReactNode;
+  /** Right-aligned mark for the item that is already in effect. */
+  trailing?: React.ReactNode;
   onSelect?: () => void;
   danger?: boolean;
   separatorBefore?: boolean;
@@ -206,10 +208,13 @@ export function DropdownMenu({
   trigger,
   items,
   align = 'end',
+  side,
 }: {
   trigger: React.ReactNode;
   items: MenuItem[];
   align?: 'start' | 'center' | 'end';
+  /** Menus opened from the rail have no room below; they open beside it. */
+  side?: 'top' | 'right' | 'bottom' | 'left';
 }) {
   return (
     <RDropdown.Root>
@@ -217,6 +222,7 @@ export function DropdownMenu({
       <RDropdown.Portal>
         <RDropdown.Content
           align={align}
+          side={side}
           sideOffset={4}
           className={cn(PANEL, 'min-w-44 rounded-lg p-1')}
         >
@@ -226,13 +232,17 @@ export function DropdownMenu({
               <RDropdown.Item
                 onSelect={item.onSelect}
                 className={cn(
-                  'flex h-8 cursor-default select-none items-center gap-2 rounded-md px-2 text-body-sm outline-none',
+                  /* min-h rather than h: an item carrying a second line (the person
+   behind a role, say) has to be allowed to grow, or the two lines
+   overflow the box and land on the row below. */
+                  'flex min-h-8 cursor-default select-none items-center gap-2 rounded-md px-2 py-1 text-body-sm outline-none',
                   'data-[highlighted]:bg-hover',
                   item.danger ? 'text-danger-fg' : 'text-on-surface',
                 )}
               >
                 {item.icon}
-                {item.label}
+                <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                {item.trailing}
               </RDropdown.Item>
             </React.Fragment>
           ))}

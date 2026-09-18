@@ -73,7 +73,6 @@ export function TopBar({
   onNavigate,
   onOpenSearch,
   onToggleAssistant,
-  onSwitchRole,
 }: {
   crumbs: Array<{ label: string; path?: string }>;
   activeRole: string;
@@ -82,7 +81,6 @@ export function TopBar({
   onNavigate: (path: string) => void;
   onOpenSearch: () => void;
   onToggleAssistant: () => void;
-  onSwitchRole: (roleId: string, userId: string, path: string) => void;
 }) {
   const { theme, setTheme } = useTheme();
   const userId = ROLES.find((r) => r.id === activeRole)?.userId ?? 'maya';
@@ -214,14 +212,9 @@ export function TopBar({
               <Avatar name={userName} size="md" online />
             </button>
           }
-          items={[
-            { label: 'Profile settings', onSelect: () => onNavigate('/profile') },
-            ...ROLES.map((r) => ({
-              label: `${r.label} — ${USERS[r.userId]?.name ?? r.userId}`,
-              onSelect: () => onSwitchRole(r.id, r.userId, r.path),
-              separatorBefore: r.id === ROLES[0].id,
-            })),
-          ]}
+          /* The role switcher used to live here too. One control, one place:
+             it is in the rail with the other whole-app controls now. */
+          items={[{ label: 'Profile settings', onSelect: () => onNavigate('/profile') }]}
         />
       </div>
     </header>
